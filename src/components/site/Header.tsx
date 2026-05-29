@@ -35,7 +35,12 @@ export function Header() {
           : "border-b border-transparent bg-transparent"
       }`}
     >
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6 sm:px-10">
+      <motion.div
+        initial={{ y: "-100%", opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 1.5, ease: [0.22, 1, 0.36, 1], delay: 3.0 }}
+        className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6 sm:px-10"
+      >
         <Magnetic strength={10}>
           <a href="#" className="flex items-center gap-2 p-2 -m-2">
             <span className="text-gold">◆</span>
@@ -80,7 +85,7 @@ export function Header() {
             )}
           </button>
         </Magnetic>
-      </div>
+      </motion.div>
     </header>
   );
 }

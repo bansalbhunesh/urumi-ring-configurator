@@ -25,6 +25,18 @@ export function Studio() {
     <section id="ring" className="relative grid min-h-[100svh] lg:grid-cols-2">
       <RoomTint />
 
+      {/* Opening Sequence Word */}
+      <motion.div 
+        className="pointer-events-none absolute inset-0 z-30 flex items-center justify-center lg:justify-start lg:pl-[15vw]"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: [0, 1, 1, 0] }}
+        transition={{ duration: 2.5, times: [0, 0.2, 0.8, 1], ease: "easeInOut" }}
+      >
+        <h1 className="font-display text-4xl tracking-[0.2em] text-white/80 uppercase">
+          Aurelle
+        </h1>
+      </motion.div>
+
       {/* 3D Canvas Viewport */}
       <div className="relative z-10 order-1 h-[56svh] lg:order-2 lg:h-auto lg:min-h-[100svh] w-full">
         <RingCanvas />
@@ -40,7 +52,7 @@ export function Studio() {
         <motion.div
           initial={{ opacity: 0, y: 28 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, ease: EASE, delay: 0.15 }}
+          transition={{ duration: 1.5, ease: EASE, delay: 2.5 }}
           className="w-full max-w-md lg:mx-auto"
         >
           <span className="eyebrow">Made to order · The Aurelle Atelier</span>

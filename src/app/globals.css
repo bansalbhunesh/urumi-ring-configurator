@@ -2,31 +2,31 @@
 
 /* ----------------------------------------------------------------------------
    Aurelle — luxury design system
-   Warm ivory canvas, charcoal ink, champagne gold. The ring is always the hero.
+   Pure black canvas, stark white ink, champagne gold. The ring is the only light.
 ---------------------------------------------------------------------------- */
 
 @theme {
-  --color-ivory: #faf7f2;
-  --color-ivory-deep: #f3ece2;
-  --color-porcelain: #fffdf9;
-  --color-champagne: #efe6d6;
-  --color-ink: #1c1a17;
-  --color-ink-soft: #46413a;
-  --color-muted: #8c8478;
-  --color-line: #e7ddcd;
+  --color-ivory: #000000;
+  --color-ivory-deep: #050505;
+  --color-porcelain: #000000;
+  --color-champagne: #111111;
+  --color-ink: #ffffff;
+  --color-ink-soft: #a3a3a3;
+  --color-muted: #525252;
+  --color-line: #222222;
   --color-gold: #b08d57;
   --color-gold-bright: #c9a86a;
 
-  --shadow-soft: 0 1px 2px rgba(28, 26, 23, 0.04),
-    0 12px 40px -16px rgba(28, 26, 23, 0.12);
-  --shadow-lift: 0 2px 6px rgba(28, 26, 23, 0.06),
-    0 30px 60px -28px rgba(28, 26, 23, 0.22);
+  --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.5),
+    0 12px 40px -16px rgba(0, 0, 0, 0.8);
+  --shadow-lift: 0 2px 6px rgba(0, 0, 0, 0.6),
+    0 30px 60px -28px rgba(0, 0, 0, 0.9);
 
   --ease-lux: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 :root {
-  color-scheme: light;
+  color-scheme: dark;
 }
 
 html {
@@ -36,7 +36,7 @@ html {
 }
 
 body {
-  background-color: var(--color-ivory);
+  background-color: var(--color-porcelain);
   color: var(--color-ink);
   font-family: var(--font-sans);
   font-feature-settings: "ss01", "cv01";
@@ -45,7 +45,7 @@ body {
 
 ::selection {
   background: var(--color-gold);
-  color: #fff;
+  color: #000;
 }
 
 /* Refined typographic helpers ------------------------------------------------ */
@@ -70,13 +70,11 @@ body {
 
 /* Ambient gradients ---------------------------------------------------------- */
 .bg-stage {
-  background:
-    radial-gradient(120% 80% at 50% 0%, #fffdf9 0%, var(--color-ivory) 46%, var(--color-ivory-deep) 100%);
+  background: #000000;
 }
 
 .bg-stage-soft {
-  background:
-    radial-gradient(90% 70% at 50% 30%, #fffefb 0%, var(--color-ivory) 70%);
+  background: #000000;
 }
 
 /* Hairline divider with a centred gold node */

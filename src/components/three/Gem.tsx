@@ -32,11 +32,14 @@ export function Gem({ mobile }: { mobile: boolean }) {
   const groupRef = useRef<THREE.Group>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const matRef = useRef<any>(null); 
-  const t = useRef(1); // transition progress: 1 = fully shown
+  const t = useRef(0); // transition progress: start at 0 for the intro sequence
 
   useFrame((state, dt) => {
+    // Intro sequence: delay stone pop-in for 1.5 seconds to let the ring materialize first
+    const introDelayPassed = state.clock.elapsedTime > 1.5;
     const swapping = displayStone !== targetStone;
-    const goal = swapping ? 0 : 1;
+    
+    const goal = (swapping || !introDelayPassed) ? 0 : 1;
     t.current = THREE.MathUtils.damp(t.current, goal, 13, dt);
 
     if (swapping && t.current < 0.04) {
