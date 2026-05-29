@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef } from "react";
-import { useFrame } from "@react-three/fiber";
+import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { METAL_BY_ID } from "@/lib/config";
 import { useConfigurator } from "@/store/configurator";
@@ -82,6 +82,19 @@ export function TwistRing({ mobile }: { mobile: boolean }) {
     metalMat.roughness = THREE.MathUtils.damp(metalMat.roughness, targetRough, 9, dt);
   });
 
+  // The ring is aware it's being watched: it leans toward the cursor and
+  // breathes a fraction of a percent at rest — alive, not animated.
+  const tiltRef = useRef<THREE.Group>(null);
+  const pointer = useThree((s) => s.pointer);
+  useFrame((state) => {
+    const g = tiltRef.current;
+    if (!g) return;
+    g.rotation.x += (-pointer.y * 0.12 - g.rotation.x) * 0.06;
+    g.rotation.y += (pointer.x * 0.18 - g.rotation.y) * 0.06;
+    const breath = 1 + Math.sin(state.clock.elapsedTime * 1.5708) * 0.004;
+    g.scale.setScalar(breath);
+  });
+
   useEffect(() => {
     return () => {
       strandA.dispose();
@@ -96,7 +109,7 @@ export function TwistRing({ mobile }: { mobile: boolean }) {
   );
 
   return (
-    <group>
+    <group ref={tiltRef}>
       <mesh geometry={strandA} material={metalMat} castShadow receiveShadow />
       <mesh geometry={strandB} material={metalMat} castShadow receiveShadow />
 

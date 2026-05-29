@@ -1,7 +1,29 @@
 "use client";
 
 import { useEffect } from "react";
-import { animate, motion, useMotionValue, useTransform } from "framer-motion";
+import { motion, useSpring, useTransform } from "framer-motion";
+
+/* Odometer price: each digit is a rolling column, so a configuration change
+   physically *counts* up or down rather than snapping. */
+function Digit({ value }: { value: number }) {
+  const mv = useSpring(value, { stiffness: 220, damping: 26 });
+  useEffect(() => {
+    mv.set(value);
+  }, [value, mv]);
+  const y = useTransform(mv, (v) => `${-v}em`);
+
+  return (
+    <span className="relative inline-block h-[1em] w-[0.56em] overflow-hidden align-baseline tabular-nums">
+      <motion.span className="absolute left-0 top-0 flex flex-col items-center" style={{ y }}>
+        {Array.from({ length: 10 }).map((_, i) => (
+          <span key={i} className="flex h-[1em] items-center justify-center leading-none">
+            {i}
+          </span>
+        ))}
+      </motion.span>
+    </span>
+  );
+}
 
 export function PriceTag({
   value,
@@ -12,19 +34,20 @@ export function PriceTag({
   symbol?: string;
   className?: string;
 }) {
-  const mv = useMotionValue(value);
-  const text = useTransform(
-    mv,
-    (v) => `${symbol}${Math.round(v).toLocaleString("en-US")}`,
+  const chars = Math.round(value).toLocaleString("en-US").split("");
+
+  return (
+    <span className={className} aria-label={`${symbol}${Math.round(value)}`}>
+      <span aria-hidden>{symbol}</span>
+      {chars.map((c, i) =>
+        /\d/.test(c) ? (
+          <Digit key={i} value={Number(c)} />
+        ) : (
+          <span key={i} aria-hidden>
+            {c}
+          </span>
+        ),
+      )}
+    </span>
   );
-
-  useEffect(() => {
-    const controls = animate(mv, value, {
-      duration: 0.7,
-      ease: [0.22, 1, 0.36, 1],
-    });
-    return () => controls.stop();
-  }, [value, mv]);
-
-  return <motion.span className={className}>{text}</motion.span>;
 }

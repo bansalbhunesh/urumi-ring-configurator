@@ -116,14 +116,14 @@ export function Gem({ mobile }: { mobile: boolean }) {
           transmission={1}
           thickness={0.55}
           ior={2.42}
-          chromaticAberration={0.06}
-          anisotropicBlur={0.12}
+          chromaticAberration={0.12}
+          anisotropicBlur={0.1}
           roughness={0}
-          distortion={0}
-          temporalDistortion={0}
+          distortion={0.08}
+          temporalDistortion={0.04}
           clearcoat={1}
           clearcoatRoughness={0}
-          attenuationDistance={3}
+          attenuationDistance={1.4}
           attenuationColor="#ffffff"
           color="#ffffff"
         />

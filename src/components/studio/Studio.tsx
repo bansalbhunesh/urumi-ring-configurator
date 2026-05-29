@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { CanvasMount } from "@/components/configurator/CanvasMount";
+import { RoomTint } from "@/components/ui/RoomTint";
 import { useConfigurator } from "@/store/configurator";
 import { useProduct } from "@/hooks/useProduct";
 import { useVariation } from "@/hooks/useVariation";
@@ -21,8 +22,9 @@ export function Studio() {
 
   return (
     <section id="ring" className="relative grid min-h-[100svh] lg:grid-cols-2">
+      <RoomTint />
       {/* Canvas — first on mobile, right on desktop */}
-      <div className="relative order-1 h-[56svh] lg:order-2 lg:h-auto lg:min-h-[100svh]">
+      <div className="relative z-10 order-1 h-[56svh] lg:order-2 lg:h-auto lg:min-h-[100svh]">
         <CanvasMount />
         <div className="pointer-events-none absolute inset-x-0 bottom-5 flex justify-center">
           <span className="rounded-full bg-white/55 px-4 py-1.5 text-[0.66rem] uppercase tracking-[0.28em] text-ink-soft backdrop-blur-sm">
@@ -32,7 +34,7 @@ export function Studio() {
       </div>
 
       {/* Configurator panel */}
-      <div className="order-2 flex items-center px-6 pb-20 pt-10 sm:px-10 lg:order-1 lg:px-16 lg:py-0">
+      <div className="relative z-10 order-2 flex items-center px-6 pb-20 pt-10 sm:px-10 lg:order-1 lg:px-16 lg:py-0">
         <motion.div
           initial={{ opacity: 0, y: 28 }}
           animate={{ opacity: 1, y: 0 }}
