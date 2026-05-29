@@ -9,7 +9,6 @@ import {
   OrbitControls,
   PerspectiveCamera,
 } from "@react-three/drei";
-import { EffectComposer, DepthOfField } from "@react-three/postprocessing";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import * as THREE from "three";
 import { TwistRing } from "./TwistRing";
@@ -55,50 +54,6 @@ function EnvPulse() {
         : 0;
     scene.environmentIntensity = 1 + pulse;
   });
-  return null;
-}
-
-/* ── Cinematic Macro Autofocus ───────────────────────────────────────────── */
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function CinematicAutofocus({ dofRef }: { dofRef: React.RefObject<any> }) {
-  const { camera, scene } = useThree();
-  const raycaster = useRef(new THREE.Raycaster());
-  const center = useRef(new THREE.Vector2(0, 0));
-  const focusTarget = useRef(new THREE.Vector3(0, 0.38, 0)); // default to ring center
-
-  useFrame((_, dt) => {
-    if (!dofRef.current) return;
-    
-    // Shoot ray from center of screen
-    raycaster.current.setFromCamera(center.current, camera);
-    const intersects = raycaster.current.intersectObjects(scene.children, true);
-    
-    // Find first intersection that is a mesh (ignore invisible colliders/helpers)
-    let hit = null;
-    for (const intersect of intersects) {
-      if (intersect.object instanceof THREE.Mesh) {
-        hit = intersect.point;
-        break;
-      }
-    }
-    
-    if (hit) {
-      // Lerp focus target towards hit point for smooth pull-focus
-      focusTarget.current.lerp(hit, 5 * dt);
-    } else {
-      // Fallback: focus on the origin/ring center
-      focusTarget.current.lerp(new THREE.Vector3(0, 0.38, 0), 3 * dt);
-    }
-    
-    // Calculate actual distance from camera to focus point
-    const distance = camera.position.distanceTo(focusTarget.current);
-    
-    // The DepthOfField component uses normalized focusDistance, but we can set the
-    // underlying effect's target directly, which computes distance automatically.
-    dofRef.current.target = focusTarget.current;
-  });
-  
   return null;
 }
 
@@ -346,21 +301,6 @@ export default function RingCanvas() {
             color="#3a3026"
           />
 
-          {/* God Tier Cinematic Macro Autofocus (Desktop Only to save battery) */}
-          {!mobile && (
-            <>
-              <CinematicAutofocus dofRef={dofRef} />
-              <EffectComposer enableNormalPass={false} multisampling={4}>
-                <DepthOfField
-                  ref={dofRef}
-                  focusDistance={0.02} // will be dynamically overridden by raycaster
-                  focalLength={0.035} // simulates a macro lens 
-                  bokehScale={4} // large, buttery bokeh 
-                  height={480} // resolution of the blur
-                />
-              </EffectComposer>
-            </>
-          )}
         </Suspense>
       </Canvas>
     </div>
