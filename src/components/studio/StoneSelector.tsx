@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
 import { STONES } from "@/lib/config";
 import { useConfigurator } from "@/store/configurator";
+import { playPing } from "@/hooks/useSound";
 
 const StoneThumb = dynamic(() => import("@/components/three/StoneThumb"), {
   ssr: false,
@@ -30,7 +31,7 @@ export function StoneSelector() {
             <button
               key={s.id}
               type="button"
-              onClick={() => setStone(s.id)}
+              onClick={() => { setStone(s.id); playPing(); }}
               aria-pressed={selected}
               className="group relative flex flex-col items-center gap-2 rounded-xl border px-3 py-4 outline-none transition-colors"
               style={{

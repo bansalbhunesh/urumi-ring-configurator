@@ -1,7 +1,6 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { CanvasMount } from "@/components/configurator/CanvasMount";
 import { RoomTint } from "@/components/ui/RoomTint";
 import { useConfigurator } from "@/store/configurator";
 import { useProduct } from "@/hooks/useProduct";
@@ -23,9 +22,11 @@ export function Studio() {
   return (
     <section id="ring" className="relative grid min-h-[100svh] lg:grid-cols-2">
       <RoomTint />
-      {/* Canvas — first on mobile, right on desktop */}
+
+      {/* Canvas viewport — the actual Canvas is now a page-level fixed layer
+          that renders into this same screen area in the "studio" scroll zone.
+          This div reserves the visual space. */}
       <div className="relative z-10 order-1 h-[56svh] lg:order-2 lg:h-auto lg:min-h-[100svh]">
-        <CanvasMount />
         <div className="pointer-events-none absolute inset-x-0 bottom-5 flex justify-center">
           <span className="rounded-full bg-white/55 px-4 py-1.5 text-[0.66rem] uppercase tracking-[0.28em] text-ink-soft backdrop-blur-sm">
             Drag to rotate

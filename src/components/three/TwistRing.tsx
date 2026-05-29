@@ -51,7 +51,9 @@ class TwistStrand extends THREE.Curve<THREE.Vector3> {
 }
 
 export function TwistRing({ mobile }: { mobile: boolean }) {
-  const metalId = useConfigurator((s) => s.metal);
+  const committed = useConfigurator((s) => s.metal);
+  const preview = useConfigurator((s) => s.previewMetal);
+  const metalId = preview ?? committed;
   const metal = METAL_BY_ID[metalId];
 
   const { strandA, strandB } = useMemo(

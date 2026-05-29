@@ -8,10 +8,18 @@ import { Closing } from "@/components/sections/Closing";
 import { CartDrawer } from "@/components/cart/CartDrawer";
 import { StickyBar } from "@/components/cart/StickyBar";
 import { Celebration } from "@/components/cart/Celebration";
+import { GemCursor } from "@/components/ui/GemCursor";
+import { ScrollTracker } from "@/components/ui/ScrollTracker";
+import { SoundToggle } from "@/components/ui/SoundToggle";
+import { CanvasMount } from "@/components/configurator/CanvasMount";
 
 export default function Home() {
   return (
     <>
+      <GemCursor />
+      <ScrollTracker />
+      <SoundToggle />
+      <CanvasMount />
       <Header />
       <main className="bg-stage">
         <Studio />

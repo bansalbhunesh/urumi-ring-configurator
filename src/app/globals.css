@@ -175,6 +175,11 @@ input[type="range"].lux-range::-moz-range-thumb {
   border: 3px solid var(--color-ivory);
 }
 
+/* Gem cursor rotation */
+@keyframes gem-cursor-spin {
+  to { transform: rotate(360deg); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;

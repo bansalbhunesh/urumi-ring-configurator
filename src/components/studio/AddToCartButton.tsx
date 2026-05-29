@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useAddToCart } from "@/hooks/useProduct";
 import { useConfigurator } from "@/store/configurator";
 import { CheckIcon } from "@/components/ui/icons";
+import { playCelebrate } from "@/hooks/useSound";
 
 export function AddToCartButton({
   variationId,
@@ -27,6 +28,7 @@ export function AddToCartButton({
         onSuccess: () => {
           setDone(true);
           celebrate();
+          playCelebrate();
           window.setTimeout(() => setDone(false), 2200);
         },
       },

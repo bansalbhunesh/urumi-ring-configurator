@@ -14,7 +14,9 @@ const TINT: Record<MetalId, string> = {
 };
 
 export function RoomTint() {
-  const metal = useConfigurator((s) => s.metal);
+  const committed = useConfigurator((s) => s.metal);
+  const preview = useConfigurator((s) => s.previewMetal);
+  const metal = preview ?? committed;
   return (
     <motion.div
       aria-hidden
