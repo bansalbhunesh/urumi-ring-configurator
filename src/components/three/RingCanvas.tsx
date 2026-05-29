@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useRef, useState, useCallback } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import {
   ContactShadows,
@@ -9,27 +9,16 @@ import {
   OrbitControls,
   PerspectiveCamera,
 } from "@react-three/drei";
+import { EffectComposer, DepthOfField } from "@react-three/postprocessing";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import * as THREE from "three";
 import { TwistRing } from "./TwistRing";
 import { useConfigurator, getScrollY } from "@/store/configurator";
 
 /* ----------------------------------------------------------------------------
-   Scroll-traveling ring canvas.
-
-   One fixed, full-viewport <Canvas> that follows the user through the page.
-   The ring transitions between three zones:
-
-   1. STUDIO — full-size ring in the right panel, orbit controls active
-   2. CORNER — miniature ring floats in a corner as editorial scrolls by
-   3. GALLERY — ring re-blooms full-frame on a dark background (before Closing)
-
-   The scroll position drives the ring's 3D position, scale, and the CSS
-   clip-path of the canvas wrapper. All done per-frame with no React re-renders.
+   Scroll-traveling ring canvas with God Tier Post-Processing.
 ---------------------------------------------------------------------------- */
 
-/* A self-contained studio environment built from Lightformers — gives jewelry-
-   grade soft reflections with no external HDRI download (works fully offline). */
 function StudioEnvironment() {
   return (
     <Environment resolution={256}>
@@ -45,7 +34,6 @@ function StudioEnvironment() {
   );
 }
 
-/* Brief lift in environment intensity whenever metal/stone changes. */
 function EnvPulse() {
   const seq = useConfigurator((s) => s.changeSeq);
   const { scene } = useThree();
@@ -70,24 +58,62 @@ function EnvPulse() {
   return null;
 }
 
+/* ── Cinematic Macro Autofocus ───────────────────────────────────────────── */
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function CinematicAutofocus({ dofRef }: { dofRef: React.RefObject<any> }) {
+  const { camera, scene } = useThree();
+  const raycaster = useRef(new THREE.Raycaster());
+  const center = useRef(new THREE.Vector2(0, 0));
+  const focusTarget = useRef(new THREE.Vector3(0, 0.38, 0)); // default to ring center
+
+  useFrame((_, dt) => {
+    if (!dofRef.current) return;
+    
+    // Shoot ray from center of screen
+    raycaster.current.setFromCamera(center.current, camera);
+    const intersects = raycaster.current.intersectObjects(scene.children, true);
+    
+    // Find first intersection that is a mesh (ignore invisible colliders/helpers)
+    let hit = null;
+    for (const intersect of intersects) {
+      if (intersect.object instanceof THREE.Mesh) {
+        hit = intersect.point;
+        break;
+      }
+    }
+    
+    if (hit) {
+      // Lerp focus target towards hit point for smooth pull-focus
+      focusTarget.current.lerp(hit, 5 * dt);
+    } else {
+      // Fallback: focus on the origin/ring center
+      focusTarget.current.lerp(new THREE.Vector3(0, 0.38, 0), 3 * dt);
+    }
+    
+    // Calculate actual distance from camera to focus point
+    const distance = camera.position.distanceTo(focusTarget.current);
+    
+    // The DepthOfField component uses normalized focusDistance, but we can set the
+    // underlying effect's target directly, which computes distance automatically.
+    dofRef.current.target = focusTarget.current;
+  });
+  
+  return null;
+}
+
 /* ── Scroll-zone calculation ─────────────────────────────────────────────── */
 
 interface ScrollZone {
-  /** 0 = studio, 1 = transitioning to corner, 2 = corner, 3 = gallery bloom */
   phase: number;
-  /** Normalised progress within the current phase (0-1) */
   t: number;
-  /** Should orbit controls be active? */
   orbitActive: boolean;
 }
 
 function getZone(scrollY: number, vh: number): ScrollZone {
-  // Studio occupies first 100vh
   const studioEnd = vh * 0.85;
-  // Corner starts at ~1vh, editorial runs until ~3.5vh
   const cornerStart = vh * 1.0;
   const cornerEnd = vh * 3.2;
-  // Gallery bloom before closing (assume closing starts ~4vh)
   const galleryStart = vh * 3.4;
   const galleryEnd = vh * 4.0;
 
@@ -112,14 +138,13 @@ function getZone(scrollY: number, vh: number): ScrollZone {
   return { phase: 3, t: 1, orbitActive: false };
 }
 
-/* ── ScrollRig: drives ring transform + orbit controls from scroll ──────── */
+/* ── ScrollRig ───────────────────────────────────────────────────────────── */
 
 function ScrollRig({ mobile }: { mobile: boolean }) {
   const controls = useRef<OrbitControlsImpl>(null);
   const resumeAt = useRef(0);
   const ringGroup = useRef<THREE.Group>(null);
 
-  /* Targets that we lerp toward every frame */
   const target = useRef({
     ringX: 0,
     ringY: 0.38,
@@ -137,15 +162,14 @@ function ScrollRig({ mobile }: { mobile: boolean }) {
     const g = ringGroup.current;
     const cam = state.camera as THREE.PerspectiveCamera;
 
-    /* Compute target transforms based on zone */
     switch (zone.phase) {
-      case 0: // Studio — full size
+      case 0:
         target.current.ringX = 0;
         target.current.ringY = 0.38;
         target.current.ringScale = 1;
         target.current.fov = 30;
         break;
-      case 1: { // Transition to corner
+      case 1: {
         const t = THREE.MathUtils.smoothstep(zone.t, 0, 1);
         target.current.ringX = THREE.MathUtils.lerp(0, mobile ? 1.2 : 2.5, t);
         target.current.ringY = THREE.MathUtils.lerp(0.38, mobile ? -1.2 : -1.6, t);
@@ -153,13 +177,13 @@ function ScrollRig({ mobile }: { mobile: boolean }) {
         target.current.fov = THREE.MathUtils.lerp(30, 28, t);
         break;
       }
-      case 2: // Corner — small, auto-rotating
+      case 2:
         target.current.ringX = mobile ? 1.2 : 2.5;
         target.current.ringY = mobile ? -1.2 : -1.6;
         target.current.ringScale = mobile ? 0.32 : 0.38;
         target.current.fov = 28;
         break;
-      case 3: { // Gallery bloom
+      case 3: {
         const t = THREE.MathUtils.smoothstep(zone.t, 0, 1);
         target.current.ringX = THREE.MathUtils.lerp(mobile ? 1.2 : 2.5, 0, t);
         target.current.ringY = THREE.MathUtils.lerp(mobile ? -1.2 : -1.6, 0.38, t);
@@ -169,7 +193,6 @@ function ScrollRig({ mobile }: { mobile: boolean }) {
       }
     }
 
-    /* Lerp toward targets */
     const dt = state.clock.getDelta() || 0.016;
     const lerpSpeed = 6;
 
@@ -183,7 +206,6 @@ function ScrollRig({ mobile }: { mobile: boolean }) {
     cam.fov = THREE.MathUtils.damp(cam.fov, target.current.fov, lerpSpeed, dt);
     cam.updateProjectionMatrix();
 
-    /* Orbit controls: active only in studio zone */
     if (c) {
       if (zone.orbitActive) {
         c.enabled = true;
@@ -248,12 +270,10 @@ function useCanvasStyle(mobile: boolean) {
       const scrollY = getScrollY();
       const zone = getZone(scrollY, vh);
 
-      /* Opacity + pointer events based on zone */
       let opacity = 1;
       let pointerEvents = "auto";
 
       if (zone.phase === 2) {
-        // In corner mode, canvas is semi-transparent and non-interactive
         opacity = 0.85;
         pointerEvents = "none";
       } else if (zone.phase === 1) {
@@ -280,6 +300,8 @@ export default function RingCanvas() {
   const [mobile, setMobile] = useState(false);
   const [ready, setReady] = useState(false);
   const wrapperRef = useCanvasStyle(mobile);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const dofRef = useRef<any>(null);
 
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 768px)");
@@ -323,6 +345,22 @@ export default function RingCanvas() {
             resolution={mobile ? 256 : 512}
             color="#3a3026"
           />
+
+          {/* God Tier Cinematic Macro Autofocus (Desktop Only to save battery) */}
+          {!mobile && (
+            <>
+              <CinematicAutofocus dofRef={dofRef} />
+              <EffectComposer enableNormalPass={false} multisampling={4}>
+                <DepthOfField
+                  ref={dofRef}
+                  focusDistance={0.02} // will be dynamically overridden by raycaster
+                  focalLength={0.035} // simulates a macro lens 
+                  bokehScale={4} // large, buttery bokeh 
+                  height={480} // resolution of the blur
+                />
+              </EffectComposer>
+            </>
+          )}
         </Suspense>
       </Canvas>
     </div>

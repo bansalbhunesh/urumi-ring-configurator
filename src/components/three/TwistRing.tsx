@@ -84,16 +84,30 @@ export function TwistRing({ mobile }: { mobile: boolean }) {
     metalMat.roughness = THREE.MathUtils.damp(metalMat.roughness, targetRough, 9, dt);
   });
 
-  // The ring is aware it's being watched: it leans toward the cursor and
-  // breathes a fraction of a percent at rest — alive, not animated.
+  // The "Living" Ring:
+  // It leans toward the cursor and breathes organically — a microscopic, 
+  // complex sway (simulated Perlin noise) that makes it feel alive when untouched.
   const tiltRef = useRef<THREE.Group>(null);
   const pointer = useThree((s) => s.pointer);
   useFrame((state) => {
     const g = tiltRef.current;
     if (!g) return;
+    
+    // Cursor tilt
     g.rotation.x += (-pointer.y * 0.12 - g.rotation.x) * 0.06;
     g.rotation.y += (pointer.x * 0.18 - g.rotation.y) * 0.06;
-    const breath = 1 + Math.sin(state.clock.elapsedTime * 1.5708) * 0.004;
+    
+    // Microscopic organic breath (simulating noise with layered sines)
+    const t = state.clock.elapsedTime;
+    const swayX = Math.sin(t * 0.4) * Math.cos(t * 0.31) * 0.015;
+    const swayY = Math.cos(t * 0.5) * Math.sin(t * 0.39) * 0.015;
+    const swayZ = Math.sin(t * 0.35) * Math.sin(t * 0.28) * 0.02;
+    
+    g.position.x = swayX;
+    g.position.y = swayY;
+    g.rotation.z = swayZ;
+
+    const breath = 1 + (Math.sin(t * 1.2) + Math.sin(t * 0.8)) * 0.0025;
     g.scale.setScalar(breath);
   });
 
