@@ -10,6 +10,8 @@ import { StoneSelector } from "./StoneSelector";
 import { PriceTag } from "./PriceTag";
 import { AddToCartButton } from "./AddToCartButton";
 
+import { RingCanvas } from "@/components/three/RingCanvas";
+
 const EASE = [0.22, 1, 0.36, 1] as const;
 
 export function Studio() {
@@ -23,11 +25,10 @@ export function Studio() {
     <section id="ring" className="relative grid min-h-[100svh] lg:grid-cols-2">
       <RoomTint />
 
-      {/* Canvas viewport — the actual Canvas is now a page-level fixed layer
-          that renders into this same screen area in the "studio" scroll zone.
-          This div reserves the visual space. */}
-      <div className="relative z-10 order-1 h-[56svh] lg:order-2 lg:h-auto lg:min-h-[100svh]">
-        <div className="pointer-events-none absolute inset-x-0 bottom-5 flex justify-center">
+      {/* 3D Canvas Viewport */}
+      <div className="relative z-10 order-1 h-[56svh] lg:order-2 lg:h-auto lg:min-h-[100svh] w-full">
+        <RingCanvas />
+        <div className="pointer-events-none absolute inset-x-0 bottom-5 flex justify-center z-20">
           <span className="rounded-full bg-white/55 px-4 py-1.5 text-[0.66rem] uppercase tracking-[0.28em] text-ink-soft backdrop-blur-sm">
             Drag to rotate
           </span>

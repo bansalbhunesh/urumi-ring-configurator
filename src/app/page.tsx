@@ -11,7 +11,6 @@ import { Celebration } from "@/components/cart/Celebration";
 import { GemCursor } from "@/components/ui/GemCursor";
 import { ScrollTracker } from "@/components/ui/ScrollTracker";
 import { SoundToggle } from "@/components/ui/SoundToggle";
-import { CanvasMount } from "@/components/configurator/CanvasMount";
 
 export default function Home() {
   return (
@@ -19,7 +18,6 @@ export default function Home() {
       <GemCursor />
       <ScrollTracker />
       <SoundToggle />
-      <CanvasMount />
       <Header />
       <main className="bg-stage">
         <Studio />
