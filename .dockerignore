@@ -1,0 +1,10 @@
+node_modules
+.next
+.git
+*.log
+dev*.log
+shot*.png
+studio*.png
+scripts/shoot.mjs
+scripts/diag.mjs
+.env.local

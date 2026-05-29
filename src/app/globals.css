@@ -1,26 +1,189 @@
 @import "tailwindcss";
 
+/* ----------------------------------------------------------------------------
+   Aurelle — luxury design system
+   Warm ivory canvas, charcoal ink, champagne gold. The ring is always the hero.
+---------------------------------------------------------------------------- */
+
+@theme {
+  --color-ivory: #faf7f2;
+  --color-ivory-deep: #f3ece2;
+  --color-porcelain: #fffdf9;
+  --color-champagne: #efe6d6;
+  --color-ink: #1c1a17;
+  --color-ink-soft: #46413a;
+  --color-muted: #8c8478;
+  --color-line: #e7ddcd;
+  --color-gold: #b08d57;
+  --color-gold-bright: #c9a86a;
+
+  --shadow-soft: 0 1px 2px rgba(28, 26, 23, 0.04),
+    0 12px 40px -16px rgba(28, 26, 23, 0.12);
+  --shadow-lift: 0 2px 6px rgba(28, 26, 23, 0.06),
+    0 30px 60px -28px rgba(28, 26, 23, 0.22);
+
+  --ease-lux: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: light;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-ivory);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-feature-settings: "ss01", "cv01";
+  overflow-x: hidden;
+}
+
+::selection {
+  background: var(--color-gold);
+  color: #fff;
+}
+
+/* Refined typographic helpers ------------------------------------------------ */
+.font-display {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+.eyebrow {
+  font-family: var(--font-sans);
+  text-transform: uppercase;
+  letter-spacing: 0.32em;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: var(--color-gold);
+}
+
+.text-balance {
+  text-wrap: balance;
+}
+
+/* Ambient gradients ---------------------------------------------------------- */
+.bg-stage {
+  background:
+    radial-gradient(120% 80% at 50% 0%, #fffdf9 0%, var(--color-ivory) 46%, var(--color-ivory-deep) 100%);
+}
+
+.bg-stage-soft {
+  background:
+    radial-gradient(90% 70% at 50% 30%, #fffefb 0%, var(--color-ivory) 70%);
+}
+
+/* Hairline divider with a centred gold node */
+.rule-gold {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--color-line) 18%,
+    var(--color-gold-bright) 50%,
+    var(--color-line) 82%,
+    transparent
+  );
+}
+
+/* Skeleton shimmer ----------------------------------------------------------- */
+.shimmer {
+  position: relative;
+  overflow: hidden;
+  background: var(--color-champagne);
+}
+.shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.65),
+    transparent
+  );
+  animation: shimmer 1.6s var(--ease-lux) infinite;
+}
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Slow idle float for ornamental marks */
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+/* Continuous marquee */
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* Custom range slider (ring size) -------------------------------------------- */
+input[type="range"].lux-range {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 2px;
+  background: var(--color-line);
+  border-radius: 999px;
+  outline: none;
+}
+input[type="range"].lux-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--color-porcelain);
+  border: 1px solid var(--color-gold);
+  box-shadow: 0 2px 8px rgba(176, 141, 87, 0.35);
+  cursor: pointer;
+  transition: transform 0.2s var(--ease-lux);
+}
+input[type="range"].lux-range::-webkit-slider-thumb:hover {
+  transform: scale(1.12);
+}
+input[type="range"].lux-range::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--color-porcelain);
+  border: 1px solid var(--color-gold);
+  cursor: pointer;
+}
+
+/* Thin, tasteful scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-ivory);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-line);
+  border-radius: 999px;
+  border: 3px solid var(--color-ivory);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
 }
