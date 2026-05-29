@@ -6,6 +6,8 @@ import { useConfigurator } from "@/store/configurator";
 import { useCart } from "@/hooks/useProduct";
 import { BagIcon } from "@/components/ui/icons";
 
+import { Magnetic } from "@/components/ui/Magnetic";
+
 const LINKS = [
   { label: "The Ring", href: "#ring" },
   { label: "Craft", href: "#craft" },
@@ -34,45 +36,50 @@ export function Header() {
       }`}
     >
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6 sm:px-10">
-        <a href="#" className="flex items-center gap-2">
-          <span className="text-gold">◆</span>
-          <span className="text-[0.95rem] font-medium uppercase tracking-[0.4em] text-ink">
-            Aurelle
-          </span>
-        </a>
+        <Magnetic strength={10}>
+          <a href="#" className="flex items-center gap-2 p-2 -m-2">
+            <span className="text-gold">◆</span>
+            <span className="text-[0.95rem] font-medium uppercase tracking-[0.4em] text-ink">
+              Aurelle
+            </span>
+          </a>
+        </Magnetic>
 
         <nav className="hidden items-center gap-10 md:flex">
           {LINKS.map((l) => (
-            <a
-              key={l.href}
-              href={l.href}
-              className="group relative text-[0.82rem] tracking-wide text-ink-soft transition-colors hover:text-ink"
-            >
-              {l.label}
-              <span className="absolute -bottom-1 left-0 h-px w-0 bg-gold transition-all duration-300 group-hover:w-full" />
-            </a>
+            <Magnetic key={l.href} strength={10}>
+              <a
+                href={l.href}
+                className="group relative text-[0.82rem] tracking-wide text-ink-soft transition-colors hover:text-ink p-2 -m-2 block"
+              >
+                {l.label}
+                <span className="absolute bottom-1 left-2 right-2 h-px scale-x-0 bg-gold transition-transform duration-300 origin-left group-hover:scale-x-100" />
+              </a>
+            </Magnetic>
           ))}
         </nav>
 
-        <button
-          type="button"
-          onClick={openCart}
-          className="group relative flex items-center gap-2 text-ink"
-          aria-label="Open bag"
-        >
-          <BagIcon className="h-5 w-5 transition-transform group-hover:scale-110" />
-          {count > 0 && (
-            <motion.span
-              key={count}
-              initial={{ scale: 0.4, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ type: "spring", stiffness: 500, damping: 24 }}
-              className="grid h-5 min-w-5 place-items-center rounded-full bg-gold px-1 text-[0.66rem] font-medium text-white"
-            >
-              {count}
-            </motion.span>
-          )}
-        </button>
+        <Magnetic strength={15}>
+          <button
+            type="button"
+            onClick={openCart}
+            className="group relative flex items-center gap-2 text-ink p-2 -m-2"
+            aria-label="Open bag"
+          >
+            <BagIcon className="h-5 w-5 transition-transform group-hover:scale-110" />
+            {count > 0 && (
+              <motion.span
+                key={count}
+                initial={{ scale: 0.4, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ type: "spring", stiffness: 500, damping: 24 }}
+                className="grid h-5 min-w-5 place-items-center rounded-full bg-gold px-1 text-[0.66rem] font-medium text-white"
+              >
+                {count}
+              </motion.span>
+            )}
+          </button>
+        </Magnetic>
       </div>
     </header>
   );

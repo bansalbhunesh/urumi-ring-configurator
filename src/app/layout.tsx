@@ -29,6 +29,9 @@ export const metadata: Metadata = {
   },
 };
 
+import { SmoothScroll } from "@/components/ui/SmoothScroll";
+import { Grain } from "@/components/ui/Grain";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -37,7 +40,10 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${display.variable} ${sans.variable}`}>
       <body className="antialiased">
-        <Providers>{children}</Providers>
+        <Grain />
+        <SmoothScroll>
+          <Providers>{children}</Providers>
+        </SmoothScroll>
       </body>
     </html>
   );

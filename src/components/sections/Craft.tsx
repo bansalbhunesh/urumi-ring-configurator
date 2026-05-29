@@ -1,4 +1,5 @@
 import { Reveal } from "@/components/ui/Reveal";
+import { SplitText } from "@/components/ui/SplitText";
 
 const PILLARS = [
   {
@@ -24,10 +25,10 @@ export function Craft() {
       <div className="mx-auto max-w-7xl">
         <Reveal>
           <span className="eyebrow">The Craft</span>
-          <h2 className="font-display mt-4 max-w-3xl text-4xl leading-tight text-balance sm:text-5xl lg:text-6xl">
-            A ring is the smallest thing you will ever wear that means the most.
-          </h2>
         </Reveal>
+        <SplitText className="font-display mt-4 max-w-3xl text-4xl leading-tight text-balance sm:text-5xl lg:text-6xl">
+          A ring is the smallest thing you will ever wear that means the most.
+        </SplitText>
 
         <div className="mt-20 grid gap-px overflow-hidden rounded-2xl border border-line bg-line md:grid-cols-3">
           {PILLARS.map((p, i) => (
