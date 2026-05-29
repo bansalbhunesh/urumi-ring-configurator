@@ -1,9 +1,14 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
 import { STONES } from "@/lib/config";
 import { useConfigurator } from "@/store/configurator";
-import { StoneGlyph } from "@/components/ui/icons";
+
+const StoneThumb = dynamic(() => import("@/components/three/StoneThumb"), {
+  ssr: false,
+  loading: () => <span className="shimmer block h-12 w-12 rounded-full opacity-60" />,
+});
 
 export function StoneSelector() {
   const stone = useConfigurator((s) => s.stone);
@@ -30,9 +35,7 @@ export function StoneSelector() {
               className="group relative flex flex-col items-center gap-2 rounded-xl border px-3 py-4 outline-none transition-colors"
               style={{
                 borderColor: selected ? "var(--color-gold)" : "var(--color-line)",
-                background: selected
-                  ? "rgba(176,141,87,0.06)"
-                  : "var(--color-porcelain)",
+                background: selected ? "rgba(176,141,87,0.06)" : "var(--color-porcelain)",
               }}
             >
               {selected && (
@@ -42,12 +45,9 @@ export function StoneSelector() {
                   transition={{ type: "spring", stiffness: 380, damping: 30 }}
                 />
               )}
-              <StoneGlyph
-                stone={s.id}
-                className={`h-9 w-9 transition-colors ${
-                  selected ? "text-gold" : "text-ink-soft group-hover:text-ink"
-                }`}
-              />
+              <span className="h-12 w-12">
+                <StoneThumb stone={s.id} active={selected} />
+              </span>
               <span
                 className={`text-[0.78rem] transition-colors ${
                   selected ? "text-ink" : "text-muted group-hover:text-ink-soft"
