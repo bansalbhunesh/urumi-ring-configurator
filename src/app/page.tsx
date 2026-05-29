@@ -7,7 +7,7 @@ import { Materials } from "@/components/sections/Materials";
 import { Closing } from "@/components/sections/Closing";
 import { CartDrawer } from "@/components/cart/CartDrawer";
 import { StickyBar } from "@/components/cart/StickyBar";
-import { Toast } from "@/components/ui/Toast";
+import { Celebration } from "@/components/cart/Celebration";
 
 export default function Home() {
   return (
@@ -23,7 +23,7 @@ export default function Home() {
       <Footer />
       <CartDrawer />
       <StickyBar />
-      <Toast />
+      <Celebration />
     </>
   );
 }

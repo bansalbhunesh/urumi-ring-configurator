@@ -14,8 +14,7 @@ export function AddToCartButton({
   loading?: boolean;
 }) {
   const add = useAddToCart();
-  const openCart = useConfigurator((s) => s.openCart);
-  const showToast = useConfigurator((s) => s.showToast);
+  const celebrate = useConfigurator((s) => s.celebrate);
   const [done, setDone] = useState(false);
 
   const disabled = !variationId || loading || add.isPending;
@@ -27,9 +26,8 @@ export function AddToCartButton({
       {
         onSuccess: () => {
           setDone(true);
-          showToast("Added to your bag");
-          window.setTimeout(() => setDone(false), 2000);
-          window.setTimeout(() => openCart(), 420);
+          celebrate();
+          window.setTimeout(() => setDone(false), 2200);
         },
       },
     );

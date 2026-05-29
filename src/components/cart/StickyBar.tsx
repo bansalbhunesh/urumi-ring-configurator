@@ -14,8 +14,7 @@ import { formatPrice } from "@/lib/format";
 export function StickyBar() {
   const metal = useConfigurator((s) => s.metal);
   const stone = useConfigurator((s) => s.stone);
-  const openCart = useConfigurator((s) => s.openCart);
-  const showToast = useConfigurator((s) => s.showToast);
+  const celebrate = useConfigurator((s) => s.celebrate);
   const { data: product } = useProduct();
   const { variation, price } = useVariation(product, metal, stone);
   const add = useAddToCart();
@@ -35,8 +34,7 @@ export function StickyBar() {
       { variationId: variation.id },
       {
         onSuccess: () => {
-          showToast("Added to your bag");
-          window.setTimeout(() => openCart(), 400);
+          celebrate();
         },
       },
     );

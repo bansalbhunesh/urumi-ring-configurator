@@ -11,6 +11,7 @@ interface ConfiguratorState {
 
   cartOpen: boolean;
   toast: string | null;
+  celebrating: boolean;
 
   setMetal: (metal: MetalId) => void;
   setStone: (stone: StoneId) => void;
@@ -18,6 +19,8 @@ interface ConfiguratorState {
   closeCart: () => void;
   showToast: (message: string) => void;
   clearToast: () => void;
+  celebrate: () => void;
+  endCelebrate: () => void;
 }
 
 export const useConfigurator = create<ConfiguratorState>((set) => ({
@@ -27,6 +30,7 @@ export const useConfigurator = create<ConfiguratorState>((set) => ({
   lastChanged: null,
   cartOpen: false,
   toast: null,
+  celebrating: false,
 
   setMetal: (metal) =>
     set((s) =>
@@ -44,4 +48,6 @@ export const useConfigurator = create<ConfiguratorState>((set) => ({
   closeCart: () => set({ cartOpen: false }),
   showToast: (message) => set({ toast: message }),
   clearToast: () => set({ toast: null }),
+  celebrate: () => set({ celebrating: true }),
+  endCelebrate: () => set({ celebrating: false }),
 }));
