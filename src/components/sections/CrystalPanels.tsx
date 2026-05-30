@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
 
 /* Crystal-glass parallax panels (moodboard: stacked frosted/faceted glass framing
@@ -18,6 +18,14 @@ const PANELS = [
 export function CrystalPanels() {
   const ref = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotion();
+  // Apply the reduced-motion branch only after mount, so the first client render
+  // matches the server (avoids a transform hydration mismatch under reduced motion).
+  const [mounted, setMounted] = useState(false);
+  // React's recommended pattern for server/client render differences; the one-time
+  // mount flag is not a cascading-render concern.
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => setMounted(true), []);
+  const still = mounted && reduce;
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start end", "end start"],
@@ -37,7 +45,7 @@ export function CrystalPanels() {
       {PANELS.map((p, i) => (
         <motion.div
           key={i}
-          style={{ y: reduce ? 0 : ys[i] }}
+          style={{ y: still ? 0 : ys[i] }}
           className={`absolute ${p.cls} ${p.blur} border border-white/20 bg-gradient-to-br from-white/[0.11] via-white/[0.03] to-transparent`}
         >
           {/* faceted edge highlights + iridescent sheen sweeping across the slab */}
