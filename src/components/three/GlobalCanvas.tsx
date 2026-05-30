@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { Canvas, useFrame } from "@react-three/fiber";
 import {
   Environment,
   Float,
@@ -9,7 +9,6 @@ import {
   OrbitControls,
   PerspectiveCamera,
   Text,
-  Lightformer,
 } from "@react-three/drei";
 import {
   EffectComposer,
@@ -29,7 +28,7 @@ import {
 
 // Crystalline star constellation background for the Specs section
 function SpecConstellation() {
-  const pointsRef = useRef<THREE.Points>(null);
+  const pointsRef = useRef<THREE.Group>(null);
   const count = 350;
   
   const [positions, lineGeometry] = useMemo(() => {
@@ -65,14 +64,24 @@ function SpecConstellation() {
   }, []);
 
   useFrame((state) => {
+    const scrollY = getScrollY();
+    const height = typeof window !== "undefined" ? window.innerHeight : 1000;
+    const s = scrollY / (height || 1);
+    
+    // Toggle visibility dynamically inside R3F without triggering React re-renders
+    const isVisible = s >= 4.6 && s <= 6.0;
+    
     if (pointsRef.current) {
-      pointsRef.current.rotation.y = state.clock.elapsedTime * 0.02;
-      pointsRef.current.rotation.x = state.clock.elapsedTime * 0.01;
+      pointsRef.current.visible = isVisible;
+      if (isVisible) {
+        pointsRef.current.rotation.y = state.clock.elapsedTime * 0.02;
+        pointsRef.current.rotation.x = state.clock.elapsedTime * 0.01;
+      }
     }
   });
 
   return (
-    <group ref={pointsRef}>
+    <group ref={pointsRef} visible={false}>
       <points>
         <bufferGeometry>
           <bufferAttribute attach="attributes-position" args={[positions, 3]} />
@@ -226,12 +235,12 @@ function EngravingCorridor({ text, visible }: { text: string; visible: boolean }
 // Camera flight controller & Scroll animator
 function ScrollDirector({
   isDesktop,
-  setScrollPercent,
-  setAberration,
+  controlsRef,
+  abRef,
 }: {
   isDesktop: boolean;
-  setScrollPercent: (s: number) => void;
-  setAberration: (a: number) => void;
+  controlsRef: React.RefObject<any>;
+  abRef: React.RefObject<any>;
 }) {
   const engraving = useConfigurator((s) => s.engraving);
   
@@ -244,8 +253,11 @@ function ScrollDirector({
     const scrollY = getScrollY();
     const height = typeof window !== "undefined" ? window.innerHeight : 1000;
     const s = scrollY / (height || 1);
-    
-    setScrollPercent(s);
+
+    // Dynamic enable/disable of OrbitControls via ref (No React re-renders)
+    if (controlsRef.current) {
+      controlsRef.current.enabled = (s > 0.35 && s < 1.35);
+    }
 
     // Coordinate maps
     const targetPos = new THREE.Vector3();
@@ -340,7 +352,11 @@ function ScrollDirector({
     }
 
     setWorldBend(currentBend.current);
-    setAberration(chromaticOffset);
+    
+    // Update postprocessing shader parameters directly via ref (No React re-renders)
+    if (abRef.current && abRef.current.offset) {
+      abRef.current.offset.set(chromaticOffset, chromaticOffset);
+    }
 
     // Apply vectors to camera
     state.camera.position.copy(camPos.current);
@@ -397,8 +413,8 @@ function ScrollDirector({
 
 export function GlobalCanvas() {
   const [isDesktop, setIsDesktop] = useState(false);
-  const [sPercent, setSPercent] = useState(0);
-  const [aberration, setAberration] = useState(0.0012);
+  const controlsRef = useRef<any>(null);
+  const abRef = useRef<any>(null);
 
   useEffect(() => {
     const checkSize = () => {
@@ -422,23 +438,24 @@ export function GlobalCanvas() {
 
         <ScrollDirector
           isDesktop={isDesktop}
-          setScrollPercent={setSPercent}
-          setAberration={setAberration}
+          controlsRef={controlsRef}
+          abRef={abRef}
         />
 
         {/* Orbit Interaction active exclusively when viewing the studio configurator section */}
         <OrbitControls
+          ref={controlsRef}
           enableZoom={false}
           enablePan={false}
           enableDamping
           dampingFactor={0.06}
-          enabled={sPercent > 0.35 && sPercent < 1.35}
+          enabled={false} // Initially managed directly inside ScrollDirector via ref
           minPolarAngle={Math.PI / 4}
           maxPolarAngle={Math.PI - Math.PI / 4}
         />
 
         {/* Doctor Strange Specs Background */}
-        {sPercent >= 4.6 && sPercent <= 6.0 && <SpecConstellation />}
+        <SpecConstellation />
 
         {/* Dynamic Autofocus & Prism Chromatic flares */}
         <EffectComposer>
@@ -448,7 +465,8 @@ export function GlobalCanvas() {
             bokehScale={4}
           />
           <ChromaticAberration
-            offset={new THREE.Vector2(aberration, aberration)}
+            ref={abRef}
+            offset={new THREE.Vector2(0.0012, 0.0012)}
             radialModulation={true}
             modulationOffset={0.65}
           />
