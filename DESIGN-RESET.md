@@ -94,3 +94,23 @@ one hero, one light, deep quiet atmosphere. Bold ≠ cluttered.
 The headless harness uses software WebGL and does **not** reproduce real-GPU HDR
 bloom — so bloom/exposure choices here are made conservatively (safe on any GPU)
 and the user's real-browser screenshots remain the ground truth to iterate against.
+
+## Implementation log
+- **Wave 1 — Reclaim the ring** ✅ `8fe0ec6`. Bloom 0.55/0.82→0.18/0.96; vignette
+  0.7→0.88; envMap 1.9→1.15, env 1.0→0.82; removed SilkRibbons/SilkHalo/GoldDust;
+  studio lighting discipline (neutral key + cool rim, warm point 0.6→0.26); intro
+  emissive cooled; rainbow backdrop → one breathing light pool over graded near-black.
+- **Wave 2 — Showcase reads as metal** ✅ `b43e9f2`. RingModel now forces every part
+  to true metal (strip baked albedo/emissive/ao maps, metalness 1, roughness 0.22,
+  envMap 1.4, cloned so cache untouched); scrims 70/80→55/65; showcase lighting
+  aligned to the studio discipline. Was pale plastic → now polished reflective metal.
+- **Wave 3 — Hero hierarchy & motion** ✅ `bf56dd3`. Removed the "Seeded demo /
+  WooCommerce live" dev badge (anti-luxury); price → a clean 3rem moment; idle
+  turntable now breathes (sine-eased speed) instead of a metronomic linear spin.
+
+Verified (software-WebGL, console-error-clean) across desktop + mobile hero, craft,
+cut, materials, promise, finale, and the showcase GLB. Production build green.
+**Open checkpoint:** real-GPU confirmation of bloom/material by the user — the one
+thing the harness cannot reproduce, and where the original failure hid. Remaining
+waves (4 layout/spacing, 5 deeper motion choreography, 6 material micro-polish) are
+lower-impact and partly need real-GPU eyes to tune safely.
