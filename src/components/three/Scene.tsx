@@ -7,6 +7,7 @@ import {
   Lightformer,
   ContactShadows,
   PerspectiveCamera,
+  MeshReflectorMaterial,
 } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import * as THREE from "three";
@@ -95,6 +96,30 @@ function SilkHalo({ reduceMotion }: { reduceMotion: boolean }) {
         blending={THREE.AdditiveBlending}
         depthWrite={false}
         toneMapped={false}
+      />
+    </mesh>
+  );
+}
+
+/* Liquid-metal floor (moodboard: chrome/mercury reflections). Heavily blurred so
+   it reads as a soft polished sheen, not a literal mirror double — worst case it
+   degrades to a plain dark floor. Desktop-only (renders an FBO each frame). */
+function ReflectiveFloor() {
+  return (
+    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.4, 0]}>
+      <planeGeometry args={[34, 34]} />
+      <MeshReflectorMaterial
+        resolution={512}
+        blur={[400, 120]}
+        mixBlur={1}
+        mixStrength={4}
+        depthScale={1.1}
+        minDepthThreshold={0.5}
+        maxDepthThreshold={1.3}
+        color="#08060a"
+        metalness={0.55}
+        roughness={0.92}
+        mirror={0.35}
       />
     </mesh>
   );
@@ -258,6 +283,7 @@ function ScrollDirector({
         color="#1a130b"
       />
 
+      {isDesktop && <ReflectiveFloor />}
       <GoldDust count={isDesktop ? 240 : 80} reduceMotion={reduceMotion} />
       <SilkHalo reduceMotion={reduceMotion} />
 
