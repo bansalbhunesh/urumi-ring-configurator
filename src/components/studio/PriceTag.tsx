@@ -13,7 +13,7 @@ function Digit({ value }: { value: number }) {
   const y = useTransform(mv, (v) => `${-v}em`);
 
   return (
-    <span className="relative inline-block h-[1em] w-[0.56em] overflow-hidden align-baseline tabular-nums">
+    <span className="relative inline-block h-[1em] w-[0.7em] overflow-hidden align-baseline tabular-nums" aria-hidden>
       <motion.span className="absolute left-0 top-0 flex flex-col items-center" style={{ y }}>
         {Array.from({ length: 10 }).map((_, i) => (
           <span key={i} className="flex h-[1em] items-center justify-center leading-none">
@@ -35,9 +35,10 @@ export function PriceTag({
   className?: string;
 }) {
   const chars = Math.round(value).toLocaleString("en-US").split("");
+  const spoken = `${symbol}${Math.round(value).toLocaleString("en-US")}`;
 
   return (
-    <span className={className} aria-label={`${symbol}${Math.round(value)}`}>
+    <span className={className} aria-label={spoken} aria-live="polite" role="text">
       <span aria-hidden>{symbol}</span>
       {chars.map((c, i) =>
         /\d/.test(c) ? (

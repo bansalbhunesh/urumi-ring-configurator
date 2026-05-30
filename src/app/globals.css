@@ -6,16 +6,16 @@
 ---------------------------------------------------------------------------- */
 
 @theme {
-  --color-ivory: #000000;
-  --color-ivory-deep: #050505;
-  --color-porcelain: #000000;
-  --color-champagne: #111111;
-  --color-ink: #ffffff;
-  --color-ink-soft: #a3a3a3;
-  --color-muted: #525252;
-  --color-line: #222222;
-  --color-gold: #b08d57;
-  --color-gold-bright: #c9a86a;
+  --color-ivory: #050403;
+  --color-ivory-deep: #030302;
+  --color-porcelain: #070605;
+  --color-champagne: #12100d;
+  --color-ink: #f6efe6;
+  --color-ink-soft: #c5bcb0;
+  --color-muted: #9a9085;
+  --color-line: #332e27;
+  --color-gold: #c2a06a;
+  --color-gold-bright: #d8bc84;
 
   --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.5),
     0 12px 40px -16px rgba(0, 0, 0, 0.8);
@@ -36,7 +36,14 @@ html {
 }
 
 body {
-  background-color: var(--color-porcelain);
+  background-color: #050403;
+  /* Warm depth so the page never reads as a flat void — the reference is never
+     pure black. Two soft pools of light: warm key upper-right, cool fill left. */
+  background-image:
+    radial-gradient(60% 50% at 72% 30%, rgba(120, 92, 54, 0.18), transparent 70%),
+    radial-gradient(55% 60% at 18% 75%, rgba(60, 70, 96, 0.1), transparent 72%),
+    linear-gradient(180deg, #0a0807 0%, #050403 55%, #070504 100%);
+  background-attachment: fixed;
   color: var(--color-ink);
   font-family: var(--font-sans);
   font-feature-settings: "ss01", "cv01";
@@ -45,20 +52,25 @@ body {
 
 ::selection {
   background: var(--color-gold);
-  color: #000;
+  color: var(--color-ivory-deep);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-gold-bright);
+  outline-offset: 3px;
 }
 
 /* Refined typographic helpers ------------------------------------------------ */
 .font-display {
   font-family: var(--font-display);
   font-weight: 400;
-  letter-spacing: -0.01em;
+  letter-spacing: 0;
 }
 
 .eyebrow {
   font-family: var(--font-sans);
   text-transform: uppercase;
-  letter-spacing: 0.32em;
+  letter-spacing: 0.18em;
   font-size: 0.6875rem;
   font-weight: 500;
   color: var(--color-gold);

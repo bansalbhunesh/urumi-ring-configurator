@@ -2,18 +2,17 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useFrame } from "@react-three/fiber";
-import { MeshTransmissionMaterial, Caustics } from "@react-three/drei";
+import { MeshTransmissionMaterial } from "@react-three/drei";
 import * as THREE from "three";
 import { gemGeometryFor, STONE_SCALE } from "./gemGeometry";
-import { useConfigurator, getInsideWormhole } from "@/store/configurator";
+import { useConfigurator } from "@/store/configurator";
 import type { StoneId } from "@/lib/types";
 
 /* ----------------------------------------------------------------------------
-   The centre stone.
-
-   God Tier features:
-   1. Real-time volumetric caustics (rainbow light throw) on desktop.
-   2. "Heartbeat" chromatic aberration pulse.
+   The centre stone — a faceted brilliant rendered with a physically-based
+   transmission material so it refracts the studio lights. Swapping the cut
+   pops the new stone in with a brief scale-in; on first load it materialises
+   alongside the band.
 ---------------------------------------------------------------------------- */
 
 function easeOutBack(x: number) {
@@ -30,8 +29,6 @@ export function Gem({ mobile }: { mobile: boolean }) {
   useEffect(() => () => geometry.dispose(), [geometry]);
 
   const groupRef = useRef<THREE.Group>(null);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const matRef = useRef<any>(null); 
   const t = useRef(0); // transition progress: start at 0 for the intro sequence
 
   const age = useRef(0);
@@ -50,13 +47,7 @@ export function Gem({ mobile }: { mobile: boolean }) {
       t.current = 0.0001;
     }
 
-    const inside = getInsideWormhole();
     const g = groupRef.current;
-    if (g) {
-      g.visible = !inside;
-    }
-    if (inside) return;
-
     if (g) {
       const pop = easeOutBack(THREE.MathUtils.clamp(t.current, 0, 1));
       const [sx, sy, sz] = STONE_SCALE[displayStone];
@@ -64,24 +55,11 @@ export function Gem({ mobile }: { mobile: boolean }) {
       g.rotation.y += dt * (1 - t.current) * 4.2;
     }
 
-    // Heartbeat: Organic pulse of the internal fire (chromatic aberration)
-    if (matRef.current) {
-      const time = state.clock.elapsedTime;
-      // Double-beat pattern similar to a heart: bump...bump......bump...bump
-      const beat = Math.sin(time * 2) * Math.sin(time * 1.8) * 0.05;
-      const targetAberration = 0.12 + Math.max(0, beat);
-      matRef.current.chromaticAberration = THREE.MathUtils.damp(
-        matRef.current.chromaticAberration,
-        targetAberration,
-        4,
-        dt
-      );
-    }
+    void state;
   });
 
   const material = (
     <MeshTransmissionMaterial
-      ref={matRef}
       samples={mobile ? 4 : 8}
       resolution={mobile ? 128 : 256}
       transmission={1}
@@ -108,4 +86,3 @@ export function Gem({ mobile }: { mobile: boolean }) {
     </group>
   );
 }
-

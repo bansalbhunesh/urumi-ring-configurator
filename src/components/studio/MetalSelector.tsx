@@ -39,11 +39,13 @@ export function MetalSelector() {
               key={m.id}
               type="button"
               onClick={() => { setMetal(m.id); playShimmer(); }}
+              onFocus={() => setPreview(m.id)}
+              onBlur={() => setPreview(null)}
               onPointerEnter={() => setPreview(m.id)}
               onPointerLeave={() => setPreview(null)}
               aria-pressed={selected}
               aria-label={m.label}
-              className="group relative flex flex-col items-center gap-2 outline-none"
+              className="group relative flex min-h-16 min-w-16 flex-col items-center gap-2 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-porcelain"
             >
               <span className="relative grid place-items-center">
                 <motion.span

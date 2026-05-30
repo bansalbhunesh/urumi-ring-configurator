@@ -18,6 +18,7 @@ export function AddToCartButton({
 }) {
   const add = useAddToCart();
   const celebrate = useConfigurator((s) => s.celebrate);
+  const showToast = useConfigurator((s) => s.showToast);
   const [done, setDone] = useState(false);
 
   const disabled = !variationId || loading || add.isPending;
@@ -32,6 +33,9 @@ export function AddToCartButton({
           celebrate();
           playCelebrate();
           window.setTimeout(() => setDone(false), 2200);
+        },
+        onError: () => {
+          showToast("Could not add this configuration. Please try again.");
         },
       },
     );
@@ -48,7 +52,8 @@ export function AddToCartButton({
         whileHover={disabled ? undefined : { y: -2 }}
         whileTap={disabled ? undefined : { scale: 0.985 }}
         transition={{ type: "spring", stiffness: 400, damping: 26 }}
-        className="group relative h-14 w-full overflow-hidden rounded-full bg-ink text-porcelain shadow-lift disabled:opacity-60"
+        className="group relative h-14 w-full overflow-hidden rounded-full bg-ink text-porcelain shadow-lift outline-none transition-opacity focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-porcelain disabled:opacity-60"
+        aria-live="polite"
       >
         {/* sweeping sheen on hover */}
         <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/15 to-transparent transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-full" />

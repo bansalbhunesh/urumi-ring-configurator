@@ -1,44 +1,95 @@
-# Aurelle: Headless WooCommerce 3D Configurator
+# Aurelle — Headless WooCommerce 3D Ring Configurator
 
-A prototype engagement ring product page built for the Urumi Forward Deployed Engineer take-home. It bridges the gap between real WooCommerce backend logic and God Tier physical 3D simulations.
+A prototype engagement-ring product page for the Urumi Forward Deployed Engineer
+take-home. A shopper configures a made-to-order twist solitaire in 3D — metal and
+centre-stone cut — sees every change reflected live, and adds the exact
+configuration to cart. Pricing and cart are driven by a headless WooCommerce
+store; a seeded fallback keeps the page fully functional when no backend is
+reachable.
 
-## How to Run
+## Run it
 
-**1. Standard Start (Demo Mode)**
+### Option A — the full stack (live WooCommerce), one command
+Requires Docker.
+```bash
+docker compose up
+```
+This brings up MariaDB, WordPress + WooCommerce, a one-shot provisioner that
+installs the plugin and seeds the **Twist Engagement Ring** variable product
+(3 metals × 3 stones, priced to match the app), and the Next.js frontend wired to
+the WooCommerce **Store API**.
+
+- App:   http://localhost:3000  (status pill reads **WooCommerce live**)
+- Store: http://localhost:8080  ·  WP admin `admin / admin`
+
+First boot takes ~1–2 min while WordPress installs and the product seeds; the app
+shows seeded data until the store answers, then flips to live automatically.
+
+### Option B — frontend only (demo mode)
 ```bash
 npm install
-npm run dev
+npm run dev          # http://localhost:3000
 ```
-By default, the `.env.local` sets `WOOCOMMERCE_ENABLED=false`. This hits our internal API routes, which bypass the live WooCommerce server and instantly return mocked composite product data. This guarantees a perfect live demo even if the backend is asleep.
+With `WOOCOMMERCE_ENABLED` unset/false, the same API routes return seeded data in
+the identical response shape. The UI labels this **Seeded demo** and disables
+checkout rather than faking an order. To point at your own store instead, copy
+`.env.example` → `.env.local`, set `WOOCOMMERCE_ENABLED=true` and `WOOCOMMERCE_URL`.
 
-**2. Live WooCommerce Mode**
-If you have a live WooCommerce instance ready:
-1. Copy `.env.example` to `.env.local`
-2. Set `WOOCOMMERCE_ENABLED=true`
-3. Set `WOOCOMMERCE_URL` to your backend URL.
-4. Run `npm run dev`. The API routes will securely proxy to the WooCommerce REST API.
+## Design direction (the main non-obvious call)
+The brief asks for something that *"reads like an engagement-ring brand site, not
+an engineering demo,"* calibrated to the polish of the reference. So the guiding
+decision was **restraint over spectacle**: the configurator and the product are
+the experience. The ring is the only spectacle — luminous, faceted, draggable —
+presented in a warm, dark, type-forward editorial frame (Diamore-grade calm, not
+a tech showcase). Motion is calm and purposeful; the camera never fights the copy.
+A single fixed 3D canvas parks the ring in a deterministic on-screen *stage* per
+section so it is always beautifully framed and never overlaps text.
 
-## Stack Choices
-- **Framework:** Next.js (App Router) — Chosen for secure Server API routes (to hide WooCommerce credentials) and robust SSR.
-- **3D Engine:** Three.js + `@react-three/fiber` + `@react-three/drei` — Chosen over Babylon because of the unparalleled React ecosystem (specifically R3F), allowing us to seamlessly sync Zustand state to 3D materials.
-- **Styling:** Tailwind CSS + Vanilla CSS — For rapid, design-system-driven iterations.
-- **Motion:** Framer Motion + Lenis — Lenis intercepts the native scroll for buttery-smooth physics, while Framer handles the cinematic split-text masks and magnetic buttons.
+## Scope decisions (deliberately underspecified in the brief)
+- **3 metals, 3 stones.** 14k/18k white, yellow, rose gold; round, oval, princess.
+  Enough to prove live configuration end-to-end and polish every state, without
+  spreading a 3-day prototype thin. The data model and seeder are list-driven, so
+  adding cuts/metals is a config edit, not a refactor.
+- **A section within a premium page**, not a bare viewer — hero configurator,
+  editorial "atelier" + materials beats, and a closing finale.
+- **Mobile** is first-class: the ring leads the hero, then steps aside for the
+  controls and copy so nothing ever collides.
 
-## The Stretch Goal (3D Picker)
-**Accomplished.** We did not rely on 2D images or SVGs for the main configurator UI. The "Centre Stone" selector is comprised of live, miniature 3D `<Canvas>` elements (`StoneThumb.tsx`). 
-- **The Design Call:** To keep performance buttery smooth, the thumbnails use a simplified `MeshPhysicalMaterial` and reduced lighting passes, saving the expensive volumetric calculations (Caustics/Postprocessing) strictly for the hero ring. 
+## Stack
+- **Next.js (App Router)** — server route handlers keep the WooCommerce surface
+  server-side and give one tidy `/api/products` + `/api/cart` contract.
+- **Three.js + React Three Fiber + drei** — React-native 3D so Zustand state drives
+  materials and the camera; `@react-three/postprocessing` for a restrained bloom.
+- **Tailwind v4 + Framer Motion + Lenis** — design-system styling, editorial motion,
+  eased scroll (disabled for touch and reduced-motion).
+- **Zustand + TanStack Query** — local config state + server cache for product/cart.
 
-## Non-Obvious Decisions
-- **Mobile Graceful Degradation:** A core mandate was "premium feel". Caustics and Dynamic Depth of Field are incredibly beautiful but mathematically expensive. We wrote logic to strictly disable these post-processing passes on mobile devices, ensuring smaller batteries don't burn out and framerates stay locked at 60fps.
-- **Procedural Audio:** Luxury is tactile. Instead of just changing colors, every interaction emits a crystalline procedural Web Audio ping or shimmer. 
+See `ARCHITECTURE.md` for the data flow and the "stage director" camera model.
 
-## AI Collaboration
-This project was built using an aggressive AI workflow as a force multiplier:
-- **Architectural Scaffolding:** Used LLMs to draft the complex boilerplate for the Headless WooCommerce Next.js proxy routes in seconds.
-- **Shader Math & Postprocessing:** Leveraged advanced reasoning models to calculate the raw math required for simulated Perlin noise ("Living Ring" breath) and the laser raycast targeting for the Cinematic Macro Autofocus.
-- **Workflow:** Codebase analysis agents were used to quickly search and edit files across the Next.js directory, allowing for massive, project-wide refactors (like implementing global Smooth Scrolling and Magnetic UI) in a fraction of the time it would take manually.
+## The stretch goal (3D picker) — done
+The centre-stone picker is not flat art: each option (`StoneThumb.tsx`) is a live
+miniature `<Canvas>` rendering the **same faceted geometry** as the hero stone
+(`gemGeometry.ts`), with a lighter material so the choice you click always matches
+what lands on the ring.
 
-## What I'd Build Next
-1. **Dynamic Ring Sizing:** Implementing parametric shape morphing so the user can see the thickness of the band change in real-time as they select their ring size.
-2. **Engraving:** Using a `CanvasTexture` mapped to the inside of the ring shank to allow live, 3D text engraving.
-3. **Cart Checkout Flow:** Building out the full headless cart UI overlay to take the user completely through checkout without ever leaving the 3D experience.
+## How AI helped
+- Drafted the headless WooCommerce proxy + Store API normalisation, and the
+  Docker/wp-cli seeder, fast.
+- Generated the Simplex-noise "materialise" shader and the procedural twist-band
+  curve math.
+- Ran an audit-and-rebuild loop: an agent captured the live app with Playwright,
+  compared it against the reference, and drove the redesign (see `AUDIT.md`) —
+  stripping an over-built cinematic scroll in favour of the restrained direction
+  above, and fixing a shader bug that had made the ring render invisible.
+
+## What I'd build next
+1. **Live checkout hand-off** to a WooCommerce checkout session.
+2. **Inner-band engraving** rendered as a `CanvasTexture` on the shank (kept out of
+   this build rather than shipped as an unfulfilled promise).
+3. **Parametric ring sizing** with a live band-thickness preview.
+
+## Notes / honesty
+- Docker was not available in the environment this was finished in, so the live
+  stack was verified by review of `docker-compose.yml` + `docker/{provision.sh,seed.php}`
+  and by exercising the identical Store-API code paths against the mock. The seeded
+  fallback is exercised end-to-end (price + exact-config cart) via Playwright.

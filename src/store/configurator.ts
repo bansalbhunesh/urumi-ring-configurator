@@ -12,20 +12,14 @@ export function setScrollY(y: number) {
   _scrollY = y;
 }
 
-let _worldBend = 0;
-export function getWorldBend() {
-  return _worldBend;
+/* Requested ring yaw (radians) for the "reset view" affordance. null = free.
+   Read by TwistRing each frame; cleared the moment the user drags. */
+let _ringYawTarget: number | null = null;
+export function getRingYawTarget() {
+  return _ringYawTarget;
 }
-export function setWorldBend(b: number) {
-  _worldBend = b;
-}
-
-let _insideWormhole = false;
-export function getInsideWormhole() {
-  return _insideWormhole;
-}
-export function setInsideWormhole(w: boolean) {
-  _insideWormhole = w;
+export function setRingYawTarget(v: number | null) {
+  _ringYawTarget = v;
 }
 
 interface ConfiguratorState {
@@ -40,12 +34,10 @@ interface ConfiguratorState {
   cartOpen: boolean;
   toast: string | null;
   celebrating: boolean;
-  engraving: string;
 
   setMetal: (metal: MetalId) => void;
   setStone: (stone: StoneId) => void;
   setPreviewMetal: (metal: MetalId | null) => void;
-  setEngraving: (text: string) => void;
   openCart: () => void;
   closeCart: () => void;
   showToast: (message: string) => void;
@@ -58,7 +50,6 @@ export const useConfigurator = create<ConfiguratorState>((set) => ({
   metal: DEFAULT_METAL,
   stone: DEFAULT_STONE,
   previewMetal: null,
-  engraving: "",
   changeSeq: 0,
   lastChanged: null,
   cartOpen: false,
@@ -78,7 +69,6 @@ export const useConfigurator = create<ConfiguratorState>((set) => ({
         : { stone, lastChanged: "stone", changeSeq: s.changeSeq + 1 },
     ),
   setPreviewMetal: (metal) => set({ previewMetal: metal }),
-  setEngraving: (text) => set({ engraving: text }),
   openCart: () => set({ cartOpen: true }),
   closeCart: () => set({ cartOpen: false }),
   showToast: (message) => set({ toast: message }),

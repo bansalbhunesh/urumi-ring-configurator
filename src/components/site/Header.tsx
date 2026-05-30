@@ -10,7 +10,7 @@ import { Magnetic } from "@/components/ui/Magnetic";
 
 const LINKS = [
   { label: "The Ring", href: "#ring" },
-  { label: "Craft", href: "#craft" },
+  { label: "Atelier", href: "#atelier" },
   { label: "Materials", href: "#materials" },
 ];
 
@@ -38,11 +38,11 @@ export function Header() {
       <motion.div
         initial={{ y: "-100%", opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 1.5, ease: [0.22, 1, 0.36, 1], delay: 3.0 }}
+        transition={{ duration: 1, ease: [0.22, 1, 0.36, 1], delay: 0.4 }}
         className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6 sm:px-10"
       >
         <Magnetic strength={10}>
-          <a href="#" className="flex items-center gap-2 p-2 -m-2">
+          <a href="#" className="-m-2 flex min-h-11 items-center gap-2 rounded-md p-2 outline-none focus-visible:ring-2 focus-visible:ring-gold">
             <span className="text-gold">◆</span>
             <span className="text-[0.95rem] font-medium uppercase tracking-[0.4em] text-ink">
               Aurelle
@@ -55,7 +55,7 @@ export function Header() {
             <Magnetic key={l.href} strength={10}>
               <a
                 href={l.href}
-                className="group relative text-[0.82rem] tracking-wide text-ink-soft transition-colors hover:text-ink p-2 -m-2 block"
+                className="group relative -m-2 block min-h-11 rounded-md p-2 text-[0.82rem] tracking-wide text-ink-soft outline-none transition-colors hover:text-ink focus-visible:ring-2 focus-visible:ring-gold"
               >
                 {l.label}
                 <span className="absolute bottom-1 left-2 right-2 h-px scale-x-0 bg-gold transition-transform duration-300 origin-left group-hover:scale-x-100" />
@@ -68,7 +68,7 @@ export function Header() {
           <button
             type="button"
             onClick={openCart}
-            className="group relative flex items-center gap-2 text-ink p-2 -m-2"
+            className="group relative -m-2 flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-md p-2 text-ink outline-none focus-visible:ring-2 focus-visible:ring-gold"
             aria-label="Open bag"
           >
             <BagIcon className="h-5 w-5 transition-transform group-hover:scale-110" />
@@ -78,7 +78,7 @@ export function Header() {
                 initial={{ scale: 0.4, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ type: "spring", stiffness: 500, damping: 24 }}
-                className="grid h-5 min-w-5 place-items-center rounded-full bg-gold px-1 text-[0.66rem] font-medium text-white"
+                className="grid h-5 min-w-5 place-items-center rounded-full bg-gold px-1 text-[0.66rem] font-medium text-black"
               >
                 {count}
               </motion.span>

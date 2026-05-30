@@ -14,20 +14,23 @@ export function SplitText({
   children,
   className = "",
   delay = 0,
+  as = "div",
 }: {
   children: string;
   className?: string;
   delay?: number;
+  as?: "div" | "h2" | "h3";
 }) {
   const container = useRef(null);
-  
-  // Split the string into words. 
-  // For actual production we'd use a more robust line-splitting algorithm or library (like SplitType)
-  // but word-splitting is standard and looks great for short-to-medium luxury headings.
+
+  // Split the string into words. Word-splitting is standard and looks great for
+  // short-to-medium luxury headings.
   const words = children.split(" ");
 
+  const MotionTag = as === "h2" ? motion.h2 : as === "h3" ? motion.h3 : motion.div;
+
   return (
-    <motion.div
+    <MotionTag
       ref={container}
       className={`flex flex-wrap ${className}`}
       initial="hidden"
@@ -56,6 +59,6 @@ export function SplitText({
           </motion.span>
         </span>
       ))}
-    </motion.div>
+    </MotionTag>
   );
 }

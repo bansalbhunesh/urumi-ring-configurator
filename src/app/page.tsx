@@ -11,17 +11,20 @@ import { Celebration } from "@/components/cart/Celebration";
 import { GemCursor } from "@/components/ui/GemCursor";
 import { ScrollTracker } from "@/components/ui/ScrollTracker";
 import { SoundToggle } from "@/components/ui/SoundToggle";
-import { EngravingToy } from "@/components/sections/EngravingToy";
-import { TechnicalSpecs } from "@/components/sections/TechnicalSpecs";
+import { Toast } from "@/components/ui/Toast";
+import { ScrollCue } from "@/components/ui/ScrollCue";
+import { ConfigUrlSync } from "@/components/ui/ConfigUrlSync";
 
 import { GlobalCanvas } from "@/components/three/GlobalCanvas";
 
 export default function Home() {
   return (
     <>
+      <ConfigUrlSync />
       <GemCursor />
       <ScrollTracker />
       <SoundToggle />
+      <ScrollCue />
       <GlobalCanvas />
       <Header />
       <main className="bg-transparent">
@@ -29,14 +32,13 @@ export default function Home() {
         <Marquee />
         <Craft />
         <Materials />
-        <EngravingToy />
-        <TechnicalSpecs />
         <Closing />
       </main>
       <Footer />
       <CartDrawer />
       <StickyBar />
       <Celebration />
+      <Toast />
     </>
   );
 }
