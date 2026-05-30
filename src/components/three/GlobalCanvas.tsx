@@ -10,11 +10,6 @@ import {
   PerspectiveCamera,
   Text,
 } from "@react-three/drei";
-import {
-  EffectComposer,
-  DepthOfField,
-  ChromaticAberration,
-} from "@react-three/postprocessing";
 import * as THREE from "three";
 import { TwistRing } from "./TwistRing";
 import { Gem } from "./Gem";
@@ -236,11 +231,9 @@ function EngravingCorridor({ text, visible }: { text: string; visible: boolean }
 function ScrollDirector({
   isDesktop,
   controlsRef,
-  abRef,
 }: {
   isDesktop: boolean;
   controlsRef: React.RefObject<any>;
-  abRef: React.RefObject<any>;
 }) {
   const engraving = useConfigurator((s) => s.engraving);
   
@@ -263,7 +256,6 @@ function ScrollDirector({
     const targetPos = new THREE.Vector3();
     const targetLook = new THREE.Vector3();
     let bend = 0;
-    let chromaticOffset = 0.0012;
     let wormholeActive = false;
 
     if (s <= 1.0) {
@@ -277,7 +269,6 @@ function ScrollDirector({
       );
       targetLook.set(isDesktop ? 1.3 : 0, 1.2, 0);
       bend = 0;
-      chromaticOffset = 0.0012 + t * 0.001;
     } else if (s <= 2.2) {
       // Phase 2: Inception Space Bend (Craft Section)
       const t = (s - 1.0) / 1.2;
@@ -291,7 +282,6 @@ function ScrollDirector({
       );
       targetLook.set(0, 0.5, 0);
       bend = t * 1.8; // Heavy world bending curve active!
-      chromaticOffset = 0.0022 + t * 0.0035;
     } else if (s <= 3.5) {
       // Phase 3: Diamond Zoom (Materials Section)
       const t = (s - 2.2) / 1.3;
@@ -302,7 +292,6 @@ function ScrollDirector({
       );
       targetLook.set(0, 1.34, 0); // Directly focus gem center
       bend = (1 - t) * 1.8; // Morph back to straight geometric diamond
-      chromaticOffset = 0.0057 + t * 0.009; // Crystalline fire prism split
     } else if (s <= 4.8) {
       // Phase 4: Interstellar Wormhole Inside Ring (Engraving)
       const t = (s - 3.5) / 1.3;
@@ -313,7 +302,6 @@ function ScrollDirector({
         THREE.MathUtils.lerp(1.9, -1.8, t)
       );
       targetLook.set(0, 0, 3); // Fly looking straight down the corridor
-      chromaticOffset = 0.0147 - t * 0.012;
     } else if (s <= 5.8) {
       // Phase 5: Doctor Strange Multiverse Split (Technical Specs)
       const t = (s - 4.8) / 1.0;
@@ -324,7 +312,6 @@ function ScrollDirector({
         Math.cos(angle) * 7.5
       );
       targetLook.set(0, 0.5, 0);
-      chromaticOffset = 0.0027 + t * 0.014; // Extreme aberration split
     } else {
       // Phase 6: Reunion CTA (Closing Section)
       const t = Math.min(1.0, (s - 5.8) / 0.5);
@@ -334,7 +321,6 @@ function ScrollDirector({
         THREE.MathUtils.lerp(0, 7.2, t)
       );
       targetLook.set(0, 0.6, 0);
-      chromaticOffset = 0.0167 - t * 0.0155;
     }
 
     // Heavy cinematic glide physics (lerp over dt)
@@ -352,11 +338,6 @@ function ScrollDirector({
     }
 
     setWorldBend(currentBend.current);
-    
-    // Update postprocessing shader parameters directly via ref (No React re-renders)
-    if (abRef.current && abRef.current.offset) {
-      abRef.current.offset.set(chromaticOffset, chromaticOffset);
-    }
 
     // Apply vectors to camera
     state.camera.position.copy(camPos.current);
@@ -412,11 +393,12 @@ function ScrollDirector({
 }
 
 export function GlobalCanvas() {
+  const [mounted, setMounted] = useState(false);
   const [isDesktop, setIsDesktop] = useState(false);
   const controlsRef = useRef<any>(null);
-  const abRef = useRef<any>(null);
 
   useEffect(() => {
+    setMounted(true);
     const checkSize = () => {
       setIsDesktop(window.innerWidth >= 1024);
     };
@@ -424,6 +406,8 @@ export function GlobalCanvas() {
     window.addEventListener("resize", checkSize);
     return () => window.removeEventListener("resize", checkSize);
   }, []);
+
+  if (!mounted) return null;
 
   return (
     <div className="fixed inset-0 z-0 h-full w-full pointer-events-none">
@@ -439,7 +423,6 @@ export function GlobalCanvas() {
         <ScrollDirector
           isDesktop={isDesktop}
           controlsRef={controlsRef}
-          abRef={abRef}
         />
 
         {/* Orbit Interaction active exclusively when viewing the studio configurator section */}
@@ -456,21 +439,6 @@ export function GlobalCanvas() {
 
         {/* Doctor Strange Specs Background */}
         <SpecConstellation />
-
-        {/* Dynamic Autofocus & Prism Chromatic flares */}
-        <EffectComposer>
-          <DepthOfField
-            focusDistance={0.02}
-            focalLength={0.16}
-            bokehScale={4}
-          />
-          <ChromaticAberration
-            ref={abRef}
-            offset={new THREE.Vector2(0.0012, 0.0012)}
-            radialModulation={true}
-            modulationOffset={0.65}
-          />
-        </EffectComposer>
       </Canvas>
     </div>
   );
