@@ -47,19 +47,30 @@ export function RingModel({ metalId }: { metalId: MetalId }) {
     return clone;
   }, [scene]);
 
-  // Collect metallic materials into a ref (mutable) so the frame loop can tint
-  // them live without mutating a memoised value.
+  // Force every part to read as precious polished metal. Generated GLBs (Tripo)
+  // bake a pale, near-matte albedo at metalness ~0 — which renders as plastic/bone.
+  // We clone each material (so the cached GLTF is untouched), strip the baked
+  // albedo/emissive maps, and drive it as a true metal so the colour tints clean
+  // reflections rather than a dull diffuse. The frame loop then tints + damps
+  // roughness to the chosen finish.
   const matsRef = useRef<THREE.MeshStandardMaterial[]>([]);
   useEffect(() => {
     const mats: THREE.MeshStandardMaterial[] = [];
     root.traverse((o) => {
       const m = o as THREE.Mesh;
-      if (!m.isMesh) return;
-      const mat = m.material as THREE.MeshStandardMaterial;
-      if (mat && "metalness" in mat && (mat.metalness ?? 0) > 0.35) {
-        mat.envMapIntensity = 1.6;
-        mats.push(mat);
-      }
+      if (!m.isMesh || !m.material) return;
+      const src = m.material as THREE.MeshStandardMaterial;
+      const mat = src.clone();
+      mat.map = null;
+      mat.emissiveMap = null;
+      mat.aoMap = null;
+      mat.emissive = new THREE.Color(0x000000);
+      mat.metalness = 1;
+      mat.roughness = 0.22;
+      mat.envMapIntensity = 1.4;
+      mat.needsUpdate = true;
+      m.material = mat;
+      mats.push(mat);
     });
     matsRef.current = mats;
   }, [root]);
