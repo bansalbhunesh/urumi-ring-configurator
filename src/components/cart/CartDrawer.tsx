@@ -167,12 +167,12 @@ export function CartDrawer() {
                   disabled={!cart?.live}
                   className="mt-5 h-13 w-full rounded-full bg-ink py-3.5 text-[0.9rem] uppercase tracking-[0.08em] text-porcelain outline-none transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-ivory disabled:cursor-not-allowed disabled:opacity-45"
                 >
-                  {cart?.live ? "Proceed to Checkout" : "Checkout disabled in demo"}
+                  {cart?.live ? "Proceed to Checkout" : "Checkout opens in the boutique"}
                 </button>
                 <p className="mt-3 text-center text-[0.72rem] text-muted">
                   {cart?.live
-                    ? "Cart synced with WooCommerce"
-                    : "Seeded demo cart. Run Docker with WooCommerce enabled for live checkout."}
+                    ? "Your bag is secured"
+                    : "A preview of the experience — your configuration is saved in the bag."}
                 </p>
               </div>
             )}

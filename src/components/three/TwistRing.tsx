@@ -202,6 +202,7 @@ export function TwistRing({
   );
 
   const introProgress = useRef(0);
+  const born = useRef(false); // the materialise is a one-time birth (Act III)
   const tiltRef = useRef<THREE.Group>(null);
   const pointer = useThree((s) => s.pointer);
 
@@ -231,14 +232,16 @@ export function TwistRing({
   };
 
   useFrame((state, dt) => {
-    // Act III — the metal materialises in step with the ring's reveal (scale),
-    // so it grows into being as it enters the stage and stays solid once there.
-    introProgress.current = THREE.MathUtils.damp(
-      introProgress.current,
-      getRingReveal(),
-      6,
-      dt,
-    );
+    // Act III — the metal materialises in step with the ring's reveal (scale) the
+    // FIRST time it enters the stage: a one-time birth. Once formed it latches
+    // solid, so re-entering later sections just scales it in cleanly rather than
+    // re-dissolving — keeping "the ring is born" a singular moment.
+    if (born.current) {
+      introProgress.current = 1;
+    } else {
+      introProgress.current = THREE.MathUtils.damp(introProgress.current, getRingReveal(), 6, dt);
+      if (introProgress.current > 0.985) born.current = true;
+    }
 
     const g = tiltRef.current;
     if (!g) return;
