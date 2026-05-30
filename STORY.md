@@ -36,11 +36,16 @@ motion always degrades gracefully (no autoplay, static frames).
    Closing → "Forever / Some choices last forever." + signature lines. Plus the
    scroll-scrubbed turntable (`586ab68`) as the image-sequence-style reveal.
    _Still to add here: `TechnicalSpecs` (Act VI) onto the page._
-2. **Act III metal-grows on scroll** — wire the materialise `uProgress` to the
-   Craft section's scroll progress (the reveal already exists).
-3. **Act IV material worlds** — metal switch transforms environment + page tint.
-4. **Act I converging-particles opening** — the cinematic cold open.
-5. **Act VI blueprint** — wireframe/dimension overlay.
+2. **Act IV material worlds** — ✅ done (`718d23a`, `b23db1d`). Global atmosphere
+   wash cross-fades the room's mood with the chosen metal (moonlight / heritage /
+   intimacy), and the Materials section names each metal as a world.
+3. **Act I converging-particles opening** — ✅ done (`d550463`). Scroll-scrubbed
+   particle cloud converges into the first facet beneath "Every forever begins as
+   a possibility." Self-contained `ActOne` canvas; build-green, SSR-safe.
+4. **Act III metal-grows on scroll** — wire the materialise `uProgress` to the
+   Craft section's scroll progress (the reveal already exists). _Next._
+5. **Act VI blueprint** — wireframe/dimension overlay (needs a net-new section;
+   `TechnicalSpecs` no longer exists in the tree).
 6. **Act VIII price-as-story** + **Act IX/X finale polish**.
 7. **Act II camera-in-diamond** + **Act VII hand** (most ambitious; may stylize).
 
