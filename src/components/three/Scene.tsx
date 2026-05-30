@@ -77,6 +77,29 @@ function GoldDust({ count, reduceMotion }: { count: number; reduceMotion: boolea
   );
 }
 
+/* Golden halo of light framing the product (moodboard: energy halo / silk glow).
+   One thin additive torus behind the ring; Bloom turns it into a soft glow.
+   Larger than the ring so it frames rather than competes. */
+function SilkHalo({ reduceMotion }: { reduceMotion: boolean }) {
+  const ref = useRef<THREE.Mesh>(null);
+  useFrame((s) => {
+    if (ref.current && !reduceMotion) ref.current.rotation.z = s.clock.elapsedTime * 0.05;
+  });
+  return (
+    <mesh ref={ref} position={[0, 0.5, -2]}>
+      <torusGeometry args={[2.9, 0.014, 12, 140]} />
+      <meshBasicMaterial
+        color="#e3c585"
+        transparent
+        opacity={0.2}
+        blending={THREE.AdditiveBlending}
+        depthWrite={false}
+        toneMapped={false}
+      />
+    </mesh>
+  );
+}
+
 function ScrollDirector({
   isDesktop,
   wide,
@@ -236,6 +259,7 @@ function ScrollDirector({
       />
 
       <GoldDust count={isDesktop ? 240 : 80} reduceMotion={reduceMotion} />
+      <SilkHalo reduceMotion={reduceMotion} />
 
       <Suspense fallback={null}>
         <group ref={ringGroupRef}>
