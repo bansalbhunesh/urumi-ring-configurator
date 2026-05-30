@@ -253,12 +253,11 @@ export function TwistRing({
         d.yaw += (yawTarget - d.yaw) * 0.12;
         d.vel = 0;
       } else {
+        // Base rotation is now scroll-driven (the ScrollDirector turntable scrubs
+        // the ring with page scroll). Here we only carry drag inertia so a flick
+        // still spins down naturally; when idle the ring holds its frame.
         d.yaw += d.vel; // inertia
         d.vel *= 0.92;
-        // Slow turntable reveal that breathes — the speed eases up and down so the
-        // motion reads organic and cinematic, never metronomic.
-        const tt = state.clock.elapsedTime;
-        d.yaw += dt * (0.13 + 0.055 * Math.sin(tt * 0.28));
       }
     }
 

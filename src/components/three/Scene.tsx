@@ -139,6 +139,7 @@ function ScrollDirector({
   const scale = useRef(0.0001);
   const groupPos = useRef(new THREE.Vector3(0, isDesktop ? 0 : 1.7, 0));
   const intro = useRef(0);
+  const groupYaw = useRef(0);
 
   useFrame((state, dt) => {
     const y = getScrollY();
@@ -205,10 +206,24 @@ function ScrollDirector({
     camPos.current.z = damp(camPos.current.z, target.camZ, k, dt);
     camLook.current.y = damp(camLook.current.y, target.lookY, k, dt);
 
+    // Scroll-scrubbed turntable. The ring's base rotation is driven directly by
+    // page scroll progress, so scrolling scrubs a slow cinematic reveal and the
+    // ring holds its frame when you stop — the live-3D equivalent of an Apple
+    // image-sequence scroll, but interactive and asset-free. Drag/parallax still
+    // compose on top via the inner group inside <TwistRing>.
+    const maxScroll =
+      typeof document !== "undefined"
+        ? Math.max(1, document.documentElement.scrollHeight - vh)
+        : 1;
+    const progress = THREE.MathUtils.clamp(y / maxScroll, 0, 1);
+    const yawTarget = progress * Math.PI * 2 * 1.15;
+    groupYaw.current = damp(groupYaw.current, yawTarget, reduceMotion ? 999 : 3.2, dt);
+
     const g = ringGroupRef.current;
     if (g) {
       g.position.copy(groupPos.current);
       g.scale.setScalar(Math.max(scale.current, 0.0001));
+      g.rotation.y = groupYaw.current;
     }
     state.camera.position.set(camPos.current.x, camPos.current.y, camPos.current.z);
     state.camera.lookAt(camLook.current);
