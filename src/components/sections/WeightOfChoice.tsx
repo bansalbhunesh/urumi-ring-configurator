@@ -71,12 +71,12 @@ export function WeightOfChoice() {
             ))}
           </dl>
 
-          <div className="mt-12 flex items-end justify-between gap-6">
+          <div className="mt-12 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
             <p className="max-w-xs text-[0.92rem] leading-relaxed text-muted">
               Everything you chose, totalled — and nothing you didn&apos;t.
             </p>
-            <div className="text-right">
-              <div className="font-sans text-[3rem] font-semibold leading-none tabular-nums text-ink">
+            <div className="sm:text-right">
+              <div className="font-sans text-[3rem] font-semibold leading-none tabular-nums whitespace-nowrap text-ink">
                 <PriceTag value={price} symbol={symbol} />
               </div>
               <p className="mt-2 text-[0.66rem] uppercase tracking-[0.22em] text-muted">
