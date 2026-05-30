@@ -12,14 +12,16 @@ export function Materials() {
       className="relative px-6 py-32 sm:px-10 lg:px-16 lg:py-48"
     >
       <div className="mx-auto max-w-2xl xl:mx-0 xl:max-w-[32rem]">
-        <span className="eyebrow">Materials</span>
+        <span className="eyebrow">The materials of forever</span>
         <SplitText as="h2" className="display-3 mt-5 text-ink">
-          Three golds, one standard.
+          Three metals. Three worlds.
         </SplitText>
         <Reveal delay={0.15}>
           <p className="mt-5 text-[1.05rem] leading-relaxed text-ink-soft">
-            Every band is cast from solid 18-karat recycled gold and finished to a
-            mirror. The colour is yours to choose — the integrity never changes.
+            Each is cast from solid 18-karat recycled gold and finished to a mirror —
+            the integrity never changes. But the feeling does: the cool moonlight of
+            white, the heritage of yellow, the intimacy of rose. Choose the one that
+            sounds like you.
           </p>
           <ul className="mt-10 space-y-5">
             {METALS.map((m) => (

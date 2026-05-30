@@ -52,16 +52,17 @@ export function TheCut() {
     <section id="cut" data-ring="stage" data-frame="stone" className="relative overflow-hidden px-6 py-32 sm:px-10 lg:px-16 lg:py-48">
       <CrystalPanels />
       <div className="relative z-10 mx-auto max-w-2xl xl:mx-0 xl:max-w-[36rem]">
-        <span className="eyebrow">The centre stone</span>
+        <span className="eyebrow">The personality of the stone</span>
         <SplitText as="h2" className="display-2 mt-5 text-balance text-ink">
           Cut to catch the light.
         </SplitText>
 
         <Reveal delay={0.15}>
           <p className="mt-6 max-w-md text-[1.05rem] leading-relaxed text-ink-soft">
-            Every stone is conflict-free, independently graded, and rendered with
-            the same physically-based shader you see on the ring — so the spec
-            sheet below updates the instant you change your mind.
+            A cut isn&apos;t a setting — it&apos;s a character. The round is timeless,
+            the oval graceful, the princess confident. Each is conflict-free,
+            independently graded, and rendered with the same shader you see on the
+            ring, so the spec sheet updates the instant you change your mind.
           </p>
         </Reveal>
 

@@ -1,0 +1,49 @@
+# THE ETERNAL CIRCLE — narrative blueprint
+
+Not a product page. A cinematic, scroll-driven story about the journey from
+possibility to commitment. The product is not the story — **the transformation
+is the story; the ring is the artifact left behind.** Each scroll should feel like
+entering a new scene in a film: its own lighting, camera, motion, atmosphere,
+emotion. The configurator's live powers (metal/stone switching, scroll-scrubbed
+3D) are kept — but reframed as *moments of authorship inside the story*, never as
+"shopping."
+
+## The ten acts → our architecture
+
+| Act | Beat | Home in code | State / how |
+|----|------|--------------|-------------|
+| **I — Before the ring** | Black. Particles of light appear, orbit, converge into the first facet. "Every forever begins as a possibility." | NEW `ActOne` intro section above `Studio`; GPU points that *converge* (not ambient) tied to scroll, resolving to the gem. | To build. Reuses a disciplined points system (purposeful, converging — the opposite of the removed ambient dust). |
+| **II — Birth of light** | Camera inside the diamond; light splits, refracts, spectral color. "Beauty begins where light finds form." | `Gem` + a close dolly beat; dispersion via the transmission material's chromatic aberration ramped on scroll. | Partial: gem exists. Needs a camera-in beat + dispersion ramp. |
+| **III — Birth of form** | Metal *grows* around the stone — strands twist, flow, merge. "Craftsmanship gives permanence to emotion." | `Craft` + the existing **materialise dissolve shader** in `TwistRing` (snoise threshold reveal). | **Already half-built** — drive `uProgress` from this section's scroll. |
+| **IV — Materials of forever** | Three worlds — White (moonlight), Yellow (heritage), Rose (intimacy). Switching metal transforms the *environment*, not just the ring. | `Materials` + per-metal environment/lighting + body tint. | Achievable: map metal → env preset + background tint + copy. |
+| **V — Personality of the stone** | Round (timeless), Oval (graceful), Princess (confident) — introduced as characters, not options. | `TheCut` — reframe spec card into character intros with motion. | Achievable: copy + motion reframe of existing section. |
+| **VI — Hidden precision** | Ring turns transparent; blueprint lines, dimensions, measurements. "Luxury is precision." | `TechnicalSpecs` (exists, not yet on page) + a wireframe/blueprint material pass. | Achievable: add section to page; blueprint overlay. |
+| **VII — Human connection** | Environment gone. A hand. The ring settles onto a finger. Real scale. "Designed for a moment that changes everything." | NEW `ActSeven`. | Hard: needs a hand asset (model or plate). Lowest-priority / may stylize. |
+| **VIII — Weight of choice** | Ring separates into metal/stone/setting; each user decision becomes visible; price appears as a *story*, not a number. | Enhance `Studio` price → a justified breakdown beat. | Achievable: "this brilliance / this craftsmanship / this material" price story. |
+| **IX — Your creation** | Everything converges into the final ring, built from every choice; environment reflects the chosen metal/stone. "No one else will create this exact ring." | `Showcase` (photoreal GLB) reframed as the culmination. | Achievable: copy + reflect chosen metal (already tints). |
+| **X — Forever** | Camera pulls back. Quiet. UI fades. Only the ring, the final price, the decision. "Some choices last forever." Add to Cart → ownership begins. | `Closing` + final CTA. | Mostly there — reframe copy + a UI-fade finish. |
+
+## Motion philosophy (applies to every act)
+Each act = its own lighting, camera language, motion language, atmosphere,
+emotion. The user should never feel they're on the same page. Transitions are
+designed, not incidental. Premium easing / spring physics throughout; reduced-
+motion always degrades gracefully (no autoplay, static frames).
+
+## Build order (highest emotional impact ÷ effort first)
+1. **Narrative spine (copy + act framing)** — reframe existing sections into Acts
+   I–X with the signature lines + "ACT N" markers, and add `TechnicalSpecs`
+   (Act VI) to the page. Transforms "product page" → "story" with low risk. *Start here.*
+2. **Act III metal-grows on scroll** — wire the materialise `uProgress` to the
+   Craft section's scroll progress (the reveal already exists).
+3. **Act IV material worlds** — metal switch transforms environment + page tint.
+4. **Act I converging-particles opening** — the cinematic cold open.
+5. **Act VI blueprint** — wireframe/dimension overlay.
+6. **Act VIII price-as-story** + **Act IX/X finale polish**.
+7. **Act II camera-in-diamond** + **Act VII hand** (most ambitious; may stylize).
+
+## Constraints / honesty
+- Real-GPU bloom/material can't be verified in the software-WebGL harness — keep
+  effects conservative; the user's real screenshots are ground truth.
+- Live metal/stone configurability is a hard requirement — every act preserves it.
+- Acts VII (hand) and II (inside-diamond) are the hardest; they may be stylized
+  rather than photoreal, and ship last.

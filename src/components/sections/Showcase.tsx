@@ -82,7 +82,7 @@ export function Showcase() {
           viewport={{ once: true, margin: "-10%" }}
           transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
         >
-          <span className="eyebrow">The render</span>
+          <span className="eyebrow">Your creation</span>
           <SplitText as="h2" className="display-2 mt-4 justify-center text-balance text-ink">
             The real thing.
           </SplitText>
@@ -90,8 +90,8 @@ export function Showcase() {
 
         <div className="mx-auto max-w-lg">
           <p className="text-[1rem] leading-relaxed text-ink-soft">
-            A photoreal capture of the finished piece — drag to turn it in your
-            hand. The metal follows your choice.
+            Built from every choice you made — drag to turn it in your hand.
+            No one else will create this exact ring.
           </p>
           <p className="mt-3 text-[0.7rem] uppercase tracking-[0.24em] text-muted">
             Drag to inspect · Now showing {METAL_BY_ID[metal].label}

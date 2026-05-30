@@ -13,10 +13,13 @@ export function Craft() {
       className="relative px-6 py-32 sm:px-10 lg:px-16 lg:py-48"
     >
       <div className="mx-auto max-w-2xl xl:mx-0 xl:max-w-[36rem]">
-        <span className="eyebrow">The Atelier</span>
+        <span className="eyebrow">The birth of form</span>
         <SplitText as="h2" className="display-2 mt-5 text-balance text-ink">
           The smallest thing you will ever wear, and the one that says the most.
         </SplitText>
+        <p className="mt-6 font-display text-xl italic leading-snug text-gold sm:text-2xl">
+          Craftsmanship is the art of giving permanence to emotion.
+        </p>
 
         <div className="mt-16 space-y-12">
           <Reveal>

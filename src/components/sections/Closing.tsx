@@ -19,13 +19,16 @@ export function Closing() {
         transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
         className="relative z-10 mx-auto max-w-lg"
       >
-        <span className="eyebrow">The moment</span>
+        <span className="eyebrow">Forever</span>
         <p className="font-display mt-4 text-balance text-[1.6rem] leading-snug text-ink sm:text-[2rem]">
           Somewhere, someone is about to ask the most important question of their
           life.
         </p>
         <p className="font-display mt-3 text-xl italic text-gold sm:text-2xl">
           This is what they&apos;ll be holding.
+        </p>
+        <p className="mt-8 text-[0.8rem] uppercase tracking-[0.28em] text-muted">
+          Some choices last forever
         </p>
       </motion.div>
 
