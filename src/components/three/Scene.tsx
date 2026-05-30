@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useRef, useState, type RefObject } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState, type RefObject } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import {
   Environment,
@@ -32,6 +32,50 @@ type Stage = {
 };
 
 const damp = THREE.MathUtils.damp;
+
+/* Gold-dust depth layer (moodboard: cosmic depth + silk glow). Sparse additive
+   points; the existing Bloom makes them shimmer. Seeded (stable), count-capped,
+   and disabled under reduced-motion. Sits behind the ring — pure ambience. */
+function GoldDust({ count, reduceMotion }: { count: number; reduceMotion: boolean }) {
+  const ref = useRef<THREE.Points>(null);
+  const positions = useMemo(() => {
+    const a = new Float32Array(count * 3);
+    const r = (i: number, n: number) => {
+      const x = Math.sin((i + 1) * n) * 43758.5453;
+      return x - Math.floor(x);
+    };
+    for (let i = 0; i < count; i++) {
+      a[i * 3] = (r(i, 12.9898) - 0.5) * 10;
+      a[i * 3 + 1] = (r(i, 78.233) - 0.5) * 6.5;
+      a[i * 3 + 2] = (r(i, 37.719) - 0.5) * 5 - 2.5;
+    }
+    return a;
+  }, [count]);
+
+  useFrame((state) => {
+    if (!ref.current) return;
+    ref.current.rotation.y = state.clock.elapsedTime * 0.018;
+    ref.current.position.y = Math.sin(state.clock.elapsedTime * 0.14) * 0.12;
+  });
+
+  if (reduceMotion) return null;
+  return (
+    <points ref={ref}>
+      <bufferGeometry>
+        <bufferAttribute attach="attributes-position" args={[positions, 3]} />
+      </bufferGeometry>
+      <pointsMaterial
+        size={0.035}
+        color="#e3c585"
+        transparent
+        opacity={0.55}
+        sizeAttenuation
+        depthWrite={false}
+        blending={THREE.AdditiveBlending}
+      />
+    </points>
+  );
+}
 
 function ScrollDirector({
   isDesktop,
@@ -190,6 +234,8 @@ function ScrollDirector({
         far={4.5}
         color="#1a130b"
       />
+
+      <GoldDust count={isDesktop ? 240 : 80} reduceMotion={reduceMotion} />
 
       <Suspense fallback={null}>
         <group ref={ringGroupRef}>
