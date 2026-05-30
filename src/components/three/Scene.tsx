@@ -101,6 +101,71 @@ function SilkHalo({ reduceMotion }: { reduceMotion: boolean }) {
   );
 }
 
+/* Diamond caustics (moodboard: refracted light cast by the stone). Rather than
+   geometry-derived caustics (an extra render pass that would fight the ring's
+   per-frame reposition/scale), this projects a procedural caustic web onto the
+   stage floor: layered domain-warped light folds, warm gold, pooled under the
+   ring by a radial mask and faded to nothing at the edges. Additive, depth-write
+   off, so it only ever adds light. Desktop-only; reduced-motion freezes it. */
+const CAUSTIC_VERT = /* glsl */ `
+  varying vec2 vUv;
+  void main() {
+    vUv = uv;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  }
+`;
+const CAUSTIC_FRAG = /* glsl */ `
+  varying vec2 vUv;
+  uniform float uTime;
+  uniform vec3 uColor;
+  #define TAU 6.28318530718
+  #define ITER 5
+  void main() {
+    float time = uTime * 0.4 + 23.0;
+    vec2 p = mod(vUv * TAU * 2.0, TAU) - 250.0;
+    vec2 i = vec2(p);
+    float c = 1.0;
+    float inten = 0.0045;
+    for (int n = 0; n < ITER; n++) {
+      float t = time * (1.0 - (3.5 / float(n + 1)));
+      i = p + vec2(cos(t - i.x) + sin(t + i.y), sin(t - i.y) + cos(t + i.x));
+      c += 1.0 / length(vec2(p.x / (sin(i.x + t) / inten), p.y / (cos(i.y + t) / inten)));
+    }
+    c /= float(ITER);
+    c = 1.17 - pow(c, 1.4);
+    float val = pow(abs(c), 8.0);
+    float d = distance(vUv, vec2(0.5));
+    float mask = smoothstep(0.5, 0.06, d);
+    gl_FragColor = vec4(uColor * val, clamp(val, 0.0, 1.0) * mask * 0.55);
+  }
+`;
+function CausticFloor({ reduceMotion }: { reduceMotion: boolean }) {
+  const matRef = useRef<THREE.ShaderMaterial>(null);
+  const uniforms = useMemo(
+    () => ({ uTime: { value: 0 }, uColor: { value: new THREE.Color("#ffe1a3") } }),
+    [],
+  );
+  useFrame((s) => {
+    if (matRef.current)
+      matRef.current.uniforms.uTime.value = reduceMotion ? 6.0 : s.clock.elapsedTime;
+  });
+  return (
+    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[1.0, -1.38, 0]}>
+      <planeGeometry args={[11, 11]} />
+      <shaderMaterial
+        ref={matRef}
+        vertexShader={CAUSTIC_VERT}
+        fragmentShader={CAUSTIC_FRAG}
+        uniforms={uniforms}
+        transparent
+        depthWrite={false}
+        toneMapped={false}
+        blending={THREE.AdditiveBlending}
+      />
+    </mesh>
+  );
+}
+
 /* Liquid-metal floor (moodboard: chrome/mercury reflections). Heavily blurred so
    it reads as a soft polished sheen, not a literal mirror double — worst case it
    degrades to a plain dark floor. Desktop-only (renders an FBO each frame). */
@@ -284,6 +349,7 @@ function ScrollDirector({
       />
 
       {isDesktop && <ReflectiveFloor />}
+      {isDesktop && <CausticFloor reduceMotion={reduceMotion} />}
       <GoldDust count={isDesktop ? 240 : 80} reduceMotion={reduceMotion} />
       <SilkHalo reduceMotion={reduceMotion} />
 
