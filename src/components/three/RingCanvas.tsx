@@ -18,7 +18,7 @@ export function RingCanvas({ mobile = false }: { mobile?: boolean }) {
     <div className="absolute inset-0 z-0 h-full w-full">
       <Canvas shadows dpr={[1, 2]} gl={{ antialias: true, alpha: true }}>
         {/* The Camera: Static, focused on the ring */}
-        <PerspectiveCamera makeDefault position={[mobile ? 0 : 1.5, 0.5, 4.0]} fov={30} />
+        <PerspectiveCamera makeDefault position={[0, 0.5, 7.5]} fov={35} />
         
         {/* Full 360 Interaction */}
         <OrbitControls
