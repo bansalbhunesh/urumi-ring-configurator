@@ -24,10 +24,12 @@ interface ConfiguratorState {
   cartOpen: boolean;
   toast: string | null;
   celebrating: boolean;
+  engraving: string;
 
   setMetal: (metal: MetalId) => void;
   setStone: (stone: StoneId) => void;
   setPreviewMetal: (metal: MetalId | null) => void;
+  setEngraving: (text: string) => void;
   openCart: () => void;
   closeCart: () => void;
   showToast: (message: string) => void;
@@ -40,6 +42,7 @@ export const useConfigurator = create<ConfiguratorState>((set) => ({
   metal: DEFAULT_METAL,
   stone: DEFAULT_STONE,
   previewMetal: null,
+  engraving: "",
   changeSeq: 0,
   lastChanged: null,
   cartOpen: false,
@@ -59,6 +62,7 @@ export const useConfigurator = create<ConfiguratorState>((set) => ({
         : { stone, lastChanged: "stone", changeSeq: s.changeSeq + 1 },
     ),
   setPreviewMetal: (metal) => set({ previewMetal: metal }),
+  setEngraving: (text) => set({ engraving: text }),
   openCart: () => set({ cartOpen: true }),
   closeCart: () => set({ cartOpen: false }),
   showToast: (message) => set({ toast: message }),

@@ -11,6 +11,8 @@ import { Celebration } from "@/components/cart/Celebration";
 import { GemCursor } from "@/components/ui/GemCursor";
 import { ScrollTracker } from "@/components/ui/ScrollTracker";
 import { SoundToggle } from "@/components/ui/SoundToggle";
+import { EngravingToy } from "@/components/sections/EngravingToy";
+import { TechnicalSpecs } from "@/components/sections/TechnicalSpecs";
 
 export default function Home() {
   return (
@@ -24,6 +26,8 @@ export default function Home() {
         <Marquee />
         <Craft />
         <Materials />
+        <EngravingToy />
+        <TechnicalSpecs />
         <Closing />
       </main>
       <Footer />
