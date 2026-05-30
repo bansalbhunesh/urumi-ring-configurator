@@ -101,6 +101,64 @@ function SilkHalo({ reduceMotion }: { reduceMotion: boolean }) {
   );
 }
 
+/* Silk-like golden light trails (moodboard: ribbons of warm light curling around
+   the product). A few thin tube ribbons swept along graceful seeded curves, sat
+   behind the ring; additive + the existing Bloom render them as soft silk-light,
+   never opaque geometry. Built once, animated by a slow group drift so they flow
+   without rebuilding geometry. Disabled under reduced-motion. */
+function makeRibbonCurve(seed: number, radius: number, height: number) {
+  const pts: THREE.Vector3[] = [];
+  const N = 16;
+  for (let i = 0; i <= N; i++) {
+    const t = i / N;
+    const a = t * Math.PI * 2 * 1.35 + seed;
+    const r = radius * (0.82 + 0.22 * Math.sin(t * Math.PI * 2 + seed));
+    pts.push(
+      new THREE.Vector3(
+        Math.cos(a) * r,
+        (t - 0.5) * height + Math.sin(t * Math.PI * 3 + seed) * 0.28,
+        Math.sin(a) * r * 0.6,
+      ),
+    );
+  }
+  return new THREE.CatmullRomCurve3(pts, false, "catmullrom", 0.6);
+}
+function SilkRibbons({ reduceMotion }: { reduceMotion: boolean }) {
+  const ref = useRef<THREE.Group>(null);
+  const geoms = useMemo(
+    () => [
+      new THREE.TubeGeometry(makeRibbonCurve(0.4, 2.5, 3.4), 130, 0.012, 5, false),
+      new THREE.TubeGeometry(makeRibbonCurve(2.3, 2.9, 3.0), 130, 0.009, 5, false),
+      new THREE.TubeGeometry(makeRibbonCurve(4.7, 2.2, 3.8), 130, 0.011, 5, false),
+    ],
+    [],
+  );
+  useFrame((s) => {
+    if (!ref.current || reduceMotion) return;
+    const t = s.clock.elapsedTime;
+    ref.current.rotation.y = t * 0.05;
+    ref.current.rotation.z = Math.sin(t * 0.12) * 0.08;
+  });
+  useEffect(() => () => geoms.forEach((g) => g.dispose()), [geoms]);
+  if (reduceMotion) return null;
+  return (
+    <group ref={ref} position={[0.5, 0.4, -1.7]}>
+      {geoms.map((g, i) => (
+        <mesh key={i} geometry={g}>
+          <meshBasicMaterial
+            color="#f0cd86"
+            transparent
+            opacity={0.32}
+            blending={THREE.AdditiveBlending}
+            depthWrite={false}
+            toneMapped={false}
+          />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
 /* Diamond caustics (moodboard: refracted light cast by the stone). Rather than
    geometry-derived caustics (an extra render pass that would fight the ring's
    per-frame reposition/scale), this projects a procedural caustic web onto the
@@ -352,6 +410,7 @@ function ScrollDirector({
       {isDesktop && <CausticFloor reduceMotion={reduceMotion} />}
       <GoldDust count={isDesktop ? 240 : 80} reduceMotion={reduceMotion} />
       <SilkHalo reduceMotion={reduceMotion} />
+      {isDesktop && <SilkRibbons reduceMotion={reduceMotion} />}
 
       <Suspense fallback={null}>
         <group ref={ringGroupRef}>
