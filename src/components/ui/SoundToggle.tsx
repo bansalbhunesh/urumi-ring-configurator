@@ -28,7 +28,8 @@ export function SoundToggle() {
   const [enabled, setEnabled] = useState(false);
   
   useEffect(() => {
-    setEnabled(isSoundOn());
+    const frame = window.requestAnimationFrame(() => setEnabled(isSoundOn()));
+    return () => window.cancelAnimationFrame(frame);
   }, []);
 
   const handleClick = () => {
@@ -43,7 +44,7 @@ export function SoundToggle() {
         onClick={handleClick}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.9 }}
-        className="flex h-10 w-10 items-center justify-center rounded-full border border-line/50 bg-white/40 shadow-sm backdrop-blur-md transition-colors hover:bg-white/60 text-ink"
+        className="flex h-11 w-11 items-center justify-center rounded-full border border-line/60 bg-ivory/75 text-ink shadow-sm outline-none backdrop-blur-md transition-colors hover:bg-champagne focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-porcelain"
         aria-label={enabled ? "Mute sound" : "Enable sound"}
       >
         <AnimatePresence mode="wait" initial={false}>

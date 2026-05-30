@@ -42,7 +42,7 @@ export function GemCursor() {
 
   useEffect(() => {
     if (isTouchDevice()) return;
-    setVisible(true);
+    const showFrame = window.requestAnimationFrame(() => setVisible(true));
 
     document.documentElement.style.cursor = "none";
 
@@ -74,6 +74,7 @@ export function GemCursor() {
     rafId = requestAnimationFrame(tick);
 
     return () => {
+      window.cancelAnimationFrame(showFrame);
       cancelAnimationFrame(rafId);
       document.documentElement.style.cursor = "";
       window.removeEventListener("mousemove", onMove);

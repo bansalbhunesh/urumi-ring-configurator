@@ -1,46 +1,43 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { TwistRing } from "@/components/three/TwistRing";
-import { Canvas } from "@react-three/fiber";
-import { Environment, PerspectiveCamera } from "@react-three/drei";
 
+/* The finale. The global canvas brings the ring back to centre stage here, so
+   copy is held to clear bands at the top and bottom — the ring fills the gap
+   between them and never overlaps text. */
 export function Closing() {
   return (
-    <section className="relative flex min-h-[100svh] flex-col items-center justify-center overflow-hidden bg-transparent px-6 text-center">
+    <section
+      id="finale"
+      className="relative flex min-h-[100svh] flex-col items-center justify-between overflow-hidden px-6 pt-28 pb-24 text-center sm:pt-32"
+    >
+      <motion.div
+        initial={{ opacity: 0, y: 18 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-15%" }}
+        transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+        className="relative z-10 mx-auto max-w-lg"
+      >
+        <span className="eyebrow">The moment</span>
+        <p className="font-display mt-4 text-[1.7rem] leading-snug text-ink sm:text-3xl">
+          Somewhere, someone is about to ask the most important question of their
+          life.
+        </p>
+        <p className="font-display mt-3 text-xl italic text-gold sm:text-2xl">
+          This is what they&apos;ll be holding.
+        </p>
+      </motion.div>
 
-      <div className="relative z-10 mx-auto max-w-2xl">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-20%" }}
-          transition={{ duration: 1.5, ease: "easeOut" }}
-          className="space-y-4"
-        >
-          <p className="font-display text-2xl sm:text-3xl leading-relaxed text-white">
-            Somewhere, right now, someone is about to ask the most important
-            question of their life.
-          </p>
-          <p className="font-display text-2xl sm:text-3xl text-gold">
-            This is what they&apos;ll be holding.
-          </p>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 2, delay: 10 }}
-          className="mt-24"
-        >
-          <a
-            href="#ring"
-            className="text-sm uppercase tracking-[0.3em] text-white/50 transition-colors hover:text-white"
-          >
-            Configure yours
-          </a>
-        </motion.div>
-      </div>
+      <motion.a
+        href="#ring"
+        initial={{ opacity: 0, y: 18 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 1, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+        className="relative z-10 inline-flex h-12 items-center rounded-full border border-line px-7 text-[0.8rem] uppercase tracking-[0.18em] text-ink outline-none transition-colors hover:border-gold hover:text-gold focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-porcelain"
+      >
+        Configure yours
+      </motion.a>
     </section>
   );
 }

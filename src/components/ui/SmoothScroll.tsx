@@ -11,9 +11,11 @@ import Lenis from "lenis";
 
 export function SmoothScroll({ children }: { children: React.ReactNode }) {
   useEffect(() => {
-    // Only enable on desktop to respect native touch scrolling
+    // Only enable on desktop to respect native touch scrolling, and never
+    // override scroll for users who prefer reduced motion.
     const isTouch = window.matchMedia("(pointer: coarse)").matches;
-    if (isTouch) return;
+    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (isTouch || prefersReduced) return;
 
     const lenis = new Lenis({
       duration: 1.2,

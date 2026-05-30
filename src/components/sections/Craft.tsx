@@ -1,49 +1,49 @@
 import { Reveal } from "@/components/ui/Reveal";
 import { SplitText } from "@/components/ui/SplitText";
 
+/* Editorial "Atelier" beat. On wide screens the ring rests in the right-hand
+   stage rendered by the global canvas, so all copy is held to a left column —
+   nothing ever overlaps the product. Below xl the ring steps aside and this
+   reads as a centred editorial column. */
 export function Craft() {
   return (
-    <section id="craft" className="bg-transparent px-6 py-32 sm:px-10 lg:py-48">
-      <div className="mx-auto max-w-[1200px]">
-        {/* Editorial Title Block without the standard eyebrow */}
-        <div className="mb-24 lg:mb-32">
-          <SplitText className="font-display max-w-4xl text-4xl leading-[1.1] text-balance sm:text-5xl lg:text-[4.5rem]">
-            A ring is the smallest thing you will ever wear that means the most.
-          </SplitText>
-        </div>
+    <section
+      id="atelier"
+      className="relative px-6 py-32 sm:px-10 lg:px-16 lg:py-48"
+    >
+      <div className="mx-auto max-w-2xl xl:mx-0 xl:max-w-[32rem]">
+        <span className="eyebrow">The Atelier</span>
+        <SplitText as="h2" className="font-display mt-5 text-balance text-4xl leading-[1.08] sm:text-5xl lg:text-6xl text-ink">
+          The smallest thing you will ever wear, and the one that says the most.
+        </SplitText>
 
-        {/* Asymmetrical Layout instead of identical cards */}
-        <div className="grid gap-16 lg:grid-cols-12 lg:gap-24">
-          
-          <div className="lg:col-span-5 lg:col-start-2">
-            <Reveal>
-              <h3 className="font-display text-3xl text-ink">Two Ribbons of Gold</h3>
-              <p className="mt-5 text-lg leading-relaxed text-ink-soft">
-                Drawn by hand into a single continuous twist. It is a quiet symbol of two lives winding into one, finished to a mirror polish that catches the ambient light of any room.
-              </p>
-            </Reveal>
-          </div>
+        <div className="mt-16 space-y-12">
+          <Reveal>
+            <h3 className="font-display text-2xl text-ink">Two ribbons of gold</h3>
+            <p className="mt-4 text-[1.05rem] leading-relaxed text-ink-soft">
+              Drawn by hand into a single continuous twist — a quiet symbol of two
+              lives winding into one — then finished to a mirror polish that gathers
+              the light of whatever room it walks into.
+            </p>
+          </Reveal>
 
-          <div className="lg:col-span-5 lg:col-start-7 lg:mt-32">
-            <Reveal>
-              <h3 className="font-display text-3xl text-ink">The Center Stone</h3>
-              <p className="mt-5 text-lg leading-relaxed text-ink-soft">
-                Every diamond is conflict-free, independently graded for brilliance, and set by hand. The twist shoulder lifts the stone to allow maximum light to enter the pavilion.
-              </p>
-            </Reveal>
-          </div>
+          <Reveal delay={0.1}>
+            <h3 className="font-display text-2xl text-ink">A stone, lifted to the light</h3>
+            <p className="mt-4 text-[1.05rem] leading-relaxed text-ink-soft">
+              Every centre stone is conflict-free and independently graded for
+              brilliance. The twisting shoulders raise it clear of the band so light
+              can enter the pavilion from every side.
+            </p>
+          </Reveal>
 
-          <div className="lg:col-span-6 lg:col-start-3 lg:mt-16">
-            <Reveal>
-              <div className="border-l border-gold pl-8">
-                <h3 className="font-display text-3xl text-ink">Backed for Life</h3>
-                <p className="mt-5 text-lg leading-relaxed text-ink-soft">
-                  Made to order in our atelier. This is not just fine jewelry—it is a piece engineered to outlast the moment it marks. We guarantee the structural integrity of the setting for a lifetime.
-                </p>
-              </div>
-            </Reveal>
-          </div>
-
+          <Reveal delay={0.2}>
+            <h3 className="font-display text-2xl text-ink">Made to order, kept for life</h3>
+            <p className="mt-4 text-[1.05rem] leading-relaxed text-ink-soft">
+              Each ring is built to your configuration in our atelier and guaranteed
+              for the life of the setting. Not fast jewellery — a piece meant to
+              outlast the moment it marks.
+            </p>
+          </Reveal>
         </div>
       </div>
     </section>

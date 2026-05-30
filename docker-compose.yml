@@ -59,7 +59,12 @@ services:
       dockerfile: Dockerfile
     restart: unless-stopped
     depends_on:
-      - wordpress
+      wordpress:
+        condition: service_started
+      # Wait for the seeder so the very first page load is already live data
+      # (otherwise the app would show seeded demo until a manual reload).
+      provision:
+        condition: service_completed_successfully
     ports:
       - "3000:3000"
     environment:

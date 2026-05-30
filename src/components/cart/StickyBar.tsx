@@ -15,6 +15,7 @@ export function StickyBar() {
   const metal = useConfigurator((s) => s.metal);
   const stone = useConfigurator((s) => s.stone);
   const celebrate = useConfigurator((s) => s.celebrate);
+  const showToast = useConfigurator((s) => s.showToast);
   const { data: product } = useProduct();
   const { variation, price } = useVariation(product, metal, stone);
   const add = useAddToCart();
@@ -22,7 +23,7 @@ export function StickyBar() {
 
   const [visible, setVisible] = useState(false);
   useEffect(() => {
-    const onScroll = () => setVisible(window.scrollY > window.innerHeight * 0.9);
+    const onScroll = () => setVisible(window.scrollY > window.innerHeight * 0.55);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -35,6 +36,9 @@ export function StickyBar() {
       {
         onSuccess: () => {
           celebrate();
+        },
+        onError: () => {
+          showToast("Could not add this configuration. Please try again.");
         },
       },
     );
@@ -63,7 +67,7 @@ export function StickyBar() {
               type="button"
               onClick={handleAdd}
               disabled={!variation || add.isPending}
-              className="h-11 shrink-0 rounded-full bg-ink px-6 text-[0.82rem] uppercase tracking-[0.08em] text-porcelain disabled:opacity-60"
+              className="h-11 shrink-0 rounded-full bg-ink px-6 text-[0.82rem] uppercase tracking-[0.08em] text-porcelain outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-ivory disabled:opacity-60"
             >
               {add.isPending ? "Adding…" : "Add to Bag"}
             </button>
