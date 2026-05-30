@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { METAL_BY_ID } from "@/lib/config";
-import { useConfigurator } from "@/store/configurator";
+import { useConfigurator, getWorldBend, getInsideWormhole } from "@/store/configurator";
 import { Gem } from "./Gem";
 
 /* ----------------------------------------------------------------------------
@@ -78,9 +78,11 @@ export function TwistRing({ mobile }: { mobile: boolean }) {
 
     mat.onBeforeCompile = (shader) => {
       shader.uniforms.uProgress = { value: 0 };
+      shader.uniforms.uWorldBend = { value: 0 };
       mat.userData.shader = shader;
       
       shader.vertexShader = `
+        uniform float uWorldBend;
         varying vec3 vWorldPosition;
         ${shader.vertexShader}
       `.replace(
@@ -88,6 +90,9 @@ export function TwistRing({ mobile }: { mobile: boolean }) {
         `
         #include <worldpos_vertex>
         vWorldPosition = (modelMatrix * vec4(transformed, 1.0)).xyz;
+        
+        // Bend the geometry based on uWorldBend (Inception Curve)
+        transformed.y += sin(transformed.x * 2.0) * uWorldBend * (transformed.z * transformed.z + 0.1);
         `
       );
       
@@ -183,6 +188,10 @@ export function TwistRing({ mobile }: { mobile: boolean }) {
         metalMat.userData.shader.uniforms.uProgress.value = introProgress.current;
       }
     }
+
+    if (metalMat.userData.shader) {
+      metalMat.userData.shader.uniforms.uWorldBend.value = getWorldBend();
+    }
   });
 
   // The "Living" Ring
@@ -192,6 +201,10 @@ export function TwistRing({ mobile }: { mobile: boolean }) {
   useFrame((state) => {
     const g = tiltRef.current;
     if (!g) return;
+    
+    const inside = getInsideWormhole();
+    g.visible = !inside;
+    if (inside) return;
     
     g.rotation.x += (-pointer.y * 0.12 - g.rotation.x) * 0.06;
     g.rotation.y += (pointer.x * 0.18 - g.rotation.y) * 0.06;

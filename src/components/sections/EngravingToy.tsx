@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { EngravingCanvas } from "@/components/three/EngravingCanvas";
+
 import { useConfigurator } from "@/store/configurator";
 
 export function EngravingToy() {
@@ -16,11 +16,8 @@ export function EngravingToy() {
   };
 
   return (
-    <section className="relative min-h-[100svh] bg-black py-32 flex flex-col justify-center overflow-hidden">
-      {/* 3D Background Canvas */}
-      <div className="absolute inset-0 z-0">
-        <EngravingCanvas text={text} />
-      </div>
+    <section className="relative min-h-[100svh] bg-transparent py-32 flex flex-col justify-center overflow-hidden">
+      {/* 3D Background is rendered by the GlobalCanvas underneath */}
 
       <div className="relative z-10 mx-auto w-full max-w-4xl px-6 sm:px-10">
         <motion.div

@@ -14,14 +14,17 @@ import { SoundToggle } from "@/components/ui/SoundToggle";
 import { EngravingToy } from "@/components/sections/EngravingToy";
 import { TechnicalSpecs } from "@/components/sections/TechnicalSpecs";
 
+import { GlobalCanvas } from "@/components/three/GlobalCanvas";
+
 export default function Home() {
   return (
     <>
       <GemCursor />
       <ScrollTracker />
       <SoundToggle />
+      <GlobalCanvas />
       <Header />
-      <main className="bg-stage">
+      <main className="bg-transparent">
         <Studio />
         <Marquee />
         <Craft />

@@ -7,17 +7,7 @@ import { Environment, PerspectiveCamera } from "@react-three/drei";
 
 export function Closing() {
   return (
-    <section className="relative flex min-h-[100svh] flex-col items-center justify-center overflow-hidden bg-black px-6 text-center">
-      <div className="absolute inset-0 pointer-events-none opacity-40">
-        <Canvas gl={{ antialias: true, alpha: true }}>
-          <PerspectiveCamera makeDefault position={[0, 0, 15]} fov={30} />
-          <ambientLight intensity={0.5} />
-          <Environment preset="city" />
-          <group rotation={[0.4, 0, 0]}>
-            <TwistRing mobile={false} />
-          </group>
-        </Canvas>
-      </div>
+    <section className="relative flex min-h-[100svh] flex-col items-center justify-center overflow-hidden bg-transparent px-6 text-center">
 
       <div className="relative z-10 mx-auto max-w-2xl">
         <motion.div

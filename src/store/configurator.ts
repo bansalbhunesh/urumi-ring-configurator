@@ -12,6 +12,22 @@ export function setScrollY(y: number) {
   _scrollY = y;
 }
 
+let _worldBend = 0;
+export function getWorldBend() {
+  return _worldBend;
+}
+export function setWorldBend(b: number) {
+  _worldBend = b;
+}
+
+let _insideWormhole = false;
+export function getInsideWormhole() {
+  return _insideWormhole;
+}
+export function setInsideWormhole(w: boolean) {
+  _insideWormhole = w;
+}
+
 interface ConfiguratorState {
   metal: MetalId;
   stone: StoneId;

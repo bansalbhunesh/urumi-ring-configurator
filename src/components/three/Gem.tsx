@@ -5,7 +5,7 @@ import { useFrame } from "@react-three/fiber";
 import { MeshTransmissionMaterial, Caustics } from "@react-three/drei";
 import * as THREE from "three";
 import { gemGeometryFor, STONE_SCALE } from "./gemGeometry";
-import { useConfigurator } from "@/store/configurator";
+import { useConfigurator, getInsideWormhole } from "@/store/configurator";
 import type { StoneId } from "@/lib/types";
 
 /* ----------------------------------------------------------------------------
@@ -47,7 +47,13 @@ export function Gem({ mobile }: { mobile: boolean }) {
       t.current = 0.0001;
     }
 
+    const inside = getInsideWormhole();
     const g = groupRef.current;
+    if (g) {
+      g.visible = !inside;
+    }
+    if (inside) return;
+
     if (g) {
       const pop = easeOutBack(THREE.MathUtils.clamp(t.current, 0, 1));
       const [sx, sy, sz] = STONE_SCALE[displayStone];

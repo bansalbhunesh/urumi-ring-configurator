@@ -5,7 +5,7 @@ import { StoneGlyph } from "@/components/ui/icons";
 
 export function Materials() {
   return (
-    <section id="materials" className="px-6 py-32 sm:px-10 lg:py-48 bg-porcelain">
+    <section id="materials" className="px-6 py-32 sm:px-10 lg:py-48 bg-transparent">
       <div className="mx-auto grid max-w-[1200px] gap-20 lg:grid-cols-2 lg:gap-32">
         <div>
           <SplitText className="font-display text-4xl leading-tight sm:text-5xl text-ink">

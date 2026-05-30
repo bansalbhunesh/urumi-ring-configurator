@@ -3,7 +3,7 @@ import { SplitText } from "@/components/ui/SplitText";
 
 export function Craft() {
   return (
-    <section id="craft" className="bg-stage-soft px-6 py-32 sm:px-10 lg:py-48">
+    <section id="craft" className="bg-transparent px-6 py-32 sm:px-10 lg:py-48">
       <div className="mx-auto max-w-[1200px]">
         {/* Editorial Title Block without the standard eyebrow */}
         <div className="mb-24 lg:mb-32">

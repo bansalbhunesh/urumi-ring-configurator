@@ -23,7 +23,7 @@ export function TechnicalSpecs() {
   }, []);
 
   return (
-    <section className="bg-black px-6 py-32 sm:px-10 lg:py-48 text-ink">
+    <section className="bg-transparent px-6 py-32 sm:px-10 lg:py-48 text-ink">
       <div className="mx-auto max-w-[800px]">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
