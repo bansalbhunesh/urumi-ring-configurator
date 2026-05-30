@@ -197,8 +197,8 @@ function EngravingCorridor({ text, visible }: { text: string; visible: boolean }
 
   return (
     <group position={[0, 0, 0]}>
-      {/* Curved corridor band */}
-      <mesh position={[0, 0, 0]}>
+      {/* Curved corridor band - ROTATED Math.PI/2 on X to align with Z-axis flight path */}
+      <mesh position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]}>
         <cylinderGeometry args={[2.0, 2.0, 10, 64, 1, true]} />
         <meshStandardMaterial
           ref={matRef}
@@ -208,17 +208,17 @@ function EngravingCorridor({ text, visible }: { text: string; visible: boolean }
         />
       </mesh>
 
-      {/* Engraving floating inside corridor */}
+      {/* Engraving Inscription floating centered at the far end of the tunnel */}
       <Text
-        position={[0, -0.15, 2.5]}
+        position={[0, 0, 4.5]}
         rotation={[0, Math.PI, 0]}
-        fontSize={0.14}
+        fontSize={0.15}
         color="#ffa63b"
         anchorX="center"
         anchorY="middle"
         fillOpacity={0.9}
       >
-        {text || "AURELLE ATELIER"}
+        {text || "YOUR MESSAGE HERE"}
         <meshBasicMaterial ref={textMatRef} toneMapped={false} />
       </Text>
 
@@ -231,9 +231,11 @@ function EngravingCorridor({ text, visible }: { text: string; visible: boolean }
 function ScrollDirector({
   isDesktop,
   controlsRef,
+  ringGroupRef,
 }: {
   isDesktop: boolean;
   controlsRef: React.RefObject<any>;
+  ringGroupRef: React.RefObject<THREE.Group>;
 }) {
   const engraving = useConfigurator((s) => s.engraving);
   
@@ -241,6 +243,7 @@ function ScrollDirector({
   const camLook = useRef(new THREE.Vector3(0, 0, 0));
   const currentBend = useRef(0);
   const currentWormhole = useRef(false);
+  const currentScale = useRef(1.0);
 
   useFrame((state, dt) => {
     const scrollY = getScrollY();
@@ -257,41 +260,51 @@ function ScrollDirector({
     const targetLook = new THREE.Vector3();
     let bend = 0;
     let wormholeActive = false;
+    let targetScaleValue = 1.0;
 
     if (s <= 1.0) {
       // Phase 1: Cosmic / Studio Hero
-      // Rings sits centered on mobile or right on desktop
+      // Centered at s = 0 for full epic screen opening, glides to right column at s = 1.0
+      // Negative X shifts camera left, which shifts origin right (right column)
       const t = s;
       targetPos.set(
-        THREE.MathUtils.lerp(isDesktop ? 0.6 : 0, isDesktop ? 1.45 : 0, t),
-        THREE.MathUtils.lerp(0.5, -0.2, t),
+        THREE.MathUtils.lerp(0, isDesktop ? -1.65 : 0, t),
+        THREE.MathUtils.lerp(0.4, isDesktop ? -0.1 : 0.8, t),
         THREE.MathUtils.lerp(7.0, 7.5, t)
       );
-      targetLook.set(isDesktop ? 1.3 : 0, 1.2, 0);
+      targetLook.set(
+        THREE.MathUtils.lerp(0, isDesktop ? -0.25 : 0, t),
+        THREE.MathUtils.lerp(0.4, isDesktop ? 0.5 : 0.8, t),
+        0
+      );
       bend = 0;
+      targetScaleValue = 1.0;
     } else if (s <= 2.2) {
       // Phase 2: Inception Space Bend (Craft Section)
+      // Camera executes orbital sweep; scale down ring to prevent overlapping text cards
       const t = (s - 1.0) / 1.2;
       const angle = t * Math.PI * 1.2;
-      const r = 7.5 - t * 2.2;
+      const r = 7.5 - t * 1.5;
       
       targetPos.set(
         Math.sin(angle + state.clock.elapsedTime * 0.05) * r,
-        -0.2 + t * 1.5,
+        -0.1 + t * 1.2,
         Math.cos(angle + state.clock.elapsedTime * 0.05) * r
       );
-      targetLook.set(0, 0.5, 0);
+      targetLook.set(0, 0.4, 0);
       bend = t * 1.8; // Heavy world bending curve active!
+      targetScaleValue = isDesktop ? 0.72 : 0.55; // scale down
     } else if (s <= 3.5) {
       // Phase 3: Diamond Zoom (Materials Section)
       const t = (s - 2.2) / 1.3;
       targetPos.set(
         THREE.MathUtils.lerp(0, 0, t),
-        THREE.MathUtils.lerp(1.3, 1.62, t),
-        THREE.MathUtils.lerp(5.3, 1.9, t)
+        THREE.MathUtils.lerp(1.1, 1.62, t),
+        THREE.MathUtils.lerp(6.0, 1.9, t)
       );
       targetLook.set(0, 1.34, 0); // Directly focus gem center
       bend = (1 - t) * 1.8; // Morph back to straight geometric diamond
+      targetScaleValue = THREE.MathUtils.lerp(isDesktop ? 0.72 : 0.55, 1.0, t);
     } else if (s <= 4.8) {
       // Phase 4: Interstellar Wormhole Inside Ring (Engraving)
       const t = (s - 3.5) / 1.3;
@@ -312,6 +325,7 @@ function ScrollDirector({
         Math.cos(angle) * 7.5
       );
       targetLook.set(0, 0.5, 0);
+      targetScaleValue = isDesktop ? 0.75 : 0.6;
     } else {
       // Phase 6: Reunion CTA (Closing Section)
       const t = Math.min(1.0, (s - 5.8) / 0.5);
@@ -321,12 +335,14 @@ function ScrollDirector({
         THREE.MathUtils.lerp(0, 7.2, t)
       );
       targetLook.set(0, 0.6, 0);
+      targetScaleValue = THREE.MathUtils.lerp(isDesktop ? 0.75 : 0.6, 1.0, t);
     }
 
     // Heavy cinematic glide physics (lerp over dt)
     camPos.current.lerp(targetPos, 1 - Math.exp(-4.5 * dt));
     camLook.current.lerp(targetLook, 1 - Math.exp(-4.5 * dt));
     currentBend.current = THREE.MathUtils.damp(currentBend.current, bend, 4.5, dt);
+    currentScale.current = THREE.MathUtils.damp(currentScale.current, targetScaleValue, 4.5, dt);
     
     // Smooth crossfade to inside cylinder
     if (wormholeActive && !currentWormhole.current) {
@@ -338,6 +354,11 @@ function ScrollDirector({
     }
 
     setWorldBend(currentBend.current);
+
+    // Apply scale dampening directly to TwistRing group to prevent text overlap
+    if (ringGroupRef.current) {
+      ringGroupRef.current.scale.setScalar(currentScale.current);
+    }
 
     // Apply vectors to camera
     state.camera.position.copy(camPos.current);
@@ -381,9 +402,11 @@ function ScrollDirector({
       {/* Renders models inside global viewport */}
       <Suspense fallback={null}>
         {!currentWormhole.current && (
-          <Float speed={1.5} rotationIntensity={0.06} floatIntensity={0.06}>
-            <TwistRing mobile={!isDesktop} />
-          </Float>
+          <group ref={ringGroupRef}>
+            <Float speed={1.5} rotationIntensity={0.06} floatIntensity={0.06}>
+              <TwistRing mobile={!isDesktop} />
+            </Float>
+          </group>
         )}
         
         <EngravingCorridor text={engraving} visible={currentWormhole.current} />
@@ -393,12 +416,11 @@ function ScrollDirector({
 }
 
 export function GlobalCanvas() {
-  const [mounted, setMounted] = useState(false);
   const [isDesktop, setIsDesktop] = useState(false);
   const controlsRef = useRef<any>(null);
+  const ringGroupRef = useRef<THREE.Group>(null);
 
   useEffect(() => {
-    setMounted(true);
     const checkSize = () => {
       setIsDesktop(window.innerWidth >= 1024);
     };
@@ -406,8 +428,6 @@ export function GlobalCanvas() {
     window.addEventListener("resize", checkSize);
     return () => window.removeEventListener("resize", checkSize);
   }, []);
-
-  if (!mounted) return null;
 
   return (
     <div className="fixed inset-0 z-0 h-full w-full pointer-events-none">
@@ -423,6 +443,7 @@ export function GlobalCanvas() {
         <ScrollDirector
           isDesktop={isDesktop}
           controlsRef={controlsRef}
+          ringGroupRef={ringGroupRef}
         />
 
         {/* Orbit Interaction active exclusively when viewing the studio configurator section */}
