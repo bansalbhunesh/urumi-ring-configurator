@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useRef, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { Environment, Lightformer, ContactShadows, OrbitControls } from "@react-three/drei";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { SplitText } from "@/components/ui/SplitText";
 import { useConfigurator } from "@/store/configurator";
 import { METAL_BY_ID } from "@/lib/config";
@@ -18,6 +18,7 @@ export function Showcase() {
   const ref = useRef<HTMLDivElement>(null);
   const [show, setShow] = useState(false);
   const metal = useConfigurator((s) => s.metal);
+  const reduced = useReducedMotion();
 
   useEffect(() => {
     const el = ref.current;
@@ -61,7 +62,7 @@ export function Showcase() {
               <RingModel metalId={metal} />
             </Suspense>
             <ContactShadows position={[0, -1.5, 0]} opacity={0.5} scale={7} blur={3} far={5} color="#1a130b" />
-            <OrbitControls autoRotate autoRotateSpeed={1.0} enableZoom={false} enablePan={false} minPolarAngle={Math.PI / 3} maxPolarAngle={Math.PI / 1.7} />
+            <OrbitControls autoRotate={!reduced} autoRotateSpeed={1.0} enableZoom={false} enablePan={false} minPolarAngle={Math.PI / 3} maxPolarAngle={Math.PI / 1.7} />
           </Canvas>
         )}
       </div>
@@ -78,7 +79,7 @@ export function Showcase() {
           transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
         >
           <span className="eyebrow">The render</span>
-          <SplitText as="h2" className="display-1 mt-4 justify-center text-balance text-ink">
+          <SplitText as="h2" className="display-2 mt-4 justify-center text-balance text-ink">
             The real thing.
           </SplitText>
         </motion.div>

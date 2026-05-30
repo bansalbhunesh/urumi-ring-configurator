@@ -1,205 +1,158 @@
-# Aurelle — Brutal Audit & Improvement Plan
+# Aurelle — Brutal Audit, Top-50 Plan, Execution & Re-Evaluation
 
-> Grounded against: the assignment PDF, the reference Loom (ORYZO by Lusion), the running app
-> (`localhost:3000`, captured via Playwright), and a full read of the source.
-> The reference video is the **baseline to exceed**, not the goal.
-
----
-
-## What the reference actually teaches
-
-The reference Loom is **ORYZO by Lusion** — a premium product site. It is not a ring, but it defines
-the bar for *feel*:
-
-- **Typography is the hero** — huge, confident display type, tightly set.
-- **Warm, photographic materials** — cream / olive / wood, real light, real depth. Never a flat void.
-- **Wit with restraint** — copy is playful and self-aware ("A visualization, not a warranty").
-- **Tech as garnish, not spectacle** — a small "FRICTION COEFFICIENT (EST): 0.80" card, *not* a
-  full-screen wormhole.
-- **The product is always beautifully lit and central**, draggable, shown from many angles.
-- **Calm, legible motion** — clean "scroll to continue" cues; nothing fights the content.
-
-Premium = **confidence + restraint + warmth**. Spectacle is not premium.
+Grounded against: the assignment PDF, the reference Loom (**ORYZO by Lusion**,
+oryzo.ai — captured frame-by-frame + full DOM), the deployed app, and the source.
+Reference repository was not provided. The reference video is the **baseline to
+exceed**, not the goal.
 
 ---
 
-## Brutal audit
+# PHASE 1 — BRUTAL AUDIT
 
-### Assignment compliance
-| Requirement | State | Note |
+## What the reference (ORYZO / Lusion) sets as the bar
+A premium product site whose DNA is: **huge confident display type**; **warm,
+photographic materials** (cream/olive/wood) — never a flat void; **wit with
+restraint** ("A visualization, not a warranty"); **tech as garnish** (a small
+"FRICTION COEFFICIENT 0.80" card, not full-screen VFX); the **product always
+beautifully lit, central, and draggable**, shown from many angles; **calm,
+legible motion** with clear scroll cues; a **dark→cream flip** palette-cleanser.
+Premium = confidence + restraint + warmth. Spectacle is *not* premium.
+
+## Assignment compliance
+| Requirement | Original state | Now |
 |---|---|---|
-| Rotate ring (smooth, premium) | ⚠️ Partial | Custom drag works, but a dead `OrbitControls` is overwritten every frame; ring has no visual presence to rotate. |
-| Switch metals live | ✅ | Hover-preview + commit; material lerps. Good idea, kept. |
-| Swap centre stone live | ✅ | round / oval / princess, animated swap. |
-| Add to cart = exact config | ✅ | Cart carries metal+stone+SKU. |
-| Live price from WooCommerce | ✅ (architecturally) | `Store API` BFF + honest mock fallback. Solid. Docker not runnable in this env. |
-| Premium, "not an engineering demo" | ❌ | **The single biggest failure.** See below. |
-| Bonus: 3D picker | ✅ (but costly) | 3 live `<Canvas>` thumbnails = 4 WebGL contexts. |
-| `docker compose up` < 5 min | ✅ (code) | WP + WooCommerce + wp-cli seeder of a real variable product. Correct. |
+| Rotate ring (smooth, mouse+touch) | ⚠️ dead OrbitControls; ring invisible | ✅ drag + inertia + idle + view presets |
+| Switch metals live | ✅ (hover-preview + commit) | ✅ retained |
+| Swap centre stone live | ✅ round/oval/princess | ✅ retained |
+| Add to cart = exact config | ✅ | ✅ (SKU/metal/stone verified) |
+| Live price from WooCommerce | ✅ Store-API BFF + honest mock | ✅ retained |
+| Premium / "not an engineering demo" | ❌ **the core failure** | ✅ rebuilt (below) |
+| Bonus: 3D picker | ✅ live mini-canvases | ✅ + photoreal showcase added |
+| `docker compose up` < 5 min | ✅ code (WP+Woo+seeder) | ✅ frontend now waits on seeder |
+| Deliverables: app/README/architecture | partial | ✅ + this audit |
 
-### The core failure: it reads as an engineering demo, not a jewelry brand
-The scroll experience is literally coded as **"Inception Space Bend", "Interstellar Wormhole",
-"Doctor Strange Multiverse Split"**, with a "Technical Specification Sheet" listing
-`Gaussian bump function, σ = 0.38` and `phase offset π radians`. The brief explicitly says the
-opposite: *"Reads like an engagement-ring brand site, not an engineering demo."* No luxury jeweller
-ships a multiverse split. This is earnest sci-fi where the reference is witty restraint.
+**Original core failure:** the build was an *engineering demo* — scroll coded as
+"Inception Space Bend / Interstellar Wormhole / Doctor Strange Multiverse," a
+mono-font "Technical Specification Sheet" (`Gaussian bump function σ = 0.38`), and
+a hero ring that **rendered invisible** (a duplicate-`varying` shader-compile bug)
+and **collided with body copy** mid-scroll. The opposite of the brief.
 
-### Motion / visual evidence (from the running app)
-1. **The ring is nearly invisible** (P0). On pure `#070605` black the metal has nothing to reflect,
-   so the hero product renders as a faint dark/white wire-loop. The whole point of the page has no
-   presence.
-2. **Ring collides with body copy** (P0). Mid-scroll the scaled ring is drawn straight over the
-   "Backed for Life" card and paragraph text. Broken, amateur.
-3. **Engraving section over-promises** (P1). Full-viewport "type to see it materialise in real time"
-   — nothing materialises; the README admits engraving isn't rendered.
-4. **Competing ring transforms** (P1). `<Float>` + "living" wobble + "heartbeat" scale + world-bend
-   shader + scroll scale/position all stack → busy, unstable motion.
-5. **Blocking 2.5s intro** (P2). Config panel is `delay: 2.5s`; controls appear late.
-6. **One-note cold palette** (P2). Pure black + gold lacks the warmth/depth of the reference.
-7. **Type lacks scale/impact** (P2). Marcellus is elegant but small; hero doesn't command.
+## Motion audit (reference vs original → now)
+- **Scene transitions:** abrupt VFX phase-jumps → calm per-section ring "stage" director (damped).
+- **Camera movement:** chaotic fly-through fighting copy → small flattering reframings (¾ / stone close / band / centred finale).
+- **Hover states:** metal hover-preview (kept); links/buttons have focus+hover underlines.
+- **Loading states:** blank canvas + 2.5s blocking intro → fast word-rise reveals, materialise-in, lazy-mounted heavy model. *Gap:* no poster still before showcase 3D resolves.
+- **Scroll behaviour:** ring drawn over text (broken) → collision-safe `data-ring` zones; Lenis eased (off for touch/reduced-motion).
+- **Micro-interactions:** magnetic buttons, odometer price, skippable celebration, cart retry, drag-to-inspect.
+- **Motion timing / easing:** unified `cubic-bezier(.22,1,.36,1)`; damped frame lerps.
+- **Perceived performance:** 4 always-on WebGL contexts + heavy VFX → canvas pauses when hidden/cart-open, model lazy-loads, 33.6MB→1.7MB. *Gap:* picker thumbnails + hero + showcase add up on low-end mobile.
+- **Premium feel:** transformed sci-fi → restrained-but-bold luxury.
 
-### Technical
-- `build` + `tsc` pass; no runtime console errors. Data layer (`woo.ts`, `mock.ts`, API routes,
-  `config.ts`) is genuinely clean and well-reasoned — **keep it**.
-- 4 simultaneous WebGL contexts is a perf/robustness risk.
+## Visual audit (reference vs now)
+- **Typography:** small thin Marcellus → **Fraunces** display, fluid to ~13rem, word-rise reveals. *Gap:* kerning on the very largest sizes.
+- **Spacing/composition:** editorial left-columns, generous whitespace, dashlines.
+- **Hierarchy:** eyebrow → giant headline → body → action.
+- **Depth:** warm layered background, vignette, contact shadows (was flat black).
+- **Lighting/materials:** studio Lightformers + warm "room" fill so metal reads luminous; photoreal Tripo model in the showcase.
+- **Luxury perception / emotional impact:** witty-romantic copy, dark→cream "Promise" flip, testimonials.
 
----
-
-## Top improvements, ranked by Impact ÷ Effort
-
-**P0 — do first (correctness + the product itself)**
-1. **Light the ring like jewelry.** Studio HDRI + key/rim lights + a warm radial backdrop behind the
-   product so metal has something to reflect; tune the diamond. *Turns the hero from invisible to a
-   showpiece.* (high impact / med effort)
-2. **Kill the scroll-collision.** Give the ring a deterministic, safe on-screen "stage" per section;
-   copy lives in the opposite column. Never overlap. (high / med)
-3. **Delete the sci-fi choreography** — world-bend, wormhole corridor, multiverse, constellation,
-   laser sparks. Replace with calm, restrained camera framing. (high / med — mostly deletion)
-4. **Remove the dead `OrbitControls`** that fights the scroll camera. (high / low)
-
-**P1 — premium feel**
-5. Simplify ring motion to one tasteful idle + reliable drag (mouse+touch) with inertia + reset.
-6. Warm, deepen the palette; add depth (vignette/gradient stage), raise muted-text contrast.
-7. Replace the "Technical Specification Sheet" with an elegant, human spec/craft block (witty, not math).
-8. Cut or honestly reframe the engraving section (no false "materialise" promise).
-9. Non-blocking intro: product + panel arrive fast with a tasteful stagger; real loading skeleton.
-10. Hero typography: larger, more confident scale and rhythm.
-
-**P2 — craft & polish**
-11. Tighten metal/stone selectors (tactile states, keyboard parity already present).
-12. Cart: thumbnail reflecting config, clear demo-vs-live checkout semantics (present, refine copy).
-13. Reduced-motion paths for camera/idle/cursor.
-14. Reduce WebGL cost: keep 3D thumbnails lightweight or share context; cap DPR by tier.
-15. Mobile: give the ring real presence, fix headline wrap, ensure sticky CTA never covers content.
-
-**P3 — verification & docs**
-16. Playwright visual checks (desktop hero, scroll stops, cart, mobile) + console-error gate.
-17. Honest README/ARCHITECTURE on live-vs-demo posture and scope decisions.
+## Issues ranked by impact (highest first)
+1. Invisible hero ring (shader bug) — **fixed**
+2. Sci-fi "engineering demo" tone — **fixed**
+3. Ring/text scroll collisions — **fixed**
+4. Flat-black, no depth/warmth — **fixed**
+5. Weak/small typography — **fixed**
+6. Blocking 2.5s intro — **fixed**
+7. No photoreal product fidelity — **addressed** (Tripo showcase)
+8. Perf (multi-canvas, 33MB model) — **mostly addressed**; mobile headroom remains
+9. No poster/instant still for heavy showcase — **open**
+10. Mobile QA of the new sections — **needs a pass**
 
 ---
 
-## Execution strategy
-Keep the strong foundation (Next 16 App Router, R3F, the WooCommerce BFF + mock, config source of
-truth). Rebuild the **experience layer** toward restrained luxury: a luminous configurator hero as the
-unambiguous centrepiece, a few collision-free editorial sections, calm motion, warm depth. Cut every
-sci-fi gimmick. Verify continuously with build + Playwright screenshots.
+# PHASE 2 — TOP 50 IMPROVEMENTS (sorted by Impact ÷ Effort, highest first)
 
-*Decisions documented in README. This file tracks the audit; progress is committed incrementally.*
+Format: **Title** — *Why* / *Visual* / *UX* / *How*. Status: ✅ done · ◐ partial · ○ open · ⊘ blocked.
+
+1. **Light the ring like jewellery** ✅ — *Why:* it was invisible. *Visual:* luminous gold. *UX:* something to rotate. *How:* studio Lightformers + key/rim + warm room fill + contact shadow.
+2. **Fix invisible-band shader bug** ✅ — *Why:* material failed to compile. *Visual:* ring renders. *UX:* core works. *How:* removed duplicate `varying`.
+3. **Kill the sci-fi scroll/VFX** ✅ — *Why:* "not an engineering demo." *Visual:* restraint. *UX:* legible. *How:* deleted wormhole/multiverse/world-bend.
+4. **Collision-safe ring stage** ✅ — *Why:* ring sat on text. *Visual:* clean. *UX:* readable. *How:* per-section `data-ring` director.
+5. **Fraunces display + fluid scale** ✅ — *Why:* timid type. *Visual:* commanding. *UX:* hierarchy. *How:* `.display-1/2/3` clamps + word-rise.
+6. **Warm, layered palette + depth** ✅ — *Why:* flat void. *Visual:* richness. *UX:* mood. *How:* body gradient, vignette, warmer tokens.
+7. **Non-blocking intro** ✅ — *Why:* 2.5s wait. *Visual:* momentum. *UX:* instant controls. *How:* removed delay; fast reveals.
+8. **Remove dead OrbitControls** ✅ — *Why:* fought scroll cam. *UX:* predictable. *How:* custom drag only.
+9. **Drag w/ inertia (mouse+touch)** ✅ — *Why:* premium rotate. *UX:* tactile. *How:* yaw accumulator + decay.
+10. **Honest live-WooCommerce posture** ✅ — *Why:* trust. *UX:* clear live/demo. *How:* status pill + mock parity.
+11. **Cart = exact config + tinted thumbnail** ✅ — *Visual:* metal chip. *UX:* confidence. *How:* map attrs→swatch/glyph.
+12. **Dark→cream "Promise" flip** ✅ — *Why:* reference cleanser. *Visual:* drama. *How:* `.paper` section, `data-ring=hidden`.
+13. **Live spec card ("The Cut")** ✅ — *Why:* reference data-card. *Visual:* tasteful data. *UX:* reflects stone. *How:* store-driven card.
+14. **Testimonials with personality** ✅ — *Why:* warmth/wit. *UX:* social proof. *How:* review cards + stars.
+15. **Per-section ring framing** ✅ — *Why:* "many angles." *Visual:* cinematic. *How:* `data-frame` stone/band/full.
+16. **Photoreal model integration (Tripo)** ✅ — *Why:* fidelity. *Visual:* real ring. *How:* GLB loader + auto-fit + tint.
+17. **Compress model 33.6→1.7MB** ✅ — *Why:* perf. *UX:* fast. *How:* gltf-transform / plain low-res variant.
+18. **Full-bleed showcase** ✅ — *Why:* hero product moment. *Visual:* impact. *How:* edge canvas + overlaid copy + scrims.
+19. **Lazy-mount heavy canvas** ✅ — *Perf:* first paint. *How:* IntersectionObserver.
+20. **Pause canvas hidden/cart-open** ✅ — *Perf:* GPU. *How:* `frameloop="never"`.
+21. **Reduced-motion paths** ✅ — *a11y.* *How:* camera/idle/bloom/Lenis guards.
+22. **Focus states + ≥44px targets** ✅ — *a11y.* *How:* focus-visible rings, min-h-11.
+23. **Skippable celebration + cart retry** ✅ — *UX:* control + resilience.
+24. **URL share-state** ✅ — *Why:* shareable config. *How:* `?metal=&stone=`.
+25. **View presets (Front/¾/Side/Top)** ✅ — *UX:* inspection. *How:* pose targets.
+26. **Scroll cue** ✅ — *Why:* reference affordance.
+27. **Honest docs (Store API, docker, decisions)** ✅.
+28. **ssr:false canvas** ✅ — *Why:* no hydration crash.
+29. **Semantic headings** ✅ — *a11y.*
+30. **DPR/transmission by device tier** ✅ — *Perf.*
+31. **Poster still for showcase** ○ — *Why:* instant frame before 3D. *Visual:* no empty gap. *UX:* perceived speed. *How:* render one frame to webp, show under canvas.
+32. **Mobile QA pass on new sections** ◐ — *Why:* verify Promise/Showcase/Testimonials at 390px. *How:* Playwright mobile shots + fixes.
+33. **Tune showcase headline/ring overlap** ○ — *Visual:* clear the prongs. *How:* nudge camera Y / headline size.
+34. **Reduce concurrent WebGL contexts on mobile** ◐ — *Perf.* *How:* static thumbnails on coarse pointers.
+35. **Variant A/B of the Tripo model** ○ — *Visual:* pick best generation.
+36. **Reduced-motion for showcase auto-rotate** ○ — *a11y.* *How:* disable autoRotate under reduced-motion.
+37. **Show engraving in cart line (if added)** ○ — *UX* (engraving out of scope now).
+38. **Keyboard rotate (arrow keys → yaw)** ○ — *a11y.*
+39. **Header active-section highlight** ○ — *UX.* *How:* IntersectionObserver on sections.
+40. **Marquee content refinement** ◐ — *Visual.*
+41. **Real checkout hand-off (live mode)** ○ — *Functionality.* *How:* Woo checkout URL/session.
+42. **Inner-band engraving (CanvasTexture)** ○ — *Delight*; deferred (no false promise now).
+43. **Parametric ring-size preview** ○ — *Feature.*
+44. **Texture → KTX2/basis** ○ — *Perf:* smaller GPU memory.
+45. **Commit a Playwright tests/ suite** ◐ — *Quality* (currently in `.audit/`).
+46. **Visual-regression baseline** ○ — *Quality.*
+47. **Docker smoke test** ⊘ — needs Docker (absent here); compose/seed reviewed.
+48. **Lighthouse / Core-Web-Vitals pass** ○ — *Perf:* tune LCP/CLS.
+49. **Copy polish pass (every section voice)** ◐ — *Luxury perception.*
+50. **Final spacing/rhythm/kerning sweep** ◐ — *Craft:* the last 5%.
 
 ---
 
-## Phase 4 — Re-evaluation (after the rebuild)
+# PHASE 3 — EXECUTION (what shipped)
+Worked highest-impact first. Commits on `main`:
+- `6036de0` restrained rebuild (lighting, stage director, removed VFX, shader fix)
+- `f5a098f` view presets, cart retry, docker gating
+- `70d75d8` Fraunces + fluid type + bold hero
+- `d846082` cinematic sections (spec card, cream flip, testimonials)
+- `8165d79` per-section ring framing
+- `7b011e3` photoreal Tripo showcase (hybrid) + 33→1.6MB compression
+- `5e401ed` cleaner plain-GLB variant
+- `d58690d` full-bleed showcase
 
-Verified via `tsc`, `eslint`, `next build`, and Playwright (desktop + mobile,
-section-anchored screenshots, plus a scripted config→cart run). No console/page
-errors in any capture.
-
-### Before → after
-| Issue | Before | After |
-|---|---|---|
-| Hero product | Invisible dark wire-loop on black | Luminous, faceted gold ring with a sparkling stone |
-| Scroll | Ring drawn over body copy | Deterministic per-section "stage"; never overlaps text |
-| Tone | Inception / wormhole / multiverse "spec sheet" | Restrained editorial — atelier, materials, finale |
-| Metal swap | Risk of disappearing | Smooth lerp; a failed-shader (invisible) bug fixed |
-| Intro | 2.5s blocking | Controls in ~0.3s; ring materialises in <1s |
-| Cart | Generic glyph, light scrim washing the page | Metal-tinted thumbnail + cut glyph; dark scrim |
-| Palette | Flat pure black | Warm, layered depth |
-| Motion | Float + wobble + heartbeat + bend stacked | One idle + reliable drag w/ inertia; reduced-motion paths |
-
-### Assignment scorecard
-Rotate ✅ · metals live ✅ · stone live ✅ · add-to-cart exact config ✅
-(`$2,400→$2,580→$2,840`, SKU `TWIST-YELLOWGOLD-PRINCESS`) · live price via Store API
-+ honest mock ✅ · premium / not-a-demo ✅ (the core inversion) · 3D picker bonus ✅ ·
-`docker compose up` stack ✅ (code verified; Docker absent in this env).
-
-### vs the reference (ORYZO)
-Matches the bar on confident type, warm depth, restraint, clean motion and
-product presentation — and exceeds it for the jewelry context by making the
-*product itself* the live, configurable hero. Remaining headroom (future passes): even bolder hero typography and collapsing
-the 3 picker sub-canvases into one shared context for lower-end mobile GPUs.
+Each gated by `eslint` + `tsc` + `next build` + Playwright (`.audit/verify.mjs`,
+7/7: all 9 metal×stone combos, `/api` contract, ring-visibility, no console errors).
 
 ---
 
-## The 50 — honest status
+# PHASE 4 — RE-EVALUATION (vs reference & assignment)
+**Assignment:** all functional requirements met and verified; the "premium, not an
+engineering demo" bar — the original failure — is now met. Docker stack code-correct
+(not bootable in this environment).
 
-Verified by `eslint` / `tsc` / `next build` and two Playwright suites
-(`.audit/verify.mjs` = 7 checks incl. all 9 combos, API contract, ring-visibility;
-`.audit/shot.mjs` = desktop+mobile captures).
+**vs the ORYZO bar:** now matches on confident type, warmth, restraint, wit, clean
+motion, and a draggable photoreal product. It **exceeds** the reference *for this
+brief* by making the product a **live, configurable** purchase surface backed by
+real WooCommerce data — which the reference (a static showcase) does not do.
 
-✅ = done · ◐ = partial · ⊘ = not applicable here
-
-1. ✅ Metal-change disappearance (shader-compile bug fixed)
-2. ✅ Live data path (Store API) + honest demo posture · live stack code-complete
-3. ✅ Mobile hero never overlaps
-4. ✅ Scroll camera synced to DOM section anchors
-5. ✅ Drag-to-rotate from first viewport; hint honest
-6. ✅ Real 3D stone thumbnails (same geometry as hero)
-7. ✅ Load choreography (materialise; price never blank via `priceFor`)
-8. ✅ ESLint clean (React 19 rules)
-9. ✅ Animation randomness seeded outside render
-10. ✅ No render-time ref visibility hacks (removed)
-11. ✅ Metal change crossfades (lerp, no remount)
-12. ✅ Diamond reads faceted/brilliant under new lighting
-13. ✅ Lighting via Lightformers — no runtime HDRI fetch
-14. ✅ Reduced-motion across camera/idle/intro/bloom/cursor/celebration/Lenis
-15. ✅ Raised muted/ink-soft contrast; badge black-on-gold
-16. ✅ Visible focus states throughout
-17. ✅ ≥44px touch targets
-18. ✅ Accessible names (stones); engraving input removed
-19. ✅ Price is one `aria-live` value
-20. ✅ Celebration shortened + skippable (click / Esc / Enter)
-21. ✅ Cart line thumbnail reflects metal + cut
-22. ✅ Cart error + retry — button shows "Couldn't add — Try again" + toast
-23. ✅ Checkout disabled + clearly demo-only
-24. ✅ Sticky bar timing; never covers content
-25. ✅ First-viewport composition + "scroll to explore" cue
-26. ✅ Ownable type (Marcellus / Manrope), scaled up
-27. ✅ Warm, layered palette (not flat black)
-28. ✅ Inspection view presets — Front / ¾ / Side / Top (pose-driven), plus drag
-29. ✅ Rotation inertia + reset
-30. ✅ Hover preview non-destructive + keyboard-equivalent
-31. ✅ Tactile selector states
-32. ✅ Network-aware live/demo status pill
-33. ✅ No demo-price flicker (computed fallback)
-34. ✅ Full config in URL (`?metal=&stone=`), restored on load
-35. ✅ Configuration summary by the CTA
-36. ✅ Engraving reframed (removed false "materialise" promise)
-37. ✅ Sci-fi "spec sheet" replaced with editorial
-38. ✅ AI-aesthetic tells removed (wormhole, multiverse, mono-math)
-39. ✅ Empty-cart polish + focus return
-40. ✅ Cart focus trap + Escape
-41. ✅ Header legible across scroll
-42. ✅ DPR + transmission resolution by device tier
-43. ✅ Canvas render loop pauses when tab hidden / cart open
-44. ✅ E2E across all 9 metal×stone combos + totals (`verify.mjs`)
-45. ✅ Desktop+mobile capture harness (`shot.mjs`)
-46. ✅ Ring-visibility pixel check (mean luma 79/255)
-47. ✅ API contract checks for `/api/products` + `/api/cart`
-48. ⊘ Docker boot not runnable here (Docker absent). Hardened anyway: `frontend`
-    now waits on `provision` (`service_completed_successfully`) so the first load
-    is live, not demo-until-reload. `compose`/`provision`/`seed` reviewed.
-49. ✅ README honest about demo vs live
-50. ✅ Final polish pass (spacing, rhythm, timing, mobile QA)
-
-**49 done · 1 N/A** (Docker boot — needs Docker installed; code hardened & reviewed).
-
+**Still weaker / next pass (do not stop):** #31 poster still, #32 mobile QA, #33
+overlap tune, #34 mobile WebGL budget, #48 Lighthouse — the current highest
+Impact÷Effort open items, and the focus of the next iteration.
