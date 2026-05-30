@@ -30,9 +30,12 @@ designed, not incidental. Premium easing / spring physics throughout; reduced-
 motion always degrades gracefully (no autoplay, static frames).
 
 ## Build order (highest emotional impact ÷ effort first)
-1. **Narrative spine (copy + act framing)** — reframe existing sections into Acts
-   I–X with the signature lines + "ACT N" markers, and add `TechnicalSpecs`
-   (Act VI) to the page. Transforms "product page" → "story" with low risk. *Start here.*
+1. **Narrative spine (copy + act framing)** — ✅ done (`273fa61`). Craft → "The
+   birth of form", Materials → "The materials of forever / Three metals. Three
+   worlds.", TheCut → "The personality of the stone", Showcase → "Your creation",
+   Closing → "Forever / Some choices last forever." + signature lines. Plus the
+   scroll-scrubbed turntable (`586ab68`) as the image-sequence-style reveal.
+   _Still to add here: `TechnicalSpecs` (Act VI) onto the page._
 2. **Act III metal-grows on scroll** — wire the materialise `uProgress` to the
    Craft section's scroll progress (the reveal already exists).
 3. **Act IV material worlds** — metal switch transforms environment + page tint.
