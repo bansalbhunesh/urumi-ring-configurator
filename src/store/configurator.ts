@@ -12,6 +12,18 @@ export function setScrollY(y: number) {
   _scrollY = y;
 }
 
+/* Ring "reveal" 0→1, derived from the ring's on-screen scale by the ScrollDirector
+   and read by the metal materialise shader (Act III — the ring grows into being as
+   it enters the stage). 1 = fully formed; near 0 only while the ring is hidden, so
+   it can never be left half-dissolved while visible. */
+let _ringReveal = 0;
+export function getRingReveal() {
+  return _ringReveal;
+}
+export function setRingReveal(v: number) {
+  _ringReveal = v;
+}
+
 /* Requested ring pose (radians) for the view presets / reset affordance.
    null = free (idle + drag + pointer parallax). Read by TwistRing each frame;
    cleared the moment the user grabs the ring. */

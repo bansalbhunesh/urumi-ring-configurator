@@ -9,6 +9,7 @@ import {
   useConfigurator,
   getRingYawTarget,
   getRingPitchTarget,
+  getRingReveal,
   setRingPose,
 } from "@/store/configurator";
 import { Gem } from "./Gem";
@@ -230,9 +231,14 @@ export function TwistRing({
   };
 
   useFrame((state, dt) => {
-    if (introProgress.current < 1) {
-      introProgress.current = THREE.MathUtils.damp(introProgress.current, 1.1, 2.4, dt);
-    }
+    // Act III — the metal materialises in step with the ring's reveal (scale),
+    // so it grows into being as it enters the stage and stays solid once there.
+    introProgress.current = THREE.MathUtils.damp(
+      introProgress.current,
+      getRingReveal(),
+      6,
+      dt,
+    );
 
     const g = tiltRef.current;
     if (!g) return;

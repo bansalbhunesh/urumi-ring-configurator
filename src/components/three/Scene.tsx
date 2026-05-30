@@ -12,7 +12,7 @@ import {
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import * as THREE from "three";
 import { TwistRing } from "./TwistRing";
-import { getScrollY, useConfigurator } from "@/store/configurator";
+import { getScrollY, setRingReveal, useConfigurator } from "@/store/configurator";
 
 /* ----------------------------------------------------------------------------
    One fixed, alpha canvas renders the ring for the whole page. The ring lives
@@ -218,6 +218,11 @@ function ScrollDirector({
     const progress = THREE.MathUtils.clamp(y / maxScroll, 0, 1);
     const yawTarget = progress * Math.PI * 2 * 1.15;
     groupYaw.current = damp(groupYaw.current, yawTarget, reduceMotion ? 999 : 3.2, dt);
+
+    // Act III — drive the metal materialise from the ring's scale: it grows into
+    // being as it enters the stage, and is guaranteed solid whenever it's at full
+    // scale (so it can never be left half-dissolved while visible).
+    setRingReveal(THREE.MathUtils.clamp(scale.current / 0.55, 0, 1));
 
     const g = ringGroupRef.current;
     if (g) {

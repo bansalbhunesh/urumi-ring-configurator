@@ -133,7 +133,7 @@ export function ActOne() {
       ref={ref}
       id="overture"
       data-ring="hidden"
-      className="relative h-[220svh]"
+      className="relative h-[165svh]"
       aria-label="An overture"
     >
       {/* Pinned stage — particles + line hold center while you scroll through */}
