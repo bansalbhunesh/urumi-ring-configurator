@@ -18,6 +18,7 @@ import { SoundToggle } from "@/components/ui/SoundToggle";
 import { Toast } from "@/components/ui/Toast";
 import { ScrollCue } from "@/components/ui/ScrollCue";
 import { ConfigUrlSync } from "@/components/ui/ConfigUrlSync";
+import { MetalAtmosphere } from "@/components/ui/MetalAtmosphere";
 
 import { GlobalCanvas } from "@/components/three/GlobalCanvas";
 
@@ -29,6 +30,7 @@ export default function Home() {
       <ScrollTracker />
       <SoundToggle />
       <ScrollCue />
+      <MetalAtmosphere />
       <GlobalCanvas />
       <Header />
       <main className="bg-transparent">
