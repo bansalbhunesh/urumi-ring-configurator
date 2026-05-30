@@ -63,6 +63,7 @@ function ScrollDirector({
     // where the ring should step aside is a markup change, not a code change.
     const center = y + vh * 0.5;
     let ring = "hero";
+    let frame = "full";
     if (typeof document !== "undefined") {
       const els = document.querySelectorAll<HTMLElement>("[data-ring]");
       for (let i = 0; i < els.length; i++) {
@@ -70,6 +71,7 @@ function ScrollDirector({
         const top = r.top + y;
         if (center >= top && center < top + r.height) {
           ring = els[i].dataset.ring || "hero";
+          frame = els[i].dataset.frame || "full";
           break;
         }
       }
@@ -78,7 +80,12 @@ function ScrollDirector({
     const hero: Stage = isDesktop
       ? { pos: new THREE.Vector3(1.5, 0, 0), scale: 1.0, camZ: 7.2, lookY: 0.5 }
       : { pos: new THREE.Vector3(0, 1.72, 0), scale: 0.52, camZ: 8.7, lookY: 0.95 };
-    const sideStage: Stage = { pos: new THREE.Vector3(1.62, -0.05, 0), scale: 1.05, camZ: 6.7, lookY: 0.66 };
+    // Stage framings — the ring is presented from varied angles as you scroll.
+    const STAGE: Record<string, Stage> = {
+      full: { pos: new THREE.Vector3(1.62, -0.05, 0), scale: 1.05, camZ: 6.7, lookY: 0.66 },
+      stone: { pos: new THREE.Vector3(1.5, -0.15, 0), scale: 1.12, camZ: 5.9, lookY: 1.0 },
+      band: { pos: new THREE.Vector3(1.64, 0.05, 0), scale: 1.0, camZ: 6.9, lookY: 0.32 },
+    };
     const hidden: Stage = { pos: new THREE.Vector3(0, 0.35, 0), scale: 0.0001, camZ: 8.7, lookY: 0.6 };
     const finaleStage: Stage = isDesktop
       ? { pos: new THREE.Vector3(0, -0.12, 0), scale: 0.74, camZ: 7.4, lookY: 0.45 }
@@ -87,7 +94,7 @@ function ScrollDirector({
     let target: Stage;
     if (ring === "finale") target = finaleStage;
     else if (ring === "hidden") target = hidden;
-    else if (ring === "stage") target = wide ? sideStage : hidden;
+    else if (ring === "stage") target = wide ? STAGE[frame] ?? STAGE.full : hidden;
     else target = hero;
 
     // On mobile the fixed ring would sit behind the hero controls as you scroll;

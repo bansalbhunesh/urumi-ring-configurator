@@ -8,6 +8,7 @@ export function Materials() {
     <section
       id="materials"
       data-ring="stage"
+      data-frame="band"
       className="relative px-6 py-32 sm:px-10 lg:px-16 lg:py-48"
     >
       <div className="mx-auto max-w-2xl xl:mx-0 xl:max-w-[32rem]">
