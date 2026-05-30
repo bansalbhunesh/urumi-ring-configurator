@@ -3,6 +3,13 @@ import { SplitText } from "@/components/ui/SplitText";
 import { METALS, STONES } from "@/lib/config";
 import { StoneGlyph } from "@/components/ui/icons";
 
+/* Act IV — each metal is a world with its own emotion, not just a colour. */
+const WORLD: Record<string, string> = {
+  "white-gold": "Moonlight — cool clarity",
+  "yellow-gold": "Heritage — warmth",
+  "rose-gold": "Intimacy — romance",
+};
+
 export function Materials() {
   return (
     <section
@@ -36,7 +43,10 @@ export function Materials() {
                     boxShadow: "inset 0 1px 2px rgba(255,255,255,0.35), 0 3px 10px rgba(0,0,0,0.45)",
                   }}
                 />
-                <span className="font-display text-xl text-ink">{m.label}</span>
+                <span className="flex flex-col">
+                  <span className="font-display text-xl text-ink">{m.label}</span>
+                  <span className="text-[0.74rem] tracking-wide text-gold/80">{WORLD[m.id]}</span>
+                </span>
                 <span className="ml-auto text-[0.82rem] text-ink-soft">{m.caption}</span>
               </li>
             ))}
