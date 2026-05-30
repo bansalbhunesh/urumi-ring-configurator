@@ -3,6 +3,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { Reveal } from "@/components/ui/Reveal";
 import { SplitText } from "@/components/ui/SplitText";
+import { CrystalPanels } from "@/components/sections/CrystalPanels";
 import { useConfigurator } from "@/store/configurator";
 import { STONE_BY_ID } from "@/lib/config";
 import type { StoneId } from "@/lib/types";
@@ -48,8 +49,9 @@ export function TheCut() {
   const spec = CUT_SPEC[stone];
 
   return (
-    <section id="cut" data-ring="stage" data-frame="stone" className="relative px-6 py-32 sm:px-10 lg:px-16 lg:py-48">
-      <div className="mx-auto max-w-2xl xl:mx-0 xl:max-w-[36rem]">
+    <section id="cut" data-ring="stage" data-frame="stone" className="relative overflow-hidden px-6 py-32 sm:px-10 lg:px-16 lg:py-48">
+      <CrystalPanels />
+      <div className="relative z-10 mx-auto max-w-2xl xl:mx-0 xl:max-w-[36rem]">
         <span className="eyebrow">The centre stone</span>
         <SplitText as="h2" className="display-2 mt-5 text-balance text-ink">
           Cut to catch the light.

@@ -98,7 +98,22 @@ Maps onto: `three/Scene.tsx` (stage + lighting + backdrop FX), `three/TwistRing.
   keep DPR tiered. The ring + diamond always render first; FX are additive layers
   that fade out if frame budget is tight.
 
-### Status
+### Status — implementation
 Analysis + design system + roadmap: **done (this doc).**
-Effect implementation: **pending `/compact`** (heavy GLSL/R3F work needs full context),
-then executed in roadmap order, each gated by lint/tsc/build/Playwright.
+All six roadmap effects shipped to `main`, each gated by tsc + lint and verified by
+Playwright screenshot (software-WebGL, console-error-clean):
+
+1. **Spotlight reveal + iridescent backdrop (A+D)** — `globals.css` `body::before`
+   holographic spotlight + drift. ✅ `a55b404`
+2. **Gold-dust particles (G)** — seeded additive points, `GoldDust`. ✅ `5c3b936`
+   **Silk-like golden trails (E)** — additive tube ribbons, `SilkRibbons`. ✅ `a9389a6`
+3. **Diamond caustics (F)** — procedural refracted-light floor pool, `CausticFloor`.
+   ✅ `bb0ff8b`
+4. **Liquid-metal reflective floor (B)** — `MeshReflectorMaterial`, `ReflectiveFloor`.
+   ✅ `79121d8`
+5. **Crystal-glass parallax panels (C)** — frosted CSS/Framer shards behind the
+   centre-stone beat, `CrystalPanels`. ✅ (this commit)
+6. **Golden halo (H)** — additive torus frame, `SilkHalo`. ✅ `c66d3b4`
+
+All 3D FX are desktop-gated where they cost a render pass, disabled under
+reduced-motion, and additive/behind the ring so the product stays the hero.
