@@ -235,7 +235,7 @@ function ScrollDirector({
 }: {
   isDesktop: boolean;
   controlsRef: React.RefObject<any>;
-  ringGroupRef: React.RefObject<THREE.Group>;
+  ringGroupRef: React.RefObject<THREE.Group | null>;
 }) {
   const engraving = useConfigurator((s) => s.engraving);
   
