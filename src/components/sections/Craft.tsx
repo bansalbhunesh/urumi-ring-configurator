@@ -9,6 +9,7 @@ export function Craft() {
   return (
     <section
       id="atelier"
+      data-ring="stage"
       className="relative px-6 py-32 sm:px-10 lg:px-16 lg:py-48"
     >
       <div className="mx-auto max-w-2xl xl:mx-0 xl:max-w-[36rem]">

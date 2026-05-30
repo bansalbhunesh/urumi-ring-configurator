@@ -54,6 +54,7 @@ export function Studio() {
   return (
     <section
       id="ring"
+      data-ring="hero"
       className="relative grid min-h-[100svh] overflow-hidden lg:grid-cols-[1.05fr_0.95fr]"
     >
       <RoomTint />

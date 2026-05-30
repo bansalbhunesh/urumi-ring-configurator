@@ -9,6 +9,7 @@ export function Closing() {
   return (
     <section
       id="finale"
+      data-ring="finale"
       className="relative flex min-h-[100svh] flex-col items-center justify-between overflow-hidden px-6 pt-28 pb-24 text-center sm:pt-32"
     >
       <motion.div
@@ -19,11 +20,11 @@ export function Closing() {
         className="relative z-10 mx-auto max-w-lg"
       >
         <span className="eyebrow">The moment</span>
-        <p className="display-3 mt-4 text-balance text-ink">
+        <p className="font-display mt-4 text-balance text-[1.6rem] leading-snug text-ink sm:text-[2rem]">
           Somewhere, someone is about to ask the most important question of their
           life.
         </p>
-        <p className="font-display mt-4 text-2xl italic text-gold sm:text-3xl">
+        <p className="font-display mt-3 text-xl italic text-gold sm:text-2xl">
           This is what they&apos;ll be holding.
         </p>
       </motion.div>

@@ -3,7 +3,10 @@ import { Footer } from "@/components/site/Footer";
 import { Studio } from "@/components/studio/Studio";
 import { Marquee } from "@/components/sections/Marquee";
 import { Craft } from "@/components/sections/Craft";
+import { TheCut } from "@/components/sections/TheCut";
 import { Materials } from "@/components/sections/Materials";
+import { PromiseSection } from "@/components/sections/Promise";
+import { Testimonials } from "@/components/sections/Testimonials";
 import { Closing } from "@/components/sections/Closing";
 import { CartDrawer } from "@/components/cart/CartDrawer";
 import { StickyBar } from "@/components/cart/StickyBar";
@@ -31,7 +34,10 @@ export default function Home() {
         <Studio />
         <Marquee />
         <Craft />
+        <TheCut />
         <Materials />
+        <PromiseSection />
+        <Testimonials />
         <Closing />
       </main>
       <Footer />

@@ -33,12 +33,6 @@ type Stage = {
 
 const damp = THREE.MathUtils.damp;
 
-function anchorTop(id: string): number | null {
-  if (typeof document === "undefined") return null;
-  const el = document.getElementById(id);
-  return el ? el.getBoundingClientRect().top + window.scrollY : null;
-}
-
 function ScrollDirector({
   isDesktop,
   wide,
@@ -64,38 +58,42 @@ function ScrollDirector({
     else if (intro.current < 1) intro.current = Math.min(1, intro.current + dt / 0.9);
     const introEase = 1 - Math.pow(1 - intro.current, 3);
 
-    const studioEl =
-      typeof document !== "undefined" ? document.getElementById("ring") : null;
-    const studioBottom = studioEl
-      ? studioEl.getBoundingClientRect().bottom + window.scrollY
-      : vh;
-    const finale = anchorTop("finale");
-
-    const inFinale = finale != null && y >= finale - vh * 0.55;
-    const inAtelier = !inFinale && y >= studioBottom - vh * 0.6;
+    // Which section owns the viewport centre? Each section declares data-ring
+    // ("hero" | "stage" | "hidden" | "finale"), so adding full-width sections
+    // where the ring should step aside is a markup change, not a code change.
+    const center = y + vh * 0.5;
+    let ring = "hero";
+    if (typeof document !== "undefined") {
+      const els = document.querySelectorAll<HTMLElement>("[data-ring]");
+      for (let i = 0; i < els.length; i++) {
+        const r = els[i].getBoundingClientRect();
+        const top = r.top + y;
+        if (center >= top && center < top + r.height) {
+          ring = els[i].dataset.ring || "hero";
+          break;
+        }
+      }
+    }
 
     const hero: Stage = isDesktop
       ? { pos: new THREE.Vector3(1.5, 0, 0), scale: 1.0, camZ: 7.2, lookY: 0.5 }
       : { pos: new THREE.Vector3(0, 1.72, 0), scale: 0.52, camZ: 8.7, lookY: 0.95 };
+    const sideStage: Stage = { pos: new THREE.Vector3(1.62, -0.05, 0), scale: 1.05, camZ: 6.7, lookY: 0.66 };
+    const hidden: Stage = { pos: new THREE.Vector3(0, 0.35, 0), scale: 0.0001, camZ: 8.7, lookY: 0.6 };
+    const finaleStage: Stage = isDesktop
+      ? { pos: new THREE.Vector3(0, -0.12, 0), scale: 0.74, camZ: 7.4, lookY: 0.45 }
+      : { pos: new THREE.Vector3(0, 0.0, 0), scale: 0.48, camZ: 8.7, lookY: 0.5 };
 
     let target: Stage;
-    if (inFinale) {
-      target = isDesktop
-        ? { pos: new THREE.Vector3(0, -0.12, 0), scale: 0.74, camZ: 7.4, lookY: 0.45 }
-        : { pos: new THREE.Vector3(0, 0.0, 0), scale: 0.48, camZ: 8.7, lookY: 0.5 };
-    } else if (inAtelier) {
-      target = wide
-        ? { pos: new THREE.Vector3(1.62, -0.05, 0), scale: 1.05, camZ: 6.7, lookY: 0.66 }
-        : { pos: new THREE.Vector3(0, 5, 0), scale: 0.0001, camZ: 8.7, lookY: 0.6 };
-    } else {
-      target = hero;
-    }
+    if (ring === "finale") target = finaleStage;
+    else if (ring === "hidden") target = hidden;
+    else if (ring === "stage") target = wide ? sideStage : hidden;
+    else target = hero;
 
-    // On mobile the canvas is fixed, so as the hero scrolls up the ring would
-    // otherwise sit behind the configurator controls. Fade it out as the user
-    // scrolls into the panel — it returns for the finale.
+    // On mobile the fixed ring would sit behind the hero controls as you scroll;
+    // fade it out as you move into the panel. It returns for the finale.
     let mobileFade = 1;
-    if (!isDesktop && !inFinale && !inAtelier) {
+    if (!isDesktop && ring === "hero") {
       mobileFade = 1 - THREE.MathUtils.smoothstep(y, vh * 0.12, vh * 0.5);
     }
 
