@@ -5,6 +5,7 @@ import { Marquee } from "@/components/sections/Marquee";
 import { Craft } from "@/components/sections/Craft";
 import { TheCut } from "@/components/sections/TheCut";
 import { Materials } from "@/components/sections/Materials";
+import { Showcase } from "@/components/sections/Showcase";
 import { PromiseSection } from "@/components/sections/Promise";
 import { Testimonials } from "@/components/sections/Testimonials";
 import { Closing } from "@/components/sections/Closing";
@@ -36,6 +37,7 @@ export default function Home() {
         <Craft />
         <TheCut />
         <Materials />
+        <Showcase />
         <PromiseSection />
         <Testimonials />
         <Closing />
