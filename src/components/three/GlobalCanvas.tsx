@@ -244,6 +244,7 @@ function ScrollDirector({
   const currentBend = useRef(0);
   const currentWormhole = useRef(false);
   const currentScale = useRef(1.0);
+  const introTime = useRef(0);
 
   useFrame((state, dt) => {
     const scrollY = getScrollY();
@@ -255,6 +256,13 @@ function ScrollDirector({
       controlsRef.current.enabled = (s > 0.35 && s < 1.35);
     }
 
+    // Track load time up to 2.5 seconds (intro sequence)
+    if (introTime.current < 2.5) {
+      introTime.current += dt;
+    }
+    const introT = THREE.MathUtils.clamp(introTime.current / 2.5, 0, 1);
+    const easedIntro = Math.sin((introT * Math.PI) / 2); // smooth ease-out
+
     // Coordinate maps
     const targetPos = new THREE.Vector3();
     const targetLook = new THREE.Vector3();
@@ -264,17 +272,17 @@ function ScrollDirector({
 
     if (s <= 1.0) {
       // Phase 1: Cosmic / Studio Hero
-      // Centered at s = 0 for full epic screen opening, glides to right column at s = 1.0
-      // Negative X shifts camera left, which shifts origin right (right column)
-      const t = s;
-      targetPos.set(
-        THREE.MathUtils.lerp(0, isDesktop ? -1.65 : 0, t),
-        THREE.MathUtils.lerp(0.4, isDesktop ? -0.1 : 0.8, t),
-        THREE.MathUtils.lerp(7.0, 7.5, t)
-      );
+      // Centered initially (easedIntro = 0), glides to right column automatically as introTime plays
+      // Scroll Y (s) does not drag it back; it holds the right-aligned position stable
+      
+      const glideX = THREE.MathUtils.lerp(0, isDesktop ? -1.65 : 0, easedIntro);
+      const glideY = THREE.MathUtils.lerp(0.4, isDesktop ? -0.1 : 0.8, easedIntro);
+      const glideZ = THREE.MathUtils.lerp(7.0, 7.5, easedIntro);
+
+      targetPos.set(glideX, glideY, glideZ);
       targetLook.set(
-        THREE.MathUtils.lerp(0, isDesktop ? -0.25 : 0, t),
-        THREE.MathUtils.lerp(0.4, isDesktop ? 0.5 : 0.8, t),
+        THREE.MathUtils.lerp(0, isDesktop ? -0.25 : 0, easedIntro),
+        THREE.MathUtils.lerp(0.4, isDesktop ? 0.5 : 0.8, easedIntro),
         0
       );
       bend = 0;
