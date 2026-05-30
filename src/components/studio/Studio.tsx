@@ -46,7 +46,7 @@ export function Studio() {
   const metal = useConfigurator((s) => s.metal);
   const stone = useConfigurator((s) => s.stone);
   const { data: product, isLoading } = useProduct();
-  const { variation, price, live } = useVariation(product, metal, stone);
+  const { variation, price } = useVariation(product, metal, stone);
   const symbol = product?.currencySymbol ?? "$";
   const metalLabel = METAL_BY_ID[metal].label;
   const stoneLabel = STONE_BY_ID[stone].label;
@@ -132,30 +132,17 @@ export function Studio() {
               <StoneSelector />
             </div>
 
-            <div className="mt-9 flex items-end justify-between gap-5">
-              <div>
-                <span className="eyebrow">Your configuration</span>
-                <div className="mt-1.5 font-sans text-[2.7rem] font-semibold leading-none tabular-nums text-ink">
-                  <PriceTag value={price} symbol={symbol} />
-                </div>
-                <p className="mt-2 text-[0.78rem] text-ink-soft">
-                  {metalLabel} · {stoneLabel}
-                </p>
+            <div className="mt-9">
+              <span className="eyebrow">Your configuration</span>
+              <div className="mt-2 font-sans text-[3rem] font-semibold leading-none tabular-nums text-ink">
+                <PriceTag value={price} symbol={symbol} />
               </div>
-              <span
-                className="mb-1 flex shrink-0 items-center gap-1.5 text-[0.64rem] uppercase tracking-[0.16em] text-ink-soft"
-                title={
-                  live
-                    ? "Pricing served live from the WooCommerce Store API"
-                    : "Pricing from the seeded mock (WooCommerce not reachable)"
-                }
-              >
-                <span className={`h-1.5 w-1.5 rounded-full ${live ? "bg-emerald-400" : "bg-gold"}`} />
-                {isLoading ? "Loading" : live ? "WooCommerce live" : "Seeded demo"}
-              </span>
+              <p className="mt-2.5 text-[0.8rem] tracking-wide text-ink-soft">
+                {metalLabel} · {stoneLabel}
+              </p>
             </div>
 
-            <div className="mt-5">
+            <div className="mt-6">
               <AddToCartButton variationId={variation?.id} loading={isLoading} />
             </div>
 

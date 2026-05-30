@@ -255,7 +255,10 @@ export function TwistRing({
       } else {
         d.yaw += d.vel; // inertia
         d.vel *= 0.92;
-        d.yaw += dt * 0.16; // slow idle reveal turn
+        // Slow turntable reveal that breathes — the speed eases up and down so the
+        // motion reads organic and cinematic, never metronomic.
+        const tt = state.clock.elapsedTime;
+        d.yaw += dt * (0.13 + 0.055 * Math.sin(tt * 0.28));
       }
     }
 
