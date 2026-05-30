@@ -3,6 +3,7 @@ import { Footer } from "@/components/site/Footer";
 import { Studio } from "@/components/studio/Studio";
 import { ActOne } from "@/components/sections/ActOne";
 import { Marquee } from "@/components/sections/Marquee";
+import { BirthOfLight } from "@/components/sections/BirthOfLight";
 import { Craft } from "@/components/sections/Craft";
 import { TheCut } from "@/components/sections/TheCut";
 import { Materials } from "@/components/sections/Materials";
@@ -40,6 +41,7 @@ export default function Home() {
         <ActOne />
         <Studio />
         <Marquee />
+        <BirthOfLight />
         <Craft />
         <TheCut />
         <Materials />
