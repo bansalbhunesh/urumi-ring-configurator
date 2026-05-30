@@ -34,9 +34,12 @@ export function Gem({ mobile }: { mobile: boolean }) {
   const matRef = useRef<any>(null); 
   const t = useRef(0); // transition progress: start at 0 for the intro sequence
 
+  const age = useRef(0);
+
   useFrame((state, dt) => {
-    // Intro sequence: delay stone pop-in for 1.5 seconds to let the ring materialize first
-    const introDelayPassed = state.clock.elapsedTime > 1.5;
+    // Intro sequence: local mounting age ensures robust materialization whenever the gem mounts
+    age.current += dt;
+    const introDelayPassed = age.current > 1.2;
     const swapping = displayStone !== targetStone;
     
     const goal = (swapping || !introDelayPassed) ? 0 : 1;
@@ -99,27 +102,10 @@ export function Gem({ mobile }: { mobile: boolean }) {
 
   return (
     <group ref={groupRef}>
-      {mobile ? (
-        <mesh geometry={geometry} castShadow>
-          {material}
-        </mesh>
-      ) : (
-        <Caustics
-          color="#ffffff"
-          position={[0, -2.4, 0]} // Project onto the floor below the ring
-          lightSource={[4, 6, 4]} // Match main directional light
-          intensity={0.08} // Subtle so it doesn't blow out the floor
-          worldRadius={0.6}
-          ior={1.15}
-          backside={true}
-          causticsOnly={false}
-          resolution={1024}
-        >
-          <mesh geometry={geometry} castShadow>
-            {material}
-          </mesh>
-        </Caustics>
-      )}
+      <mesh geometry={geometry} castShadow receiveShadow>
+        {material}
+      </mesh>
     </group>
   );
 }
+
