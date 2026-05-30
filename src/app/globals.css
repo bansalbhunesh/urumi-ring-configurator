@@ -10,12 +10,15 @@
   --color-ivory-deep: #030302;
   --color-porcelain: #070605;
   --color-champagne: #12100d;
-  --color-ink: #f6efe6;
-  --color-ink-soft: #c5bcb0;
-  --color-muted: #9a9085;
-  --color-line: #332e27;
-  --color-gold: #c2a06a;
-  --color-gold-bright: #d8bc84;
+  --color-ink: #f5ead6;
+  --color-ink-soft: #cabfae;
+  --color-muted: #9a9081;
+  --color-line: #38322a;
+  --color-gold: #c8a56b;
+  --color-gold-bright: #e3c585;
+  /* Inverted (light) section, à la the reference's flip to cream */
+  --color-paper: #efe6d4;
+  --color-paper-ink: #14100a;
 
   --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.5),
     0 12px 40px -16px rgba(0, 0, 0, 0.8);
@@ -64,20 +67,64 @@ body {
 .font-display {
   font-family: var(--font-display);
   font-weight: 400;
-  letter-spacing: 0;
+  letter-spacing: -0.01em;
 }
 
 .eyebrow {
   font-family: var(--font-sans);
   text-transform: uppercase;
-  letter-spacing: 0.18em;
-  font-size: 0.6875rem;
-  font-weight: 500;
+  letter-spacing: 0.24em;
+  font-size: 0.68rem;
+  font-weight: 600;
   color: var(--color-gold);
 }
 
 .text-balance {
   text-wrap: balance;
+}
+
+/* Big, confident fluid display scale (reference-grade presence) -------------- */
+.display-1 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: 0.92;
+  letter-spacing: -0.02em;
+  font-size: clamp(3.4rem, 13vw, 13rem);
+}
+.display-2 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+  font-size: clamp(2.6rem, 8vw, 6.5rem);
+}
+.display-3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.015em;
+  font-size: clamp(2rem, 4.6vw, 3.6rem);
+}
+
+/* Animated dashed connector line, like the reference's o-dashline */
+.o-dashline {
+  height: 1px;
+  background-image: repeating-linear-gradient(
+    90deg,
+    var(--color-line) 0,
+    var(--color-line) 6px,
+    transparent 6px,
+    transparent 12px
+  );
+}
+
+/* Inverted light section */
+.paper {
+  background: var(--color-paper);
+  color: var(--color-paper-ink);
+}
+.paper .eyebrow {
+  color: #8a6a36;
 }
 
 /* Ambient gradients ---------------------------------------------------------- */

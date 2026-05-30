@@ -11,7 +11,7 @@ export function Materials() {
     >
       <div className="mx-auto max-w-2xl xl:mx-0 xl:max-w-[32rem]">
         <span className="eyebrow">Materials</span>
-        <SplitText as="h2" className="font-display mt-5 text-4xl leading-tight sm:text-5xl text-ink">
+        <SplitText as="h2" className="display-3 mt-5 text-ink">
           Three golds, one standard.
         </SplitText>
         <Reveal delay={0.15}>
@@ -39,11 +39,7 @@ export function Materials() {
           </ul>
         </Reveal>
 
-        <SplitText
-          as="h2"
-          delay={0.1}
-          className="font-display mt-24 text-4xl leading-tight sm:text-5xl text-ink"
-        >
+        <SplitText as="h2" delay={0.1} className="display-3 mt-24 text-ink">
           A cut for every hand.
         </SplitText>
         <Reveal delay={0.15}>

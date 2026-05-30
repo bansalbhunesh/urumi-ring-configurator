@@ -11,9 +11,9 @@ export function Craft() {
       id="atelier"
       className="relative px-6 py-32 sm:px-10 lg:px-16 lg:py-48"
     >
-      <div className="mx-auto max-w-2xl xl:mx-0 xl:max-w-[32rem]">
+      <div className="mx-auto max-w-2xl xl:mx-0 xl:max-w-[36rem]">
         <span className="eyebrow">The Atelier</span>
-        <SplitText as="h2" className="font-display mt-5 text-balance text-4xl leading-[1.08] sm:text-5xl lg:text-6xl text-ink">
+        <SplitText as="h2" className="display-2 mt-5 text-balance text-ink">
           The smallest thing you will ever wear, and the one that says the most.
         </SplitText>
 

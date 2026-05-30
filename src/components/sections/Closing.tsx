@@ -19,11 +19,11 @@ export function Closing() {
         className="relative z-10 mx-auto max-w-lg"
       >
         <span className="eyebrow">The moment</span>
-        <p className="font-display mt-4 text-[1.7rem] leading-snug text-ink sm:text-3xl">
+        <p className="display-3 mt-4 text-balance text-ink">
           Somewhere, someone is about to ask the most important question of their
           life.
         </p>
-        <p className="font-display mt-3 text-xl italic text-gold sm:text-2xl">
+        <p className="font-display mt-4 text-2xl italic text-gold sm:text-3xl">
           This is what they&apos;ll be holding.
         </p>
       </motion.div>

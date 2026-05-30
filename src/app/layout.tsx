@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
-import { Marcellus, Manrope } from "next/font/google";
+import { Fraunces, Manrope } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers";
 
-const display = Marcellus({
+const display = Fraunces({
   variable: "--font-display",
   subsets: ["latin"],
-  weight: "400",
+  weight: ["400", "500", "600", "700", "900"],
+  style: ["normal", "italic"],
   display: "swap",
 });
 
