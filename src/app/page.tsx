@@ -1,6 +1,7 @@
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { Studio } from "@/components/studio/Studio";
+import { ActOne } from "@/components/sections/ActOne";
 import { Marquee } from "@/components/sections/Marquee";
 import { Craft } from "@/components/sections/Craft";
 import { TheCut } from "@/components/sections/TheCut";
@@ -34,6 +35,7 @@ export default function Home() {
       <GlobalCanvas />
       <Header />
       <main className="bg-transparent">
+        <ActOne />
         <Studio />
         <Marquee />
         <Craft />
