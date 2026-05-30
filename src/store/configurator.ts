@@ -12,14 +12,20 @@ export function setScrollY(y: number) {
   _scrollY = y;
 }
 
-/* Requested ring yaw (radians) for the "reset view" affordance. null = free.
-   Read by TwistRing each frame; cleared the moment the user drags. */
+/* Requested ring pose (radians) for the view presets / reset affordance.
+   null = free (idle + drag + pointer parallax). Read by TwistRing each frame;
+   cleared the moment the user grabs the ring. */
 let _ringYawTarget: number | null = null;
+let _ringPitchTarget: number | null = null;
 export function getRingYawTarget() {
   return _ringYawTarget;
 }
-export function setRingYawTarget(v: number | null) {
-  _ringYawTarget = v;
+export function getRingPitchTarget() {
+  return _ringPitchTarget;
+}
+export function setRingPose(yaw: number | null, pitch: number | null = yaw) {
+  _ringYawTarget = yaw;
+  _ringPitchTarget = pitch;
 }
 
 interface ConfiguratorState {

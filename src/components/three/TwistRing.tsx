@@ -5,7 +5,12 @@ import { useFrame, useThree, type ThreeEvent } from "@react-three/fiber";
 import * as THREE from "three";
 import { METAL_BY_ID } from "@/lib/config";
 import type { MetalOption } from "@/lib/types";
-import { useConfigurator, getRingYawTarget, setRingYawTarget } from "@/store/configurator";
+import {
+  useConfigurator,
+  getRingYawTarget,
+  getRingPitchTarget,
+  setRingPose,
+} from "@/store/configurator";
 import { Gem } from "./Gem";
 
 /* ----------------------------------------------------------------------------
@@ -206,7 +211,7 @@ export function TwistRing({
     drag.current.active = true;
     drag.current.lastX = e.clientX;
     drag.current.vel = 0;
-    setRingYawTarget(null); // grabbing the ring releases any "reset view"
+    setRingPose(null, null); // grabbing the ring releases any preset/reset view
     (e.target as Element)?.setPointerCapture?.(e.pointerId);
     e.stopPropagation();
   };
@@ -233,17 +238,18 @@ export function TwistRing({
     if (!g) return;
     const d = drag.current;
     const yawTarget = getRingYawTarget();
+    const pitchTarget = getRingPitchTarget();
 
     if (reduceMotion) {
       if (yawTarget != null) d.yaw += (yawTarget - d.yaw) * 0.25;
       g.rotation.y += (d.yaw - g.rotation.y) * 0.2;
-      g.rotation.x = 0;
+      g.rotation.x = pitchTarget ?? 0;
       return;
     }
 
     if (!d.active) {
       if (yawTarget != null) {
-        // Eased return to a requested angle (reset view); idle paused.
+        // Eased move to a requested angle (view preset / reset); idle paused.
         d.yaw += (yawTarget - d.yaw) * 0.12;
         d.vel = 0;
       } else {
@@ -253,7 +259,8 @@ export function TwistRing({
       }
     }
 
-    const tiltX = -pointer.y * 0.1;
+    // Pitch follows a preset when set, otherwise gentle pointer parallax.
+    const tiltX = pitchTarget != null ? pitchTarget : -pointer.y * 0.1;
     g.rotation.y += (d.yaw - g.rotation.y) * 0.1;
     g.rotation.x += (tiltX - g.rotation.x) * 0.05;
 

@@ -169,13 +169,13 @@ Verified by `eslint` / `tsc` / `next build` and two Playwright suites
 19. ✅ Price is one `aria-live` value
 20. ✅ Celebration shortened + skippable (click / Esc / Enter)
 21. ✅ Cart line thumbnail reflects metal + cut
-22. ◐ Cart error handling via toast (no explicit retry button)
+22. ✅ Cart error + retry — button shows "Couldn't add — Try again" + toast
 23. ✅ Checkout disabled + clearly demo-only
 24. ✅ Sticky bar timing; never covers content
 25. ✅ First-viewport composition + "scroll to explore" cue
 26. ✅ Ownable type (Marcellus / Manrope), scaled up
 27. ✅ Warm, layered palette (not flat black)
-28. ◐ Inspection: reset-view added; full top/side/macro presets deferred (drag covers it)
+28. ✅ Inspection view presets — Front / ¾ / Side / Top (pose-driven), plus drag
 29. ✅ Rotation inertia + reset
 30. ✅ Hover preview non-destructive + keyboard-equivalent
 31. ✅ Tactile selector states
@@ -195,9 +195,11 @@ Verified by `eslint` / `tsc` / `next build` and two Playwright suites
 45. ✅ Desktop+mobile capture harness (`shot.mjs`)
 46. ✅ Ring-visibility pixel check (mean luma 79/255)
 47. ✅ API contract checks for `/api/products` + `/api/cart`
-48. ⊘ Docker smoke — Docker absent in this env; `compose`/`provision`/`seed` reviewed
+48. ⊘ Docker boot not runnable here (Docker absent). Hardened anyway: `frontend`
+    now waits on `provision` (`service_completed_successfully`) so the first load
+    is live, not demo-until-reload. `compose`/`provision`/`seed` reviewed.
 49. ✅ README honest about demo vs live
 50. ✅ Final polish pass (spacing, rhythm, timing, mobile QA)
 
-**47 done · 2 partial · 1 N/A.**
+**49 done · 1 N/A** (Docker boot — needs Docker installed; code hardened & reviewed).
 

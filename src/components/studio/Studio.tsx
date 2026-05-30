@@ -2,7 +2,14 @@
 
 import { motion } from "framer-motion";
 import { RoomTint } from "@/components/ui/RoomTint";
-import { useConfigurator, setRingYawTarget } from "@/store/configurator";
+import { useConfigurator, setRingPose } from "@/store/configurator";
+
+const VIEWS = [
+  { label: "Front", yaw: 0, pitch: 0 },
+  { label: "¾", yaw: -Math.PI / 5, pitch: 0.14 },
+  { label: "Side", yaw: Math.PI / 2, pitch: 0 },
+  { label: "Top", yaw: 0, pitch: 1.0 },
+] as const;
 import { useProduct } from "@/hooks/useProduct";
 import { useVariation } from "@/hooks/useVariation";
 import { METAL_BY_ID, STONE_BY_ID } from "@/lib/config";
@@ -36,19 +43,27 @@ export function Studio() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1, delay: 1.1, ease: EASE }}
-          className="pointer-events-none absolute inset-x-0 bottom-6 z-20 flex items-center justify-center gap-2"
+          className="pointer-events-none absolute inset-x-0 bottom-6 z-20 flex flex-col items-center gap-2.5"
         >
           <span className="inline-flex items-center gap-2 rounded-full border border-line/80 bg-porcelain/50 px-4 py-1.5 text-[0.62rem] uppercase tracking-[0.24em] text-ink-soft backdrop-blur-sm">
             <DragGlyph /> Drag to rotate
           </span>
-          <button
-            type="button"
-            onClick={() => setRingYawTarget(0)}
-            aria-label="Reset ring view"
-            className="pointer-events-auto grid h-8 w-8 place-items-center rounded-full border border-line/80 bg-porcelain/50 text-ink-soft backdrop-blur-sm outline-none transition-colors hover:text-ink focus-visible:ring-2 focus-visible:ring-gold"
+          <div
+            role="group"
+            aria-label="Ring view presets"
+            className="pointer-events-auto hidden items-center gap-0.5 rounded-full border border-line/80 bg-porcelain/50 p-1 backdrop-blur-sm lg:flex"
           >
-            <DragGlyph />
-          </button>
+            {VIEWS.map((v) => (
+              <button
+                key={v.label}
+                type="button"
+                onClick={() => setRingPose(v.yaw, v.pitch)}
+                className="rounded-full px-3 py-1 text-[0.6rem] uppercase tracking-[0.18em] text-ink-soft outline-none transition-colors hover:bg-ink/5 hover:text-ink focus-visible:ring-2 focus-visible:ring-gold"
+              >
+                {v.label}
+              </button>
+            ))}
+          </div>
         </motion.div>
       </div>
 

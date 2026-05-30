@@ -41,7 +41,13 @@ export function AddToCartButton({
     );
   };
 
-  const state = add.isPending ? "pending" : done ? "done" : "idle";
+  const state = add.isPending
+    ? "pending"
+    : done
+      ? "done"
+      : add.isError
+        ? "error"
+        : "idle";
 
   return (
     <Magnetic strength={12} className="w-full">
@@ -80,6 +86,17 @@ export function AddToCartButton({
                 className="flex items-center gap-2"
               >
                 <CheckIcon className="h-4 w-4" /> Added
+              </motion.span>
+            )}
+            {state === "error" && (
+              <motion.span
+                key="error"
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -6 }}
+                className="flex items-center gap-2"
+              >
+                Couldn&apos;t add — Try again
               </motion.span>
             )}
             {state === "idle" && (
