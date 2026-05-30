@@ -53,6 +53,33 @@ body {
   overflow-x: hidden;
 }
 
+/* Holographic spotlight backdrop (moodboard: diffraction + spotlight reveal).
+   A faint top spotlight + slow iridescent sheen behind the alpha canvas. Pure
+   CSS, GPU-friendly; the global reduced-motion rule disables the drift. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: -12%;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(38% 28% at 50% -4%, rgba(255, 240, 210, 0.1), transparent 70%),
+    conic-gradient(
+      from 200deg at 68% 32%,
+      rgba(120, 96, 200, 0.05),
+      rgba(86, 160, 200, 0.05),
+      rgba(210, 150, 96, 0.06),
+      rgba(120, 96, 200, 0.05)
+    );
+  filter: blur(48px);
+  animation: fx-drift 32s linear infinite;
+}
+@keyframes fx-drift {
+  to {
+    transform: rotate(10deg) scale(1.06);
+  }
+}
+
 ::selection {
   background: var(--color-gold);
   color: var(--color-ivory-deep);
