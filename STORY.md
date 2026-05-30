@@ -42,12 +42,18 @@ motion always degrades gracefully (no autoplay, static frames).
 3. **Act I converging-particles opening** — ✅ done (`d550463`). Scroll-scrubbed
    particle cloud converges into the first facet beneath "Every forever begins as
    a possibility." Self-contained `ActOne` canvas; build-green, SSR-safe.
-4. **Act III metal-grows on scroll** — wire the materialise `uProgress` to the
-   Craft section's scroll progress (the reveal already exists). _Next._
-5. **Act VI blueprint** — wireframe/dimension overlay (needs a net-new section;
-   `TechnicalSpecs` no longer exists in the tree).
-6. **Act VIII price-as-story** + **Act IX/X finale polish**.
-7. **Act II camera-in-diamond** + **Act VII hand** (most ambitious; may stylize).
+4. **Act III metal-grows on scroll** — ✅ done (`96fb332`). Reveal coupled to ring
+   scale; materialises on entry, solid at full scale.
+5. **Act VI blueprint** — ✅ done (`8b79aba`). Animated technical-drawing SVG
+   (`Blueprint`), reflects the live stone.
+6. **Act VIII price-as-story** — ✅ done (`633091d`, `WeightOfChoice`).
+7. **Act II birth-of-light** — ✅ done (`2110a70`, `BirthOfLight`, prism/spectrum SVG).
+8. **Act VII the hand** — ✅ done (`HumanConnection`, stylized gold line-art).
+
+**All ten acts shipped.** The signature for the diagrammatic interludes (II/VI/VII)
+is a unified gold line-art language. Remaining work is iterative polish against the
+real-GPU experience, not new acts — see Constraints. Finale polish (Act IX/X UI
+fade, the converging "your creation" recap) is the natural next refinement pass.
 
 ## Constraints / honesty
 - Real-GPU bloom/material can't be verified in the software-WebGL harness — keep
