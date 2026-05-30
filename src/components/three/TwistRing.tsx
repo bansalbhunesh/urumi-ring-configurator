@@ -130,7 +130,7 @@ function patchMetalShader(shader: MetalShader) {
       }
       float edge = smoothstep(threshold - 0.08, threshold, noise * 0.5 + 0.5);
       if (edge > 0.0 && uProgress < 0.99) {
-        gl_FragColor.rgb += vec3(1.0, 0.72, 0.3) * edge * 2.2;
+        gl_FragColor.rgb += vec3(1.0, 0.88, 0.7) * edge * 0.9;
       }
       `,
     );
@@ -169,7 +169,7 @@ function MetalMaterial({
       color="#e9e9ec"
       metalness={1}
       roughness={0.18}
-      envMapIntensity={1.9}
+      envMapIntensity={1.15}
       transparent
       depthWrite
       onBeforeCompile={(shader) => {

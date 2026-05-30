@@ -34,131 +34,6 @@ type Stage = {
 
 const damp = THREE.MathUtils.damp;
 
-/* Gold-dust depth layer (moodboard: cosmic depth + silk glow). Sparse additive
-   points; the existing Bloom makes them shimmer. Seeded (stable), count-capped,
-   and disabled under reduced-motion. Sits behind the ring — pure ambience. */
-function GoldDust({ count, reduceMotion }: { count: number; reduceMotion: boolean }) {
-  const ref = useRef<THREE.Points>(null);
-  const positions = useMemo(() => {
-    const a = new Float32Array(count * 3);
-    const r = (i: number, n: number) => {
-      const x = Math.sin((i + 1) * n) * 43758.5453;
-      return x - Math.floor(x);
-    };
-    for (let i = 0; i < count; i++) {
-      a[i * 3] = (r(i, 12.9898) - 0.5) * 10;
-      a[i * 3 + 1] = (r(i, 78.233) - 0.5) * 6.5;
-      a[i * 3 + 2] = (r(i, 37.719) - 0.5) * 5 - 2.5;
-    }
-    return a;
-  }, [count]);
-
-  useFrame((state) => {
-    if (!ref.current) return;
-    ref.current.rotation.y = state.clock.elapsedTime * 0.018;
-    ref.current.position.y = Math.sin(state.clock.elapsedTime * 0.14) * 0.12;
-  });
-
-  if (reduceMotion) return null;
-  return (
-    <points ref={ref}>
-      <bufferGeometry>
-        <bufferAttribute attach="attributes-position" args={[positions, 3]} />
-      </bufferGeometry>
-      <pointsMaterial
-        size={0.035}
-        color="#e3c585"
-        transparent
-        opacity={0.55}
-        sizeAttenuation
-        depthWrite={false}
-        blending={THREE.AdditiveBlending}
-      />
-    </points>
-  );
-}
-
-/* Golden halo of light framing the product (moodboard: energy halo / silk glow).
-   One thin additive torus behind the ring; Bloom turns it into a soft glow.
-   Larger than the ring so it frames rather than competes. */
-function SilkHalo({ reduceMotion }: { reduceMotion: boolean }) {
-  const ref = useRef<THREE.Mesh>(null);
-  useFrame((s) => {
-    if (ref.current && !reduceMotion) ref.current.rotation.z = s.clock.elapsedTime * 0.05;
-  });
-  return (
-    <mesh ref={ref} position={[0, 0.5, -2]}>
-      <torusGeometry args={[2.9, 0.014, 12, 140]} />
-      <meshBasicMaterial
-        color="#e3c585"
-        transparent
-        opacity={0.2}
-        blending={THREE.AdditiveBlending}
-        depthWrite={false}
-        toneMapped={false}
-      />
-    </mesh>
-  );
-}
-
-/* Silk-like golden light trails (moodboard: ribbons of warm light curling around
-   the product). A few thin tube ribbons swept along graceful seeded curves, sat
-   behind the ring; additive + the existing Bloom render them as soft silk-light,
-   never opaque geometry. Built once, animated by a slow group drift so they flow
-   without rebuilding geometry. Disabled under reduced-motion. */
-function makeRibbonCurve(seed: number, radius: number, height: number) {
-  const pts: THREE.Vector3[] = [];
-  const N = 16;
-  for (let i = 0; i <= N; i++) {
-    const t = i / N;
-    const a = t * Math.PI * 2 * 1.35 + seed;
-    const r = radius * (0.82 + 0.22 * Math.sin(t * Math.PI * 2 + seed));
-    pts.push(
-      new THREE.Vector3(
-        Math.cos(a) * r,
-        (t - 0.5) * height + Math.sin(t * Math.PI * 3 + seed) * 0.28,
-        Math.sin(a) * r * 0.6,
-      ),
-    );
-  }
-  return new THREE.CatmullRomCurve3(pts, false, "catmullrom", 0.6);
-}
-function SilkRibbons({ reduceMotion }: { reduceMotion: boolean }) {
-  const ref = useRef<THREE.Group>(null);
-  const geoms = useMemo(
-    () => [
-      new THREE.TubeGeometry(makeRibbonCurve(0.4, 2.5, 3.4), 130, 0.012, 5, false),
-      new THREE.TubeGeometry(makeRibbonCurve(2.3, 2.9, 3.0), 130, 0.009, 5, false),
-      new THREE.TubeGeometry(makeRibbonCurve(4.7, 2.2, 3.8), 130, 0.011, 5, false),
-    ],
-    [],
-  );
-  useFrame((s) => {
-    if (!ref.current || reduceMotion) return;
-    const t = s.clock.elapsedTime;
-    ref.current.rotation.y = t * 0.05;
-    ref.current.rotation.z = Math.sin(t * 0.12) * 0.08;
-  });
-  useEffect(() => () => geoms.forEach((g) => g.dispose()), [geoms]);
-  if (reduceMotion) return null;
-  return (
-    <group ref={ref} position={[0.5, 0.4, -1.7]}>
-      {geoms.map((g, i) => (
-        <mesh key={i} geometry={g}>
-          <meshBasicMaterial
-            color="#f0cd86"
-            transparent
-            opacity={0.32}
-            blending={THREE.AdditiveBlending}
-            depthWrite={false}
-            toneMapped={false}
-          />
-        </mesh>
-      ))}
-    </group>
-  );
-}
-
 /* Diamond caustics (moodboard: refracted light cast by the stone). Rather than
    geometry-derived caustics (an extra render pass that would fight the ring's
    per-frame reposition/scale), this projects a procedural caustic web onto the
@@ -194,7 +69,7 @@ const CAUSTIC_FRAG = /* glsl */ `
     float val = pow(abs(c), 8.0);
     float d = distance(vUv, vec2(0.5));
     float mask = smoothstep(0.5, 0.06, d);
-    gl_FragColor = vec4(uColor * val, clamp(val, 0.0, 1.0) * mask * 0.55);
+    gl_FragColor = vec4(uColor * val, clamp(val, 0.0, 1.0) * mask * 0.28);
   }
 `;
 function CausticFloor({ reduceMotion }: { reduceMotion: boolean }) {
@@ -341,45 +216,50 @@ function ScrollDirector({
 
   return (
     <>
-      <ambientLight intensity={0.35} />
-      <Environment resolution={256} environmentIntensity={1.0}>
+      {/* Studio lighting discipline: one bright neutral key models the metal, a
+         cool rim separates it from the dark, warm accents are restrained so the
+         scene reads precious (cool-neutral with warmth) rather than mono-orange. */}
+      <ambientLight intensity={0.26} />
+      <Environment resolution={256} environmentIntensity={0.82}>
+        {/* Main key — large neutral softbox, the principal modelling light. */}
         <Lightformer
           form="rect"
-          intensity={4.5}
-          color="#fff6ea"
+          intensity={5}
+          color="#ffffff"
+          scale={[1.4, 9, 1]}
+          position={[4.5, 1, 3]}
+          rotation={[0, -0.6, 0]}
+        />
+        {/* Warm wrap — gentle warmth on the key side, dialed back. */}
+        <Lightformer
+          form="rect"
+          intensity={2.6}
+          color="#fdf3e6"
           scale={[10, 8, 1]}
           position={[-3, 4, 4]}
           rotation={[-0.3, 0.2, 0]}
         />
+        {/* Cool rim — the "expensive" edge light that lifts metal off the black. */}
         <Lightformer
-          form="rect"
-          intensity={6}
-          color="#ffffff"
-          scale={[1.2, 9, 1]}
-          position={[4.5, 1, 3]}
-          rotation={[0, -0.6, 0]}
+          form="ring"
+          intensity={3.2}
+          color="#cfe0ff"
+          scale={[4, 4, 1]}
+          position={[-3, 1, -5]}
         />
+        {/* Faint warm under-fill so the shadow side never crushes to pure black. */}
         <Lightformer
           form="rect"
-          intensity={2.2}
-          color="#f3c98b"
+          intensity={1.2}
+          color="#e9d3b0"
           scale={[6, 3, 1]}
           position={[3, -3, 2]}
           rotation={[0.4, -0.3, 0]}
         />
         <Lightformer
-          form="ring"
-          intensity={3}
-          color="#cfe0ff"
-          scale={[4, 4, 1]}
-          position={[-3, 1, -5]}
-        />
-        {/* Dim warm "room" — fills the metal's dark side with warmth instead
-           of pure black (the original cause of the invisible ring). */}
-        <Lightformer
           form="rect"
-          intensity={0.7}
-          color="#2a2018"
+          intensity={0.55}
+          color="#241d16"
           scale={[30, 30, 1]}
           position={[0, 0, -8]}
         />
@@ -389,13 +269,13 @@ function ScrollDirector({
         position={[-4, 7, 5]}
         angle={0.5}
         penumbra={1}
-        intensity={2.6}
-        color="#fff3e2"
+        intensity={2.0}
+        color="#fff6ec"
         castShadow
         shadow-bias={-0.0001}
         shadow-mapSize={[1024, 1024]}
       />
-      <pointLight position={[3.5, -1, 2.5]} intensity={0.6} color="#e9b572" />
+      <pointLight position={[3.5, -1, 2.5]} intensity={0.26} color="#dcc49a" />
 
       <ContactShadows
         position={[0, -1.35, 0]}
@@ -408,9 +288,6 @@ function ScrollDirector({
 
       {isDesktop && <ReflectiveFloor />}
       {isDesktop && <CausticFloor reduceMotion={reduceMotion} />}
-      <GoldDust count={isDesktop ? 240 : 80} reduceMotion={reduceMotion} />
-      <SilkHalo reduceMotion={reduceMotion} />
-      {isDesktop && <SilkRibbons reduceMotion={reduceMotion} />}
 
       <Suspense fallback={null}>
         <group ref={ringGroupRef}>
@@ -420,13 +297,16 @@ function ScrollDirector({
 
       {isDesktop && !reduceMotion && (
         <EffectComposer enableNormalPass={false}>
+          {/* A whisper of bloom — only the diamond's hottest sparkle should ever
+             glow. The metal must read as polished metal, never as a light source. */}
           <Bloom
-            intensity={0.55}
-            luminanceThreshold={0.82}
-            luminanceSmoothing={0.18}
+            intensity={0.18}
+            luminanceThreshold={0.96}
+            luminanceSmoothing={0.22}
             mipmapBlur
           />
-          <Vignette eskil={false} offset={0.28} darkness={0.7} />
+          {/* Firm vignette to darken the frame edges and focus the eye on the ring. */}
+          <Vignette eskil={false} offset={0.2} darkness={0.88} />
         </EffectComposer>
       )}
     </>

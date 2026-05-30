@@ -39,13 +39,14 @@ html {
 }
 
 body {
-  background-color: #050403;
-  /* Warm depth so the page never reads as a flat void — the reference is never
-     pure black. Two soft pools of light: warm key upper-right, cool fill left. */
+  background-color: #040303;
+  /* Deep, quiet studio atmosphere — never a flat void, never noisy. One warm
+     light pool high-centre, a faint cool counter low-left for depth, graded to
+     near-black at the base so the frame recedes and the ring stays the subject. */
   background-image:
-    radial-gradient(60% 50% at 72% 30%, rgba(120, 92, 54, 0.18), transparent 70%),
-    radial-gradient(55% 60% at 18% 75%, rgba(60, 70, 96, 0.1), transparent 72%),
-    linear-gradient(180deg, #0a0807 0%, #050403 55%, #070504 100%);
+    radial-gradient(68% 52% at 56% 16%, rgba(150, 116, 70, 0.15), transparent 66%),
+    radial-gradient(48% 50% at 20% 84%, rgba(48, 58, 80, 0.07), transparent 74%),
+    linear-gradient(180deg, #0b0908 0%, #060504 54%, #030302 100%);
   background-attachment: fixed;
   color: var(--color-ink);
   font-family: var(--font-sans);
@@ -53,31 +54,26 @@ body {
   overflow-x: hidden;
 }
 
-/* Holographic spotlight backdrop (moodboard: diffraction + spotlight reveal).
-   A faint top spotlight + slow iridescent sheen behind the alpha canvas. Pure
-   CSS, GPU-friendly; the global reduced-motion rule disables the drift. */
+/* The single light. A soft warm pool high-centre that gently breathes — the only
+   light in the room behind the alpha canvas. No hue shifts, no drift, no clutter;
+   atmosphere with one reason to exist: to lift the ring out of the dark. The
+   reduced-motion rule stills the breath. */
 body::before {
   content: "";
   position: fixed;
-  inset: -12%;
+  inset: 0;
   z-index: -1;
   pointer-events: none;
-  background:
-    radial-gradient(38% 28% at 50% -4%, rgba(255, 240, 210, 0.1), transparent 70%),
-    conic-gradient(
-      from 200deg at 68% 32%,
-      rgba(120, 96, 200, 0.05),
-      rgba(86, 160, 200, 0.05),
-      rgba(210, 150, 96, 0.06),
-      rgba(120, 96, 200, 0.05)
-    );
-  filter: blur(48px);
-  animation: fx-drift 32s linear infinite;
+  background: radial-gradient(
+    44% 34% at 50% 6%,
+    rgba(255, 243, 222, 0.08),
+    transparent 70%
+  );
+  animation: fx-breathe 16s var(--ease-lux) infinite;
 }
-@keyframes fx-drift {
-  to {
-    transform: rotate(10deg) scale(1.06);
-  }
+@keyframes fx-breathe {
+  0%, 100% { opacity: 0.65; }
+  50% { opacity: 1; }
 }
 
 ::selection {
