@@ -8,6 +8,7 @@ import { Craft } from "@/components/sections/Craft";
 import { TheCut } from "@/components/sections/TheCut";
 import { Materials } from "@/components/sections/Materials";
 import { Blueprint } from "@/components/sections/Blueprint";
+import { HumanConnection } from "@/components/sections/HumanConnection";
 import { WeightOfChoice } from "@/components/sections/WeightOfChoice";
 import { Showcase } from "@/components/sections/Showcase";
 import { PromiseSection } from "@/components/sections/Promise";
@@ -46,6 +47,7 @@ export default function Home() {
         <TheCut />
         <Materials />
         <Blueprint />
+        <HumanConnection />
         <WeightOfChoice />
         <Showcase />
         <PromiseSection />
