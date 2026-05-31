@@ -1,22 +1,12 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { SplitText } from "@/components/ui/SplitText";
 import { useConfigurator } from "@/store/configurator";
 import { METAL_BY_ID } from "@/lib/config";
 
-/* ----------------------------------------------------------------------------
-   ACT VII — The human connection.
-
-   The environment falls away. Silence. The ring settles onto a finger — real
-   scale, no UI, just the moment. Rendered as a quiet line-art beat in the same
-   gold-stroke language as Acts II/VI (a graceful finger; faint neighbours suggest
-   the hand), with the band tinted to the chosen metal settling into place as the
-   section arrives. "Designed for a moment that changes everything."
----------------------------------------------------------------------------- */
-
 const EASE = [0.22, 1, 0.36, 1] as const;
-const line = {
+const stroke = {
   hidden: { pathLength: 0, opacity: 0 },
   show: (i: number) => ({
     pathLength: 1,
@@ -31,52 +21,174 @@ const line = {
 export function HumanConnection() {
   const metal = useConfigurator((s) => s.metal);
   const band = METAL_BY_ID[metal].color;
+  const reduceMotion = useReducedMotion() ?? false;
 
   return (
     <section
       id="hand"
       data-ring="hidden"
-      className="relative flex min-h-[100svh] flex-col items-center justify-center overflow-hidden px-6 py-28 text-center"
+      className="relative flex min-h-[100svh] flex-col items-center justify-center overflow-hidden bg-[#0c0b09] px-6 py-28 text-center"
     >
+      {/* warm atmospheric bloom — centered on the ring */}
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(ellipse 62% 38% at 50% 52%, rgba(195,155,65,0.18) 0%, rgba(130,90,30,0.07) 55%, transparent 78%)",
+        }}
+        aria-hidden
+      />
+      {/* cinematic vignette — darkens the four corners */}
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(ellipse 80% 75% at 50% 50%, transparent 35%, rgba(4,3,2,0.75) 100%)",
+        }}
+        aria-hidden
+      />
+
+      {/* the hand — large enough to feel present, not decorative */}
       <motion.svg
-        viewBox="0 0 480 520"
-        className="w-full max-w-md"
+        viewBox="0 0 480 580"
+        className="relative z-10 w-full max-w-[28rem] sm:max-w-2xl"
         fill="none"
         initial="hidden"
         whileInView="show"
         viewport={{ once: true, margin: "-15%" }}
         aria-hidden
       >
-        {/* faint neighbouring fingers — just enough to suggest the hand */}
-        <motion.path d="M176 500 C 168 380, 176 280, 188 214" stroke="#e3c585" strokeOpacity="0.22" strokeWidth="1" variants={line} custom={0} />
-        <motion.path d="M150 505 C 138 400, 150 320, 168 260" stroke="#e3c585" strokeOpacity="0.16" strokeWidth="1" variants={line} custom={0.4} />
-        <motion.path d="M300 500 C 312 380, 306 290, 296 226" stroke="#e3c585" strokeOpacity="0.22" strokeWidth="1" variants={line} custom={0.2} />
+        <defs>
+          {/* layered glow for the ring band */}
+          <filter id="hc-ring-glow" x="-80%" y="-120%" width="260%" height="340%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="outer" />
+            <feGaussianBlur in="SourceGraphic" stdDeviation="3.5" result="mid" />
+            <feMerge>
+              <feMergeNode in="outer" />
+              <feMergeNode in="mid" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+          {/* diffuse glow for the stone */}
+          <filter id="hc-stone-glow" x="-300%" y="-300%" width="700%" height="700%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="7" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        </defs>
 
-        {/* the ring finger — two elegant edges meeting at a soft tip */}
-        <motion.path d="M222 505 C 214 360, 220 240, 234 150" stroke="#e3c585" strokeOpacity="0.85" strokeWidth="1.4" variants={line} custom={1} />
-        <motion.path d="M270 505 C 276 360, 270 240, 256 150" stroke="#e3c585" strokeOpacity="0.85" strokeWidth="1.4" variants={line} custom={1.2} />
+        {/* pinky + index — barely-there atmosphere, not the subject */}
+        <motion.path
+          d="M148 568 C 136 452, 150 362, 172 292"
+          stroke="#e3c585" strokeOpacity="0.32" strokeWidth="1.2"
+          variants={stroke} custom={0.3}
+        />
+        <motion.path
+          d="M318 566 C 334 452, 322 362, 308 298"
+          stroke="#e3c585" strokeOpacity="0.32" strokeWidth="1.2"
+          variants={stroke} custom={0.5}
+        />
+
+        {/* neighbouring fingers — visible but secondary */}
+        <motion.path
+          d="M178 563 C 170 418, 178 300, 190 222"
+          stroke="#e3c585" strokeOpacity="0.52" strokeWidth="1.4"
+          variants={stroke} custom={0}
+        />
+        <motion.path
+          d="M300 561 C 312 418, 308 308, 296 230"
+          stroke="#e3c585" strokeOpacity="0.52" strokeWidth="1.4"
+          variants={stroke} custom={0.2}
+        />
+
+        {/* ring finger — the hero */}
+        <motion.path
+          d="M220 568 C 212 400, 218 272, 232 160"
+          stroke="#e3c585" strokeOpacity="0.92" strokeWidth="2"
+          variants={stroke} custom={1}
+        />
+        <motion.path
+          d="M272 568 C 280 400, 274 272, 258 160"
+          stroke="#e3c585" strokeOpacity="0.92" strokeWidth="2"
+          variants={stroke} custom={1.2}
+        />
         {/* fingertip */}
-        <motion.path d="M234 150 C 238 132, 252 132, 256 150" stroke="#e3c585" strokeOpacity="0.85" strokeWidth="1.4" variants={line} custom={1.5} />
-        {/* nail hint */}
-        <motion.path d="M238 150 C 240 162, 250 162, 252 150" stroke="#e3c585" strokeOpacity="0.4" strokeWidth="0.8" variants={line} custom={1.8} />
-        {/* knuckle / palm hint at the base */}
-        <motion.path d="M150 505 C 210 470, 280 470, 320 505" stroke="#e3c585" strokeOpacity="0.18" strokeWidth="1" variants={line} custom={0.6} />
+        <motion.path
+          d="M232 160 C 236 138, 254 138, 258 160"
+          stroke="#e3c585" strokeOpacity="0.92" strokeWidth="2"
+          variants={stroke} custom={1.5}
+        />
+        {/* nail — fine detail */}
+        <motion.path
+          d="M237 160 C 239 174, 251 174, 253 160"
+          stroke="#e3c585" strokeOpacity="0.48" strokeWidth="1"
+          variants={stroke} custom={1.9}
+        />
+        {/* palm / knuckle hint */}
+        <motion.path
+          d="M148 568 C 212 530, 288 530, 332 568"
+          stroke="#e3c585" strokeOpacity="0.24" strokeWidth="1.1"
+          variants={stroke} custom={0.7}
+        />
 
-        {/* the ring — tinted to the chosen metal — settles onto the finger */}
+        {/* ── THE RING ── */}
         <motion.g
-          initial={{ y: -26, opacity: 0 }}
-          whileInView={{ y: 0, opacity: 1 }}
+          initial={reduceMotion ? { opacity: 1 } : { y: -38, opacity: 0 }}
+          whileInView={reduceMotion ? { opacity: 1 } : { y: 0, opacity: 1 }}
           viewport={{ once: true, margin: "-15%" }}
-          transition={{ duration: 1.1, ease: EASE, delay: 1.5 }}
+          transition={{ duration: 1.35, ease: EASE, delay: 1.7 }}
         >
-          <ellipse cx="246" cy="300" rx="34" ry="13" stroke={band} strokeWidth="3.4" fill="none" />
-          <ellipse cx="246" cy="300" rx="34" ry="13" stroke={band} strokeOpacity="0.35" strokeWidth="7" fill="none" style={{ filter: "blur(3px)" }} />
-          {/* a small set stone catching light */}
-          <circle cx="246" cy="287" r="3.4" fill="#fff6e6" />
+          {/* outer atmospheric bloom */}
+          <ellipse cx="246" cy="318" rx="48" ry="18"
+            stroke={band} strokeOpacity="0.14" strokeWidth="22" fill="none"
+            style={{ filter: "blur(14px)" }}
+          />
+          {/* mid glow — gives the band depth */}
+          <ellipse cx="246" cy="318" rx="46" ry="17"
+            stroke={band} strokeOpacity="0.50" strokeWidth="8" fill="none"
+            style={{ filter: "blur(4px)" }}
+          />
+          {/* crisp band */}
+          <ellipse cx="246" cy="318" rx="44" ry="16.5"
+            stroke={band} strokeWidth="4.2" fill="none"
+            filter="url(#hc-ring-glow)"
+          />
+
+          {/* stone diffuse light */}
+          <circle cx="246" cy="301" r="11"
+            fill={band} fillOpacity="0.20"
+            style={{ filter: "blur(10px)" }}
+          />
+          {/* stone face */}
+          <circle cx="246" cy="301" r="5"
+            fill="#fff8f0" filter="url(#hc-stone-glow)"
+          />
+
+          {/* 8-point sparkle — reveals after the ring lands */}
+          <motion.g
+            initial={{ opacity: 0, scale: 0 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.55, ease: EASE, delay: 2.7 }}
+            style={{ transformOrigin: "246px 301px" }}
+          >
+            {/* cardinal rays */}
+            <line x1="246" y1="287" x2="246" y2="292" stroke="#fff8f0" strokeWidth="1" />
+            <line x1="246" y1="310" x2="246" y2="315" stroke="#fff8f0" strokeWidth="1" />
+            <line x1="232" y1="301" x2="237" y2="301" stroke="#fff8f0" strokeWidth="1" />
+            <line x1="255" y1="301" x2="260" y2="301" stroke="#fff8f0" strokeWidth="1" />
+            {/* diagonal rays */}
+            <line x1="237" y1="291" x2="240" y2="294" stroke="#fff8f0" strokeWidth="0.7" strokeOpacity="0.65" />
+            <line x1="255" y1="291" x2="252" y2="294" stroke="#fff8f0" strokeWidth="0.7" strokeOpacity="0.65" />
+            <line x1="237" y1="311" x2="240" y2="308" stroke="#fff8f0" strokeWidth="0.7" strokeOpacity="0.65" />
+            <line x1="255" y1="311" x2="252" y2="308" stroke="#fff8f0" strokeWidth="0.7" strokeOpacity="0.65" />
+          </motion.g>
         </motion.g>
       </motion.svg>
 
-      <SplitText as="h2" className="display-3 mt-10 max-w-2xl text-balance text-ink">
+      <SplitText as="h2" className="display-3 relative z-10 mt-10 max-w-2xl text-balance text-ink">
         Designed for a moment that changes everything.
       </SplitText>
     </section>
