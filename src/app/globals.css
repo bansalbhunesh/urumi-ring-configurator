@@ -20,6 +20,17 @@
   --color-paper: #efe6d4;
   --color-paper-ink: #14100a;
 
+  /* shadcn/ui compatibility — map the few base tokens its primitives expect
+     (border / card / muted-foreground) onto the Aurelle palette, so any shadcn
+     component added to components/ui inherits the house style, not default gray. */
+  --color-border: #38322a;          /* = --color-line */
+  --color-card: #070605;            /* = --color-porcelain */
+  --color-card-foreground: #f5ead6; /* = --color-ink */
+  --color-muted-foreground: #9a9081; /* = --color-muted */
+
+  /* Aceternity Spotlight sweep (used by components/ui/spotlight.tsx). */
+  --animate-spotlight: spotlight 2.4s var(--ease-lux) 0.4s 1 forwards;
+
   --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.5),
     0 12px 40px -16px rgba(0, 0, 0, 0.8);
   --shadow-lift: 0 2px 6px rgba(0, 0, 0, 0.6),
@@ -201,6 +212,18 @@ body::before {
 @keyframes float-slow {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-8px); }
+}
+
+/* Aceternity Spotlight — eases in from off-frame, once, on mount */
+@keyframes spotlight {
+  0% {
+    opacity: 0;
+    transform: translate(-72%, -62%) scale(0.5);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -40%) scale(1);
+  }
 }
 
 /* Continuous marquee */
