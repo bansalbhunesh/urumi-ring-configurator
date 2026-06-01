@@ -2,15 +2,14 @@ import { create } from "zustand";
 import { DEFAULT_METAL, DEFAULT_STONE } from "@/lib/config";
 import type { MetalId, StoneId } from "@/lib/types";
 
-/* Scroll position — updated by a passive listener, read by the 3D scroll rig.
-   Lives outside React to avoid re-renders on every pixel. */
+/* Scroll position + velocity — updated by a passive listener, read by the 3D
+   scroll rig. Lives outside React to avoid re-renders on every pixel. */
 let _scrollY = 0;
-export function getScrollY() {
-  return _scrollY;
-}
-export function setScrollY(y: number) {
-  _scrollY = y;
-}
+let _scrollVel = 0;
+export function getScrollY() { return _scrollY; }
+export function setScrollY(y: number) { _scrollY = y; }
+export function getScrollVel() { return _scrollVel; }
+export function setScrollVel(v: number) { _scrollVel = v; }
 
 /* Ring "reveal" 0→1, derived from the ring's on-screen scale by the ScrollDirector
    and read by the metal materialise shader (Act III — the ring grows into being as

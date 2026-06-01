@@ -48,7 +48,7 @@ export function BirthOfLight() {
   return (
     <section
       id="light"
-      data-ring="hidden"
+      data-ring="bgfloat"
       className="relative flex min-h-[100svh] flex-col items-center justify-center overflow-hidden px-6 py-28 text-center sm:px-10"
     >
       <span className="eyebrow">The birth of light</span>

@@ -83,7 +83,7 @@ function Overture({ reduceMotion }: { reduceMotion: boolean }) {
         </bufferGeometry>
         <pointsMaterial
           size={0.045}
-          color="#fff1d8"
+          color="#ffe4b0"
           transparent
           opacity={0.9}
           sizeAttenuation
@@ -95,7 +95,7 @@ function Overture({ reduceMotion }: { reduceMotion: boolean }) {
       <mesh ref={sparkRef} position={[0, -1.5, 0]}>
         <icosahedronGeometry args={[1, 0]} />
         <meshBasicMaterial
-          color="#fff6e6"
+          color="#ffecb8"
           transparent
           opacity={0}
           blending={THREE.AdditiveBlending}

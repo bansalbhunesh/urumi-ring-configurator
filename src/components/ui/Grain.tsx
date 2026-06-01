@@ -8,7 +8,7 @@
 
 export function Grain() {
   return (
-    <div className="pointer-events-none fixed inset-0 z-50 h-[100vh] w-[100vw] overflow-hidden opacity-[0.035] mix-blend-overlay">
+    <div className="pointer-events-none fixed inset-0 z-50 h-[100vh] w-[100vw] overflow-hidden opacity-[0.055] mix-blend-overlay">
       <svg
         id="grain-svg"
         viewBox="0 0 200 200"

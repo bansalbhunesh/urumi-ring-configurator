@@ -26,9 +26,10 @@ import { Gem } from "./Gem";
 ---------------------------------------------------------------------------- */
 
 const RING_RADIUS = 1;
-const STRAND_TUBE = 0.058;
-const SEPARATION = 0.072;
+const SEPARATION = 0.105;
 const HALF_TURNS = 3;
+const RIBBON_HALF_W = 0.07;
+const RIBBON_HALF_H = 0.017;
 
 const GEM_Y = 1.34;
 const GEM_SCALE = 1.35;
@@ -59,6 +60,62 @@ class TwistStrand extends THREE.Curve<THREE.Vector3> {
     target.set(cx + nx * offN, cy + ny * offN, offB);
     return target;
   }
+}
+
+/* Flat ribbon cross-section — each strand is a thin rectangle that reflects
+   light like polished flat gold rather than a rope-like cylinder.
+   Uses Frenet frames to orient the cross-section along the curve. */
+function buildRibbonGeo(curve: THREE.Curve<THREE.Vector3>, segments = 480): THREE.BufferGeometry {
+  const frames = curve.computeFrenetFrames(segments, true);
+  const hw = RIBBON_HALF_W;
+  const hh = RIBBON_HALF_H;
+
+  // 4 verts per cross-section: 0=top-right, 1=top-left, 2=bot-left, 3=bot-right
+  const nVerts = (segments + 1) * 4;
+  const pos = new Float32Array(nVerts * 3);
+  const nrm = new Float32Array(nVerts * 3);
+  const p = new THREE.Vector3();
+
+  for (let i = 0; i <= segments; i++) {
+    curve.getPointAt(i / segments, p);
+    const n = frames.normals[i];
+    const b = frames.binormals[i];
+    const base = i * 4 * 3;
+    // top face (+b normal)
+    pos[base]   = p.x+n.x*hw+b.x*hh; pos[base+1] = p.y+n.y*hw+b.y*hh; pos[base+2] = p.z+n.z*hw+b.z*hh;
+    nrm[base]   = b.x; nrm[base+1] = b.y; nrm[base+2] = b.z;
+    pos[base+3] = p.x-n.x*hw+b.x*hh; pos[base+4] = p.y-n.y*hw+b.y*hh; pos[base+5] = p.z-n.z*hw+b.z*hh;
+    nrm[base+3] = b.x; nrm[base+4] = b.y; nrm[base+5] = b.z;
+    // bottom face (-b normal)
+    pos[base+6] = p.x-n.x*hw-b.x*hh; pos[base+7] = p.y-n.y*hw-b.y*hh; pos[base+8] = p.z-n.z*hw-b.z*hh;
+    nrm[base+6] = -b.x; nrm[base+7] = -b.y; nrm[base+8] = -b.z;
+    pos[base+9] = p.x+n.x*hw-b.x*hh; pos[base+10]= p.y+n.y*hw-b.y*hh; pos[base+11]= p.z+n.z*hw-b.z*hh;
+    nrm[base+9] = -b.x; nrm[base+10]= -b.y; nrm[base+11]= -b.z;
+  }
+
+  const idx = new Uint32Array(segments * 24); // 4 faces × 2 tris × 3 verts
+  let ii = 0;
+  for (let i = 0; i < segments; i++) {
+    const a = i * 4, b = (i + 1) * 4;
+    // top face (CCW from +b)
+    idx[ii++]=a;   idx[ii++]=b;   idx[ii++]=b+1;
+    idx[ii++]=a;   idx[ii++]=b+1; idx[ii++]=a+1;
+    // bottom face (CCW from -b)
+    idx[ii++]=a+2; idx[ii++]=a+3; idx[ii++]=b+3;
+    idx[ii++]=a+2; idx[ii++]=b+3; idx[ii++]=b+2;
+    // left edge
+    idx[ii++]=a+1; idx[ii++]=b+1; idx[ii++]=b+2;
+    idx[ii++]=a+1; idx[ii++]=b+2; idx[ii++]=a+2;
+    // right edge
+    idx[ii++]=a+3; idx[ii++]=b+3; idx[ii++]=b;
+    idx[ii++]=a+3; idx[ii++]=b;   idx[ii++]=a;
+  }
+
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+  geo.setAttribute("normal",   new THREE.BufferAttribute(nrm, 3));
+  geo.setIndex(new THREE.BufferAttribute(idx, 1));
+  return geo;
 }
 
 /* A gentle "materialise" dissolve on first load — premium without being a
@@ -195,8 +252,8 @@ export function TwistRing({
 
   const { strandA, strandB } = useMemo(
     () => ({
-      strandA: new THREE.TubeGeometry(new TwistStrand(0), 600, STRAND_TUBE, 18, true),
-      strandB: new THREE.TubeGeometry(new TwistStrand(Math.PI), 600, STRAND_TUBE, 18, true),
+      strandA: buildRibbonGeo(new TwistStrand(0)),
+      strandB: buildRibbonGeo(new TwistStrand(Math.PI)),
     }),
     [],
   );
@@ -205,6 +262,13 @@ export function TwistRing({
   const born = useRef(false); // the materialise is a one-time birth (Act III)
   const tiltRef = useRef<THREE.Group>(null);
   const pointer = useThree((s) => s.pointer);
+  const gl = useThree((s) => s.gl);
+
+  // Grab cursor wired to the canvas DOM element
+  useEffect(() => {
+    gl.domElement.style.cursor = "grab";
+    return () => { gl.domElement.style.cursor = "auto"; };
+  }, [gl]);
 
   // Drag-to-rotate state: yaw accumulator + inertial velocity.
   const drag = useRef({ active: false, lastX: 0, yaw: 0, vel: 0 });
@@ -213,7 +277,8 @@ export function TwistRing({
     drag.current.active = true;
     drag.current.lastX = e.clientX;
     drag.current.vel = 0;
-    setRingPose(null, null); // grabbing the ring releases any preset/reset view
+    gl.domElement.style.cursor = "grabbing";
+    setRingPose(null, null);
     (e.target as Element)?.setPointerCapture?.(e.pointerId);
     e.stopPropagation();
   };
@@ -228,6 +293,13 @@ export function TwistRing({
   };
   const onPointerUp = (e: ThreeEvent<PointerEvent>) => {
     drag.current.active = false;
+    gl.domElement.style.cursor = "grab";
+    // Snap to nearest canonical 45° when releasing slowly
+    if (Math.abs(drag.current.vel) < 0.006) {
+      const snap = Math.round(drag.current.yaw / (Math.PI / 4)) * (Math.PI / 4);
+      drag.current.yaw = snap;
+      drag.current.vel = 0;
+    }
     e.stopPropagation();
   };
 
@@ -266,7 +338,7 @@ export function TwistRing({
         // the ring with page scroll). Here we only carry drag inertia so a flick
         // still spins down naturally; when idle the ring holds its frame.
         d.yaw += d.vel; // inertia
-        d.vel *= 0.92;
+        d.vel *= 0.88;
       }
     }
 

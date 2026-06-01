@@ -6,30 +6,50 @@ import type { StoneId } from "@/lib/types";
    the 3D picker thumbnails, so the choice you click is literally the cut you
    see on the ring. */
 
-function faceted(geo: THREE.BufferGeometry): THREE.BufferGeometry {
-  const flat = geo.toNonIndexed();
-  flat.computeVertexNormals();
-  geo.dispose();
-  return flat;
-}
+type V3 = [number, number, number];
 
+/* Proper round brilliant: 48 explicit triangles (8 segments × 6 tris per segment).
+   Vertex rings: TC (table centre), TE[8] (table edge), GD[8] (girdle-crown
+   junction), GM[8] (girdle-pavilion junction), CU (culet).
+   Windings verified via cross-product so every face's normal points outward. */
 export function brilliantGeometry(): THREE.BufferGeometry {
-  const girdle = 0.17;
-  const table = 0.085;
-  const crownH = 0.075;
-  const pavH = 0.3;
+  const N = 8;
+  const tableR  = 0.082;
+  const girdleR = 0.172;
+  const crownH  = 0.072;
+  const girdleH = 0.016;
+  const pavH    = 0.28;
 
-  const crown = new THREE.CylinderGeometry(table, girdle, crownH, 18, 1);
-  crown.translate(0, crownH / 2, 0);
+  const angles = Array.from({ length: N }, (_, i) => (i / N) * Math.PI * 2 + Math.PI / N);
+  const next = (i: number) => (i + 1) % N;
 
-  const pavilion = new THREE.ConeGeometry(girdle, pavH, 18, 1);
-  pavilion.rotateX(Math.PI);
-  pavilion.translate(0, -pavH / 2, 0);
+  const TC: V3 = [0, crownH, 0];
+  const TE = angles.map<V3>(a => [Math.cos(a) * tableR,  crownH,   Math.sin(a) * tableR]);
+  const GD = angles.map<V3>(a => [Math.cos(a) * girdleR, 0,        Math.sin(a) * girdleR]);
+  const GM = angles.map<V3>(a => [Math.cos(a) * girdleR, -girdleH, Math.sin(a) * girdleR]);
+  const CU: V3 = [0, -pavH, 0];
 
-  const merged = mergeGeometries([crown, pavilion], false)!;
-  crown.dispose();
-  pavilion.dispose();
-  return faceted(merged);
+  const tris: number[] = [];
+  const tri = (a: V3, b: V3, c: V3) => tris.push(...a, ...b, ...c);
+
+  for (let i = 0; i < N; i++) {
+    const j = next(i);
+    // Crown star — flat table, normal points +Y: TC, TE[j], TE[i]
+    tri(TC, TE[j], TE[i]);
+    // Crown main (2 triangles, outward+upward normals)
+    tri(GD[i], TE[i], TE[j]);
+    tri(GD[i], TE[j], GD[j]);
+    // Girdle (2 triangles, radially outward normals)
+    tri(GD[i], GD[j], GM[i]);
+    tri(GD[j], GM[j], GM[i]);
+    // Pavilion (outward+downward normals)
+    tri(GM[i], GM[j], CU);
+  }
+
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute("position", new THREE.BufferAttribute(new Float32Array(tris), 3));
+  geo.computeVertexNormals();
+  return geo;
 }
 
 export function princessGeometry(): THREE.BufferGeometry {
@@ -49,7 +69,10 @@ export function princessGeometry(): THREE.BufferGeometry {
   const merged = mergeGeometries([crown, pavilion], false)!;
   crown.dispose();
   pavilion.dispose();
-  return faceted(merged);
+  const flat = merged.toNonIndexed();
+  flat.computeVertexNormals();
+  merged.dispose();
+  return flat;
 }
 
 export function gemGeometryFor(stone: StoneId): THREE.BufferGeometry {

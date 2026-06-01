@@ -4,7 +4,6 @@ import { Suspense, useEffect, useMemo, useRef, useState, type RefObject } from "
 import { Canvas, useFrame } from "@react-three/fiber";
 import {
   Environment,
-  Lightformer,
   ContactShadows,
   PerspectiveCamera,
   MeshReflectorMaterial,
@@ -141,6 +140,11 @@ function ScrollDirector({
   const intro = useRef(0);
   const groupYaw = useRef(0);
 
+  // Camera flourish on metal/stone change: brief 10% push-in, then ease back.
+  const changeSeq = useConfigurator((s) => s.changeSeq);
+  const prevSeq = useRef(0);
+  const flourishZ = useRef(0);
+
   useFrame((state, dt) => {
     const y = getScrollY();
     const vh = typeof window !== "undefined" ? window.innerHeight : 900;
@@ -178,6 +182,10 @@ function ScrollDirector({
       band: { pos: new THREE.Vector3(1.64, 0.05, 0), scale: 1.0, camZ: 6.9, lookY: 0.32 },
     };
     const hidden: Stage = { pos: new THREE.Vector3(0, 0.35, 0), scale: 0.0001, camZ: 8.7, lookY: 0.6 };
+    // bgfloat: ring stays visible but small — atmosphere without dominating the text
+    const bgfloat: Stage = isDesktop
+      ? { pos: new THREE.Vector3(1.0, 0.18, 0), scale: 0.36, camZ: 8.0, lookY: 0.6 }
+      : { pos: new THREE.Vector3(0, 0.55, 0), scale: 0.20, camZ: 9.5, lookY: 0.55 };
     const finaleStage: Stage = isDesktop
       ? { pos: new THREE.Vector3(0, -0.12, 0), scale: 0.74, camZ: 7.4, lookY: 0.45 }
       : { pos: new THREE.Vector3(0, 0.0, 0), scale: 0.48, camZ: 8.7, lookY: 0.5 };
@@ -185,6 +193,7 @@ function ScrollDirector({
     let target: Stage;
     if (ring === "finale") target = finaleStage;
     else if (ring === "hidden") target = hidden;
+    else if (ring === "bgfloat") target = bgfloat;
     else if (ring === "stage") target = wide ? STAGE[frame] ?? STAGE.full : hidden;
     else target = hero;
 
@@ -198,12 +207,19 @@ function ScrollDirector({
     const targetScale =
       target.scale * mobileFade * (intro.current < 1 ? introEase : 1);
 
+    // Camera flourish: push in 0.65 units when metal or stone changes
+    if (changeSeq !== prevSeq.current) {
+      prevSeq.current = changeSeq;
+      flourishZ.current = -0.65;
+    }
+    flourishZ.current = THREE.MathUtils.lerp(flourishZ.current, 0, Math.min(dt * 2.4, 1));
+
     const k = reduceMotion ? 999 : 4.5;
     groupPos.current.x = damp(groupPos.current.x, target.pos.x, k, dt);
     groupPos.current.y = damp(groupPos.current.y, target.pos.y, k, dt);
     groupPos.current.z = damp(groupPos.current.z, target.pos.z, k, dt);
     scale.current = damp(scale.current, targetScale, k, dt);
-    camPos.current.z = damp(camPos.current.z, target.camZ, k, dt);
+    camPos.current.z = damp(camPos.current.z, target.camZ + flourishZ.current, k, dt);
     camLook.current.y = damp(camLook.current.y, target.lookY, k, dt);
 
     // Scroll-scrubbed turntable. The ring's base rotation is driven directly by
@@ -236,54 +252,11 @@ function ScrollDirector({
 
   return (
     <>
-      {/* Studio lighting discipline: one bright neutral key models the metal, a
-         cool rim separates it from the dark, warm accents are restrained so the
-         scene reads precious (cool-neutral with warmth) rather than mono-orange. */}
-      <ambientLight intensity={0.26} />
-      <Environment resolution={256} environmentIntensity={0.82}>
-        {/* Main key — large neutral softbox, the principal modelling light. */}
-        <Lightformer
-          form="rect"
-          intensity={5}
-          color="#ffffff"
-          scale={[1.4, 9, 1]}
-          position={[4.5, 1, 3]}
-          rotation={[0, -0.6, 0]}
-        />
-        {/* Warm wrap — gentle warmth on the key side, dialed back. */}
-        <Lightformer
-          form="rect"
-          intensity={2.6}
-          color="#fdf3e6"
-          scale={[10, 8, 1]}
-          position={[-3, 4, 4]}
-          rotation={[-0.3, 0.2, 0]}
-        />
-        {/* Cool rim — the "expensive" edge light that lifts metal off the black. */}
-        <Lightformer
-          form="ring"
-          intensity={3.2}
-          color="#cfe0ff"
-          scale={[4, 4, 1]}
-          position={[-3, 1, -5]}
-        />
-        {/* Faint warm under-fill so the shadow side never crushes to pure black. */}
-        <Lightformer
-          form="rect"
-          intensity={1.2}
-          color="#e9d3b0"
-          scale={[6, 3, 1]}
-          position={[3, -3, 2]}
-          rotation={[0.4, -0.3, 0]}
-        />
-        <Lightformer
-          form="rect"
-          intensity={0.55}
-          color="#241d16"
-          scale={[30, 30, 1]}
-          position={[0, 0, -8]}
-        />
-      </Environment>
+      {/* HDRI studio environment — full 360° IBL from a real studio capture.
+         Gives the metal physically-correct multi-directional reflections that
+         Lightformers alone cannot produce. */}
+      <ambientLight intensity={0.22} />
+      <Environment preset="studio" environmentIntensity={0.9} />
 
       <spotLight
         position={[-4, 7, 5]}

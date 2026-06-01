@@ -50,14 +50,12 @@ html {
 }
 
 body {
-  background-color: #040303;
-  /* Deep, quiet studio atmosphere — never a flat void, never noisy. One warm
-     light pool high-centre, a faint cool counter low-left for depth, graded to
-     near-black at the base so the frame recedes and the ring stays the subject. */
+  background-color: #060504;
+  /* Deep warm studio — enough amber in the upper pool to read precious, not void. */
   background-image:
-    radial-gradient(68% 52% at 56% 16%, rgba(150, 116, 70, 0.15), transparent 66%),
-    radial-gradient(48% 50% at 20% 84%, rgba(48, 58, 80, 0.07), transparent 74%),
-    linear-gradient(180deg, #0b0908 0%, #060504 54%, #030302 100%);
+    radial-gradient(68% 52% at 56% 16%, rgba(180, 130, 60, 0.22), transparent 62%),
+    radial-gradient(38% 42% at 14% 78%, rgba(48, 58, 80, 0.09), transparent 72%),
+    linear-gradient(180deg, #0e0b08 0%, #080604 52%, #050402 100%);
   background-attachment: fixed;
   color: var(--color-ink);
   font-family: var(--font-sans);
@@ -77,7 +75,7 @@ body::before {
   pointer-events: none;
   background: radial-gradient(
     44% 34% at 50% 6%,
-    rgba(255, 243, 222, 0.08),
+    rgba(255, 243, 222, 0.15),
     transparent 70%
   );
   animation: fx-breathe 16s var(--ease-lux) infinite;
@@ -121,9 +119,9 @@ body::before {
 .display-1 {
   font-family: var(--font-display);
   font-weight: 600;
-  line-height: 0.92;
-  letter-spacing: -0.02em;
-  font-size: clamp(3.4rem, 13vw, 13rem);
+  line-height: 0.88;
+  letter-spacing: -0.03em;
+  font-size: clamp(3.6rem, 16vw, 14rem);
 }
 .display-2 {
   font-family: var(--font-display);

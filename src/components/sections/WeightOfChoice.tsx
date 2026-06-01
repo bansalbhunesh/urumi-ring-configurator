@@ -122,7 +122,7 @@ export function WeightOfChoice() {
   return (
     <section
       id="weight"
-      data-ring="hidden"
+      data-ring="bgfloat"
       className="relative flex min-h-[100svh] items-center px-6 py-32 sm:px-10 lg:px-16"
     >
       <div className="mx-auto w-full max-w-2xl">

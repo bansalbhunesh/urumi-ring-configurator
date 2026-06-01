@@ -63,7 +63,7 @@ export function Blueprint() {
     <section
       ref={sectionRef}
       id="precision"
-      data-ring="hidden"
+      data-ring="bgfloat"
       className="relative flex min-h-[100svh] flex-col items-center justify-center px-6 py-28 text-center sm:px-10"
     >
       <InceptionReveal mode="fall">
