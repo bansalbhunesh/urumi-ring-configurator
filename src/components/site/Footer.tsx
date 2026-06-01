@@ -9,10 +9,10 @@ export function Footer() {
           </span>
         </div>
         <p className="text-[0.78rem] text-muted">
-          A prototype configurator · Built for the Urumi FDE take-home
+          18k recycled gold · Conflict-free diamonds · Made to order
         </p>
         <p className="text-[0.78rem] text-muted">
-          Headless WooCommerce · React Three Fiber
+          &copy; {new Date().getFullYear()} Aurelle · All rights reserved
         </p>
       </div>
     </footer>

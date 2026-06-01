@@ -97,7 +97,7 @@ export function Studio() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2, ease: EASE }}
           >
-            <span className="eyebrow">Made to order · Solid 14k recycled gold</span>
+            <span className="eyebrow">Made to order · Solid 18k recycled gold</span>
           </motion.div>
 
           <h1 className="mt-5">
@@ -115,9 +115,8 @@ export function Studio() {
             transition={{ duration: 1, delay: 1, ease: EASE }}
             className="mt-6 max-w-md text-[1.02rem] leading-relaxed text-ink-soft"
           >
-            Two ribbons of gold, wound into one. Choose the metal, choose the
-            stone — every change rendered live, in three dimensions, the moment
-            you make it.
+            Two ribbons of gold, wound into one. The ring that makes a question
+            feel like the only question that has ever mattered.
           </motion.p>
 
           <motion.div

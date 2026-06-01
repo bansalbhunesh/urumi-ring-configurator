@@ -9,7 +9,6 @@ import { Materials } from "@/components/sections/Materials";
 import { Showcase } from "@/components/sections/Showcase";
 import { WaterDiamond } from "@/components/sections/WaterDiamond";
 import { BlueprintSpec } from "@/components/sections/BlueprintSpec";
-import { MirrorRoom } from "@/components/sections/MirrorRoom";
 import { PromiseSection } from "@/components/sections/Promise";
 import { Testimonials } from "@/components/sections/Testimonials";
 import { Closing } from "@/components/sections/Closing";
@@ -40,30 +39,29 @@ export default function Home() {
       <GlobalCanvas />
       <Header />
       <main className="bg-transparent">
-        {/* 1 — cold open: particles converge into the first facet */}
+        {/* I — cold open: particles converge into the first facet */}
         <ActOne />
-        {/* 2 — the product: hero configurator */}
+        {/* II — the product: hero configurator, ring is born */}
         <Studio />
-        {/* 3 — on the hand: SVG line-art, ring colour follows selection */}
+        {/* III — on the hand: SVG line-art, ring settles onto a finger */}
         <OnTheHand />
-        {/* 4 — holographic scroll sequence: 6 renders scrubbed by page scroll */}
+        {/* IV — holographic scroll: six renders of the ring scrubbed by scroll */}
         <HolographicReveal />
-        {/* 5 — editorial: craft, materials, stones */}
+        {/* V — craft: the birth of form, editorial motion */}
         <Craft />
+        {/* VI — materials: three metals, three worlds */}
         <Materials />
-        {/* 6 — water distortion: diamond emerges through rippling water */}
-        <WaterDiamond />
-        {/* 7 — photoreal beat: the real GLB ring, drag to inspect */}
-        <Showcase />
-        {/* 8 — blueprint: engineering spec overlay */}
+        {/* VII — hidden precision: animated blueprint, dimension lines */}
         <BlueprintSpec />
-        {/* 9 — mirror room: infinite reflections */}
-        <MirrorRoom />
-        {/* 10 — palette flip: the promise statement on cream */}
+        {/* VIII — born under pressure: GLSL water, diamond emerges */}
+        <WaterDiamond />
+        {/* IX — your creation: photoreal ring, drag to inspect */}
+        <Showcase />
+        {/* X — the promise: palette flip to cream */}
         <PromiseSection />
-        {/* 11 — social proof */}
+        {/* XI — kept forever: what they said after yes */}
         <Testimonials />
-        {/* 12 — finale CTA */}
+        {/* XII — finale: the weight of the decision */}
         <Closing />
       </main>
       <Footer />

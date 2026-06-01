@@ -1,4 +1,7 @@
-import { Reveal } from "@/components/ui/Reveal";
+"use client";
+
+import { motion } from "framer-motion";
+import { InceptionReveal, InceptionStagger, InceptionItem } from "@/components/ui/InceptionReveal";
 import { SplitText } from "@/components/ui/SplitText";
 
 const REVIEWS = [
@@ -22,13 +25,26 @@ const REVIEWS = [
   },
 ];
 
+const EASE = [0.22, 1, 0.36, 1] as const;
+
 function Stars({ n }: { n: number }) {
   return (
     <div className="flex gap-1" aria-label={`${n} out of 5 stars`}>
       {Array.from({ length: 5 }).map((_, i) => (
-        <svg key={i} width="14" height="14" viewBox="0 0 24 24" fill={i < n ? "currentColor" : "none"} stroke="currentColor" strokeWidth="1.4" className="text-gold" aria-hidden>
+        <motion.svg
+          key={i}
+          width="14" height="14" viewBox="0 0 24 24"
+          fill={i < n ? "currentColor" : "none"}
+          stroke="currentColor" strokeWidth="1.4"
+          className="text-gold"
+          aria-hidden
+          initial={{ opacity: 0, scale: 0.4 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ delay: i * 0.06, duration: 0.4, ease: EASE }}
+        >
           <path d="M12 2.5l2.9 5.9 6.6.95-4.75 4.63 1.12 6.52L12 17.9l-5.9 3.1 1.12-6.52L2.5 9.85l6.6-.95L12 2.5z" strokeLinejoin="round" />
-        </svg>
+        </motion.svg>
       ))}
     </div>
   );
@@ -37,38 +53,73 @@ function Stars({ n }: { n: number }) {
 export function Testimonials() {
   return (
     <section id="reviews" data-ring="hidden" className="relative z-10 px-6 py-32 sm:px-10 lg:py-44">
+      {/* Warm ambient glow — grounds the section without competing with the cards */}
+      <div
+        className="pointer-events-none absolute inset-0"
+        aria-hidden
+        style={{
+          background: "radial-gradient(ellipse 70% 50% at 50% 60%, rgba(200,165,107,0.05) 0%, transparent 70%)",
+        }}
+      />
+
       <div className="mx-auto max-w-6xl">
         <div className="flex flex-wrap items-end justify-between gap-6">
           <div>
-            <span className="eyebrow">Kept forever</span>
-            <SplitText as="h2" className="display-3 mt-4 text-ink">
+            <InceptionReveal mode="clip">
+              <span className="eyebrow">Kept forever</span>
+            </InceptionReveal>
+            <SplitText as="h2" className="display-3 mt-4 text-ink" mode="push" stagger={0.055} delay={0.1}>
               What they say after the yes.
             </SplitText>
           </div>
-          <div className="flex items-center gap-3">
-            <Stars n={5} />
-            <span className="text-[0.8rem] uppercase tracking-[0.16em] text-ink-soft">4.9 / 5 · 1,400+ reviews</span>
-          </div>
+
+          <InceptionReveal mode="drift" dir="right" delay={0.2}>
+            <div className="flex items-center gap-3">
+              <Stars n={5} />
+              <span className="text-[0.8rem] uppercase tracking-[0.16em] text-ink-soft">
+                4.9 / 5 · 1,400+ couples
+              </span>
+            </div>
+          </InceptionReveal>
         </div>
 
-        <div className="mt-14 grid gap-6 md:grid-cols-3">
-          {REVIEWS.map((r, i) => (
-            <Reveal key={r.name} delay={i * 0.08}>
-              <figure className="flex h-full flex-col justify-between rounded-2xl border border-line bg-champagne/30 p-7 backdrop-blur-sm">
+        <InceptionStagger delay={0.15} stagger={0.13} className="mt-14 grid gap-6 md:grid-cols-3">
+          {REVIEWS.map((r) => (
+            <InceptionItem key={r.name} mode="rise">
+              <motion.figure
+                className="group flex h-full flex-col justify-between rounded-2xl border border-line bg-champagne/20 p-7 backdrop-blur-sm transition-colors duration-500 hover:border-gold/30 hover:bg-champagne/35"
+                whileHover={{ y: -4, transition: { type: "spring", stiffness: 320, damping: 28 } }}
+              >
                 <div>
                   <Stars n={r.stars} />
-                  <blockquote className="mt-5 font-display text-[1.35rem] leading-snug text-ink">
-                    “{r.quote}”
+                  <blockquote className="mt-5 font-display text-[1.28rem] leading-snug text-ink">
+                    &ldquo;{r.quote}&rdquo;
                   </blockquote>
                 </div>
-                <figcaption className="mt-8">
-                  <div className="text-[0.92rem] text-ink">{r.name}</div>
-                  <div className="text-[0.78rem] text-muted">{r.role}</div>
+                <figcaption className="mt-8 flex items-center gap-3 border-t border-line/60 pt-5">
+                  {/* Gold monogram dot */}
+                  <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-gold/15 text-[0.75rem] font-semibold text-gold">
+                    {r.name.charAt(0)}
+                  </span>
+                  <div>
+                    <div className="text-[0.88rem] font-medium text-ink">{r.name}</div>
+                    <div className="text-[0.74rem] italic text-muted">{r.role}</div>
+                  </div>
                 </figcaption>
-              </figure>
-            </Reveal>
+              </motion.figure>
+            </InceptionItem>
           ))}
-        </div>
+        </InceptionStagger>
+
+        {/* Quiet closing line — bridges toward the finale */}
+        <InceptionReveal mode="rise" delay={0.3} className="mt-16 text-center">
+          <div className="mx-auto max-w-[6rem]">
+            <div className="rule-gold h-px" />
+          </div>
+          <p className="mt-6 text-[0.8rem] uppercase tracking-[0.28em] text-muted">
+            Every story starts with a question
+          </p>
+        </InceptionReveal>
       </div>
     </section>
   );
