@@ -26,3 +26,32 @@ export async function postAddToCart(
   if (!res.ok) throw new Error("Failed to add to cart");
   return res.json();
 }
+
+export async function deleteCartItem(key: string): Promise<CartState> {
+  const res = await fetch("/api/cart", {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ key }),
+  });
+  if (!res.ok) throw new Error("Failed to remove cart item");
+  return res.json();
+}
+
+export async function patchCartItem(
+  key: string,
+  quantity: number,
+): Promise<CartState> {
+  const res = await fetch("/api/cart", {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ key, quantity }),
+  });
+  if (!res.ok) throw new Error("Failed to update cart item");
+  return res.json();
+}
+
+export async function postCheckout(): Promise<{ url: string | null; reason?: string }> {
+  const res = await fetch("/api/checkout", { method: "POST" });
+  if (!res.ok) throw new Error("Failed to initiate checkout");
+  return res.json();
+}

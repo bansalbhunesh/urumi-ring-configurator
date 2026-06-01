@@ -5,7 +5,14 @@ import {
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
-import { fetchCart, fetchProduct, postAddToCart } from "@/lib/api";
+import {
+  deleteCartItem,
+  fetchCart,
+  fetchProduct,
+  patchCartItem,
+  postAddToCart,
+  postCheckout,
+} from "@/lib/api";
 import type { CartState } from "@/lib/types";
 
 export function useProduct() {
@@ -35,5 +42,32 @@ export function useAddToCart() {
     onSuccess: (cart: CartState) => {
       qc.setQueryData(["cart"], cart);
     },
+  });
+}
+
+export function useRemoveFromCart() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ key }: { key: string }) => deleteCartItem(key),
+    onSuccess: (cart: CartState) => {
+      qc.setQueryData(["cart"], cart);
+    },
+  });
+}
+
+export function useUpdateCartItem() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ key, quantity }: { key: string; quantity: number }) =>
+      patchCartItem(key, quantity),
+    onSuccess: (cart: CartState) => {
+      qc.setQueryData(["cart"], cart);
+    },
+  });
+}
+
+export function useCheckout() {
+  return useMutation({
+    mutationFn: postCheckout,
   });
 }

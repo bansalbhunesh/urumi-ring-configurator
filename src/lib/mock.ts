@@ -119,4 +119,30 @@ export function mockAddToCart(
   return { cart: buildCart(lines), encoded: encodeMockCart(lines) };
 }
 
+export function mockRemoveFromCart(
+  itemKey: string,
+  raw?: string,
+): { cart: CartState; encoded: string } {
+  const lines = decodeMockCart(raw);
+  const variationId = Number(itemKey);
+  const next = lines.filter((l) => l.variationId !== variationId);
+  return { cart: buildCart(next), encoded: encodeMockCart(next) };
+}
+
+export function mockUpdateCartItem(
+  itemKey: string,
+  quantity: number,
+  raw?: string,
+): { cart: CartState; encoded: string } {
+  const lines = decodeMockCart(raw);
+  const variationId = Number(itemKey);
+  if (quantity <= 0) {
+    const next = lines.filter((l) => l.variationId !== variationId);
+    return { cart: buildCart(next), encoded: encodeMockCart(next) };
+  }
+  const line = lines.find((l) => l.variationId === variationId);
+  if (line) line.quantity = quantity;
+  return { cart: buildCart(lines), encoded: encodeMockCart(lines) };
+}
+
 export { PRODUCT_SLUG };

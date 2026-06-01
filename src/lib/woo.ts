@@ -257,3 +257,56 @@ export async function getCart(cartToken?: string): Promise<CartResult | null> {
     return null;
   }
 }
+
+export async function removeCartItem(
+  itemKey: string,
+  cartToken?: string,
+): Promise<CartResult | null> {
+  if (!ENABLED) return null;
+  try {
+    const primed = await primeCart(cartToken);
+    if (!primed) return null;
+    const res = await storeFetch(`/cart/remove-item`, {
+      method: "POST",
+      headers: {
+        Nonce: primed.nonce,
+        "X-WC-Store-API-Nonce": primed.nonce,
+        ...(primed.cartToken ? { "Cart-Token": primed.cartToken } : {}),
+      },
+      body: JSON.stringify({ key: itemKey }),
+    });
+    if (!res.ok) return null;
+    const cart = (await res.json()) as StoreCart;
+    const token = res.headers.get("Cart-Token") ?? primed.cartToken;
+    return { cart: normaliseCart(cart), cartToken: token ?? undefined };
+  } catch {
+    return null;
+  }
+}
+
+export async function updateCartItemQuantity(
+  itemKey: string,
+  quantity: number,
+  cartToken?: string,
+): Promise<CartResult | null> {
+  if (!ENABLED) return null;
+  try {
+    const primed = await primeCart(cartToken);
+    if (!primed) return null;
+    const res = await storeFetch(`/cart/update-item`, {
+      method: "POST",
+      headers: {
+        Nonce: primed.nonce,
+        "X-WC-Store-API-Nonce": primed.nonce,
+        ...(primed.cartToken ? { "Cart-Token": primed.cartToken } : {}),
+      },
+      body: JSON.stringify({ key: itemKey, quantity }),
+    });
+    if (!res.ok) return null;
+    const cart = (await res.json()) as StoreCart;
+    const token = res.headers.get("Cart-Token") ?? primed.cartToken;
+    return { cart: normaliseCart(cart), cartToken: token ?? undefined };
+  } catch {
+    return null;
+  }
+}
