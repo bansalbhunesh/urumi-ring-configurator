@@ -169,7 +169,7 @@ export function WaterDiamond() {
           className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-5 px-6 text-center"
         >
           <BlurReveal delay={0.1}>
-            <span className="eyebrow text-sky-200/80">Pure carbon · 2F deep</span>
+            <span className="eyebrow text-sky-200/80">Pure carbon · Conflict-free · IOR 2.42</span>
           </BlurReveal>
           <BlurReveal delay={0.2}>
             <h2 className="font-display text-balance text-[2rem] leading-snug text-white sm:text-[3rem]">

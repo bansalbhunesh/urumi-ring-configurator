@@ -8,6 +8,7 @@ import { Craft } from "@/components/sections/Craft";
 import { Materials } from "@/components/sections/Materials";
 import { Showcase } from "@/components/sections/Showcase";
 import { WaterDiamond } from "@/components/sections/WaterDiamond";
+import { RingFeatures } from "@/components/sections/RingFeatures";
 import { BlueprintSpec } from "@/components/sections/BlueprintSpec";
 import { PromiseSection } from "@/components/sections/Promise";
 import { Testimonials } from "@/components/sections/Testimonials";
@@ -51,7 +52,9 @@ export default function Home() {
         <Craft />
         {/* VI — materials: three metals, three worlds */}
         <Materials />
-        {/* VII — hidden precision: animated blueprint, dimension lines */}
+        {/* VII — the three pillars: perpetual twist, open-air crown, lifelong precision */}
+        <RingFeatures />
+        {/* VIII — hidden precision: animated blueprint, dimension lines */}
         <BlueprintSpec />
         {/* VIII — born under pressure: GLSL water, diamond emerges */}
         <WaterDiamond />
