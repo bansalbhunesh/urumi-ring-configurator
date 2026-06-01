@@ -28,8 +28,8 @@ import { Gem } from "./Gem";
 const RING_RADIUS = 1;
 const SEPARATION = 0.105;
 const HALF_TURNS = 3;
-const RIBBON_HALF_W = 0.07;
-const RIBBON_HALF_H = 0.017;
+const RIBBON_HALF_W = 0.065;
+const RIBBON_HALF_H = 0.042;
 
 const GEM_Y = 1.34;
 const GEM_SCALE = 1.35;

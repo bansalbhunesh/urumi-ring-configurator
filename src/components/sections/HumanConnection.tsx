@@ -50,8 +50,8 @@ export function HumanConnection() {
 
       {/* the hand — large enough to feel present, not decorative */}
       <motion.svg
-        viewBox="0 0 480 580"
-        className="relative z-10 w-full max-w-[28rem] sm:max-w-2xl"
+        viewBox="0 0 480 560"
+        className="relative z-10 w-full max-w-[24rem] sm:max-w-xl lg:max-w-2xl"
         fill="none"
         initial="hidden"
         whileInView="show"
@@ -141,18 +141,18 @@ export function HumanConnection() {
           transition={{ duration: 1.35, ease: EASE, delay: 1.7 }}
         >
           {/* outer atmospheric bloom */}
-          <ellipse cx="246" cy="318" rx="48" ry="18"
-            stroke={band} strokeOpacity="0.14" strokeWidth="22" fill="none"
-            style={{ filter: "blur(14px)" }}
+          <ellipse cx="246" cy="312" rx="56" ry="21"
+            stroke={band} strokeOpacity="0.18" strokeWidth="28" fill="none"
+            style={{ filter: "blur(16px)" }}
           />
-          {/* mid glow — gives the band depth */}
-          <ellipse cx="246" cy="318" rx="46" ry="17"
-            stroke={band} strokeOpacity="0.50" strokeWidth="8" fill="none"
-            style={{ filter: "blur(4px)" }}
+          {/* mid glow */}
+          <ellipse cx="246" cy="312" rx="54" ry="20"
+            stroke={band} strokeOpacity="0.55" strokeWidth="10" fill="none"
+            style={{ filter: "blur(5px)" }}
           />
           {/* crisp band */}
-          <ellipse cx="246" cy="318" rx="44" ry="16.5"
-            stroke={band} strokeWidth="4.2" fill="none"
+          <ellipse cx="246" cy="312" rx="52" ry="19"
+            stroke={band} strokeWidth="5.5" fill="none"
             filter="url(#hc-ring-glow)"
           />
 

@@ -256,7 +256,7 @@ function ScrollDirector({
          Gives the metal physically-correct multi-directional reflections that
          Lightformers alone cannot produce. */}
       <ambientLight intensity={0.22} />
-      <Environment preset="studio" environmentIntensity={0.9} />
+      <Environment preset="studio" environmentIntensity={0.72} />
 
       <spotLight
         position={[-4, 7, 5]}
