@@ -6,27 +6,28 @@
 ---------------------------------------------------------------------------- */
 
 @theme {
-  --color-ivory: #050403;
-  --color-ivory-deep: #030302;
-  --color-porcelain: #070605;
-  --color-champagne: #12100d;
-  --color-ink: #f5ead6;
-  --color-ink-soft: #cabfae;
-  --color-muted: #9a9081;
-  --color-line: #38322a;
-  --color-gold: #c8a56b;
-  --color-gold-bright: #e3c585;
+  --color-ivory: oklch(3.5% 0.006 62);
+  --color-ivory-deep: oklch(2% 0.004 62);
+  --color-porcelain: oklch(4.5% 0.008 62);
+  --color-champagne: oklch(8% 0.010 60);
+  --color-ink: oklch(93% 0.022 80);
+  --color-ink-soft: oklch(78% 0.018 80);
+  --color-muted: oklch(62% 0.012 78);
+  --color-line: oklch(23% 0.012 60);
+  --color-gold: oklch(73% 0.090 68);
+  --color-gold-bright: oklch(83% 0.075 82);
+  --color-gold-warm: oklch(47% 0.062 62);
   /* Inverted (light) section, à la the reference's flip to cream */
-  --color-paper: #efe6d4;
-  --color-paper-ink: #14100a;
+  --color-paper: oklch(92% 0.018 85);
+  --color-paper-ink: oklch(8% 0.014 55);
 
   /* shadcn/ui compatibility — map the few base tokens its primitives expect
      (border / card / muted-foreground) onto the Aurelle palette, so any shadcn
      component added to components/ui inherits the house style, not default gray. */
-  --color-border: #38322a;          /* = --color-line */
-  --color-card: #070605;            /* = --color-porcelain */
-  --color-card-foreground: #f5ead6; /* = --color-ink */
-  --color-muted-foreground: #9a9081; /* = --color-muted */
+  --color-border: oklch(23% 0.012 60);
+  --color-card: oklch(4.5% 0.008 62);
+  --color-card-foreground: oklch(93% 0.022 80);
+  --color-muted-foreground: oklch(62% 0.012 78);
 
   /* Aceternity Spotlight sweep (used by components/ui/spotlight.tsx). */
   --animate-spotlight: spotlight 2.4s var(--ease-lux) 0.4s 1 forwards;
@@ -47,10 +48,11 @@ html {
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  overflow-x: clip;
 }
 
 body {
-  background-color: #060504;
+  background-color: var(--color-ivory);
   /* Deep warm studio — enough amber in the upper pool to read precious, not void. */
   background-image:
     radial-gradient(68% 52% at 56% 16%, rgba(180, 130, 60, 0.22), transparent 62%),
@@ -60,7 +62,7 @@ body {
   color: var(--color-ink);
   font-family: var(--font-sans);
   font-feature-settings: "ss01", "cv01";
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 /* The single light. A soft warm pool high-centre that gently breathes — the only
@@ -122,6 +124,8 @@ body::before {
   line-height: 0.88;
   letter-spacing: -0.03em;
   font-size: clamp(3.6rem, 16vw, 14rem);
+  overflow-wrap: anywhere;
+  min-width: 0;
 }
 .display-2 {
   font-family: var(--font-display);
@@ -129,6 +133,8 @@ body::before {
   line-height: 0.95;
   letter-spacing: -0.02em;
   font-size: clamp(2.6rem, 8vw, 6.5rem);
+  overflow-wrap: anywhere;
+  min-width: 0;
 }
 .display-3 {
   font-family: var(--font-display);
@@ -136,6 +142,8 @@ body::before {
   line-height: 1;
   letter-spacing: -0.015em;
   font-size: clamp(2rem, 4.6vw, 3.6rem);
+  overflow-wrap: anywhere;
+  min-width: 0;
 }
 
 /* Animated dashed connector line, like the reference's o-dashline */
@@ -156,16 +164,16 @@ body::before {
   color: var(--color-paper-ink);
 }
 .paper .eyebrow {
-  color: #8a6a36;
+  color: var(--color-gold-warm);
 }
 
 /* Ambient gradients ---------------------------------------------------------- */
 .bg-stage {
-  background: #000000;
+  background: oklch(3% 0.005 62);
 }
 
 .bg-stage-soft {
-  background: #000000;
+  background: oklch(3% 0.005 62);
 }
 
 /* Hairline divider with a centred gold node */
@@ -274,11 +282,6 @@ input[type="range"].lux-range::-moz-range-thumb {
   background: var(--color-line);
   border-radius: 999px;
   border: 3px solid var(--color-ivory);
-}
-
-/* Gem cursor rotation */
-@keyframes gem-cursor-spin {
-  to { transform: rotate(360deg); }
 }
 
 @media (prefers-reduced-motion: reduce) {

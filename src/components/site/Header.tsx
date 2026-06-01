@@ -27,7 +27,6 @@ export function Header() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // IntersectionObserver tracks which section owns the viewport — active nav link
   useEffect(() => {
     const targets = LINKS.map((l) => document.getElementById(l.section)).filter(Boolean) as HTMLElement[];
     if (!targets.length) return;
@@ -45,7 +44,7 @@ export function Header() {
 
   return (
     <header
-      className={`fixed inset-x-0 top-0 z-40 transition-all duration-500 ${
+      className={`fixed inset-x-0 top-0 z-40 transition-[border-color,background-color,backdrop-filter] duration-500 ${
         scrolled
           ? "border-b border-line/70 bg-ivory/80 backdrop-blur-md"
           : "border-b border-transparent bg-transparent"
@@ -73,22 +72,21 @@ export function Header() {
           {LINKS.map((l) => {
             const isActive = active === l.section;
             return (
-              <Magnetic key={l.href} strength={10}>
-                <a
-                  href={l.href}
-                  className="group relative -m-2 block min-h-11 rounded-md p-2 text-[0.82rem] tracking-wide outline-none transition-colors focus-visible:ring-2 focus-visible:ring-gold"
-                  style={{ color: isActive ? "var(--color-gold)" : undefined }}
-                  aria-current={isActive ? "page" : undefined}
-                >
-                  <span className={`transition-colors duration-300 ${isActive ? "text-gold" : "text-ink-soft group-hover:text-ink"}`}>
-                    {l.label}
-                  </span>
-                  <span
-                    className="absolute bottom-1 left-2 right-2 h-px bg-gold transition-transform duration-300 origin-left"
-                    style={{ transform: isActive ? "scaleX(1)" : "scaleX(0)" }}
-                  />
-                </a>
-              </Magnetic>
+              <a
+                key={l.href}
+                href={l.href}
+                className="group relative -m-2 block min-h-11 rounded-md p-2 text-[0.82rem] tracking-wide outline-none transition-colors focus-visible:ring-2 focus-visible:ring-gold"
+                style={{ color: isActive ? "var(--color-gold)" : undefined }}
+                aria-current={isActive ? "page" : undefined}
+              >
+                <span className={`transition-colors duration-300 ${isActive ? "text-gold" : "text-ink-soft group-hover:text-ink"}`}>
+                  {l.label}
+                </span>
+                <span
+                  className="absolute bottom-1 left-2 right-2 h-px bg-gold transition-transform duration-300 origin-left"
+                  style={{ transform: isActive ? "scaleX(1)" : "scaleX(0)" }}
+                />
+              </a>
             );
           })}
         </nav>

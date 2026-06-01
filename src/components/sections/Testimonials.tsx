@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { InceptionReveal, InceptionStagger, InceptionItem } from "@/components/ui/InceptionReveal";
+import { Reveal, RevealStagger, RevealItem } from "@/components/ui/Reveal";
 import { SplitText } from "@/components/ui/SplitText";
 
 const REVIEWS = [
@@ -65,27 +65,27 @@ export function Testimonials() {
       <div className="mx-auto max-w-6xl">
         <div className="flex flex-wrap items-end justify-between gap-6">
           <div>
-            <InceptionReveal mode="clip">
+            <Reveal mode="clip">
               <span className="eyebrow">Kept forever</span>
-            </InceptionReveal>
+            </Reveal>
             <SplitText as="h2" className="display-3 mt-4 text-ink" mode="push" stagger={0.055} delay={0.1}>
               What they say after the yes.
             </SplitText>
           </div>
 
-          <InceptionReveal mode="drift" dir="right" delay={0.2}>
+          <Reveal mode="rise" dir="right" delay={0.2}>
             <div className="flex items-center gap-3">
               <Stars n={5} />
               <span className="text-[0.8rem] uppercase tracking-[0.16em] text-ink-soft">
                 4.9 / 5 · 1,400+ couples
               </span>
             </div>
-          </InceptionReveal>
+          </Reveal>
         </div>
 
-        <InceptionStagger delay={0.15} stagger={0.13} className="mt-14 grid gap-6 md:grid-cols-3">
+        <RevealStagger delay={0.15} stagger={0.13} className="mt-14 grid gap-6 md:grid-cols-3">
           {REVIEWS.map((r) => (
-            <InceptionItem key={r.name} mode="rise">
+            <RevealItem key={r.name} mode="rise">
               <motion.figure
                 className="group flex h-full flex-col justify-between rounded-2xl border border-line bg-champagne/20 p-7 backdrop-blur-sm transition-colors duration-500 hover:border-gold/30 hover:bg-champagne/35"
                 whileHover={{ y: -4, transition: { type: "spring", stiffness: 320, damping: 28 } }}
@@ -107,19 +107,19 @@ export function Testimonials() {
                   </div>
                 </figcaption>
               </motion.figure>
-            </InceptionItem>
+            </RevealItem>
           ))}
-        </InceptionStagger>
+        </RevealStagger>
 
         {/* Quiet closing line — bridges toward the finale */}
-        <InceptionReveal mode="rise" delay={0.3} className="mt-16 text-center">
+        <Reveal mode="rise" delay={0.3} className="mt-16 text-center">
           <div className="mx-auto max-w-[6rem]">
             <div className="rule-gold h-px" />
           </div>
           <p className="mt-6 text-[0.8rem] uppercase tracking-[0.28em] text-muted">
             Every story starts with a question
           </p>
-        </InceptionReveal>
+        </Reveal>
       </div>
     </section>
   );

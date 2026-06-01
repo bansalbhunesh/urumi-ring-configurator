@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { InceptionReveal } from "@/components/ui/InceptionReveal";
+import { Reveal } from "@/components/ui/Reveal";
 import { SplitText } from "@/components/ui/SplitText";
 import { MagneticButton } from "@/components/ui/animations/MagneticButton";
 
@@ -36,7 +36,7 @@ export function Closing() {
         <div className="rule-gold h-px" />
       </motion.div>
 
-      <InceptionReveal mode="flip" className="relative z-10 mx-auto max-w-xl mt-8">
+      <Reveal mode="rise" className="relative z-10 mx-auto max-w-xl mt-8">
         <span className="eyebrow">Forever</span>
         <SplitText
           as="p"
@@ -68,7 +68,7 @@ export function Closing() {
         >
           Some choices last forever
         </motion.p>
-      </InceptionReveal>
+      </Reveal>
 
       <div className="relative z-10 flex flex-col items-center gap-5">
         <motion.div
@@ -79,7 +79,7 @@ export function Closing() {
         >
           <MagneticButton
             href="#ring"
-            className="inline-flex h-14 items-center rounded-full bg-gold/10 border border-gold/60 px-12 text-[0.82rem] uppercase tracking-[0.22em] text-gold outline-none transition-all hover:bg-gold hover:text-black focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-porcelain"
+            className="inline-flex h-14 items-center rounded-full bg-gold/10 border border-gold/60 px-12 text-[0.82rem] uppercase tracking-[0.22em] text-gold outline-none transition-[background-color,border-color,color] hover:bg-gold hover:text-black focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-porcelain"
             strength={0.28}
           >
             Configure yours

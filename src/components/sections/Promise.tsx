@@ -19,7 +19,7 @@
    ============================================================ */
 
 import { motion } from "framer-motion";
-import { InceptionReveal } from "@/components/ui/InceptionReveal";
+import { Reveal } from "@/components/ui/Reveal";
 import { SplitText } from "@/components/ui/SplitText";
 
 const EX = [0.16, 1, 0.3, 1] as const;
@@ -46,9 +46,9 @@ export function PromiseSection() {
       />
 
       {/* Eyebrow — standard clip (small, precise) */}
-      <InceptionReveal mode="clip" className="relative z-10">
+      <Reveal mode="clip" className="relative z-10">
         <span className="eyebrow">The promise</span>
-      </InceptionReveal>
+      </Reveal>
 
       {/* The big line — 3D perspective push, each word from deep space */}
       <div className="relative z-10 mt-7">
@@ -63,12 +63,12 @@ export function PromiseSection() {
       </div>
 
       {/* Subtext — clips in from left after the heading lands */}
-      <InceptionReveal mode="clip" delay={0.6} className="relative z-10 mt-8">
+      <Reveal mode="clip" delay={0.6} className="relative z-10 mt-8">
         <p className="mx-auto max-w-md text-[1.05rem] leading-relaxed text-paper-ink/70">
           Not an algorithm. Not a subscription. One object, made once, meant to
           outlast every phone you will ever own.
         </p>
-      </InceptionReveal>
+      </Reveal>
     </section>
   );
 }

@@ -133,7 +133,7 @@ export function Studio() {
 
             <div className="mt-9">
               <span className="eyebrow">Your configuration</span>
-              <div className="mt-2 font-sans text-[4.5rem] font-semibold leading-none tabular-nums text-ink">
+              <div className="mt-2 font-sans text-2xl font-semibold leading-none tabular-nums text-ink">
                 <PriceTag value={price} symbol={symbol} />
               </div>
               <p className="mt-2.5 text-[0.8rem] tracking-wide text-ink-soft">
