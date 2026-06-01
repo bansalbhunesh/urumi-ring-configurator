@@ -18,11 +18,11 @@ import { Gem } from "./Gem";
    Procedural "twist" engagement ring.
 
    Two metal strands run the full circle of the band. The twist between them is
-   not uniform: a smooth bump function concentrates the winding at the top
-   shoulders and falls to zero at the bottom, so the lower shank reads as one
-   clean comfort-fit band while the shoulders open into a symmetric twist that
-   sweeps up and cradles a raised solitaire — the signature of the reference
-   ring, rather than a uniform rope eternity band.
+   non-uniform: a smooth bump concentrates winding at the top shoulders and
+   falls to zero at the bottom — so the lower shank reads as one clean comfort-
+   fit band while the shoulders open into a symmetric twist that cradles the
+   solitaire. Roughness 0.08 (white-gold) / 0.11 (yellow, rose) gives a
+   mirror-polished precious-metal appearance in the studio IBL.
 ---------------------------------------------------------------------------- */
 
 const RING_RADIUS = 1;
@@ -62,15 +62,12 @@ class TwistStrand extends THREE.Curve<THREE.Vector3> {
   }
 }
 
-/* Flat ribbon cross-section — each strand is a thin rectangle that reflects
-   light like polished flat gold rather than a rope-like cylinder.
-   Uses Frenet frames to orient the cross-section along the curve. */
+/* Flat ribbon cross-section — polished-flat-gold light response. */
 function buildRibbonGeo(curve: THREE.Curve<THREE.Vector3>, segments = 480): THREE.BufferGeometry {
   const frames = curve.computeFrenetFrames(segments, true);
   const hw = RIBBON_HALF_W;
   const hh = RIBBON_HALF_H;
 
-  // 4 verts per cross-section: 0=top-right, 1=top-left, 2=bot-left, 3=bot-right
   const nVerts = (segments + 1) * 4;
   const pos = new Float32Array(nVerts * 3);
   const nrm = new Float32Array(nVerts * 3);
@@ -81,32 +78,26 @@ function buildRibbonGeo(curve: THREE.Curve<THREE.Vector3>, segments = 480): THRE
     const n = frames.normals[i];
     const b = frames.binormals[i];
     const base = i * 4 * 3;
-    // top face (+b normal)
     pos[base]   = p.x+n.x*hw+b.x*hh; pos[base+1] = p.y+n.y*hw+b.y*hh; pos[base+2] = p.z+n.z*hw+b.z*hh;
     nrm[base]   = b.x; nrm[base+1] = b.y; nrm[base+2] = b.z;
     pos[base+3] = p.x-n.x*hw+b.x*hh; pos[base+4] = p.y-n.y*hw+b.y*hh; pos[base+5] = p.z-n.z*hw+b.z*hh;
     nrm[base+3] = b.x; nrm[base+4] = b.y; nrm[base+5] = b.z;
-    // bottom face (-b normal)
     pos[base+6] = p.x-n.x*hw-b.x*hh; pos[base+7] = p.y-n.y*hw-b.y*hh; pos[base+8] = p.z-n.z*hw-b.z*hh;
     nrm[base+6] = -b.x; nrm[base+7] = -b.y; nrm[base+8] = -b.z;
     pos[base+9] = p.x+n.x*hw-b.x*hh; pos[base+10]= p.y+n.y*hw-b.y*hh; pos[base+11]= p.z+n.z*hw-b.z*hh;
     nrm[base+9] = -b.x; nrm[base+10]= -b.y; nrm[base+11]= -b.z;
   }
 
-  const idx = new Uint32Array(segments * 24); // 4 faces × 2 tris × 3 verts
+  const idx = new Uint32Array(segments * 24);
   let ii = 0;
   for (let i = 0; i < segments; i++) {
     const a = i * 4, b = (i + 1) * 4;
-    // top face (CCW from +b)
     idx[ii++]=a;   idx[ii++]=b;   idx[ii++]=b+1;
     idx[ii++]=a;   idx[ii++]=b+1; idx[ii++]=a+1;
-    // bottom face (CCW from -b)
     idx[ii++]=a+2; idx[ii++]=a+3; idx[ii++]=b+3;
     idx[ii++]=a+2; idx[ii++]=b+3; idx[ii++]=b+2;
-    // left edge
     idx[ii++]=a+1; idx[ii++]=b+1; idx[ii++]=b+2;
     idx[ii++]=a+1; idx[ii++]=b+2; idx[ii++]=a+2;
-    // right edge
     idx[ii++]=a+3; idx[ii++]=b+3; idx[ii++]=b;
     idx[ii++]=a+3; idx[ii++]=b;   idx[ii++]=a;
   }
@@ -118,8 +109,7 @@ function buildRibbonGeo(curve: THREE.Curve<THREE.Vector3>, segments = 480): THRE
   return geo;
 }
 
-/* A gentle "materialise" dissolve on first load — premium without being a
-   gimmick. Driven by a single uProgress uniform that climbs 0 → 1 once. */
+/* Materialise dissolve — noise-clipped birth, warm gold edge. One-time only. */
 function patchMetalShader(shader: MetalShader) {
   shader.uniforms.uProgress = { value: 0 };
 
@@ -226,8 +216,8 @@ function MetalMaterial({
       ref={materialRef}
       color="#e9e9ec"
       metalness={1}
-      roughness={0.18}
-      envMapIntensity={1.15}
+      roughness={0.08}
+      envMapIntensity={1.4}
       transparent
       depthWrite
       onBeforeCompile={(shader) => {
@@ -259,18 +249,16 @@ export function TwistRing({
   );
 
   const introProgress = useRef(0);
-  const born = useRef(false); // the materialise is a one-time birth (Act III)
+  const born = useRef(false);
   const tiltRef = useRef<THREE.Group>(null);
   const pointer = useThree((s) => s.pointer);
   const gl = useThree((s) => s.gl);
 
-  // Grab cursor wired to the canvas DOM element
   useEffect(() => {
     gl.domElement.style.cursor = "grab";
     return () => { gl.domElement.style.cursor = "auto"; };
   }, [gl]);
 
-  // Drag-to-rotate state: yaw accumulator + inertial velocity.
   const drag = useRef({ active: false, lastX: 0, yaw: 0, vel: 0 });
 
   const onPointerDown = (e: ThreeEvent<PointerEvent>) => {
@@ -294,7 +282,6 @@ export function TwistRing({
   const onPointerUp = (e: ThreeEvent<PointerEvent>) => {
     drag.current.active = false;
     gl.domElement.style.cursor = "grab";
-    // Snap to nearest canonical 45° when releasing slowly
     if (Math.abs(drag.current.vel) < 0.006) {
       const snap = Math.round(drag.current.yaw / (Math.PI / 4)) * (Math.PI / 4);
       drag.current.yaw = snap;
@@ -303,11 +290,17 @@ export function TwistRing({
     e.stopPropagation();
   };
 
+  // Keyboard rotate — arrow keys for accessibility
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "ArrowLeft")  drag.current.yaw -= Math.PI / 8;
+      if (e.key === "ArrowRight") drag.current.yaw += Math.PI / 8;
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
   useFrame((state, dt) => {
-    // Act III — the metal materialises in step with the ring's reveal (scale) the
-    // FIRST time it enters the stage: a one-time birth. Once formed it latches
-    // solid, so re-entering later sections just scales it in cleanly rather than
-    // re-dissolving — keeping "the ring is born" a singular moment.
     if (born.current) {
       introProgress.current = 1;
     } else {
@@ -330,24 +323,18 @@ export function TwistRing({
 
     if (!d.active) {
       if (yawTarget != null) {
-        // Eased move to a requested angle (view preset / reset); idle paused.
         d.yaw += (yawTarget - d.yaw) * 0.12;
         d.vel = 0;
       } else {
-        // Base rotation is now scroll-driven (the ScrollDirector turntable scrubs
-        // the ring with page scroll). Here we only carry drag inertia so a flick
-        // still spins down naturally; when idle the ring holds its frame.
-        d.yaw += d.vel; // inertia
+        d.yaw += d.vel;
         d.vel *= 0.88;
       }
     }
 
-    // Pitch follows a preset when set, otherwise gentle pointer parallax.
     const tiltX = pitchTarget != null ? pitchTarget : -pointer.y * 0.1;
     g.rotation.y += (d.yaw - g.rotation.y) * 0.1;
     g.rotation.x += (tiltX - g.rotation.x) * 0.05;
 
-    // barely-there idle drift so it feels alive, not floating away
     const t = state.clock.elapsedTime;
     g.position.x = Math.sin(t * 0.4) * 0.012;
     g.position.y = Math.cos(t * 0.5) * 0.012;
@@ -380,10 +367,10 @@ export function TwistRing({
         <MetalMaterial metal={metal} progress={introProgress} />
       </mesh>
 
-      {/* Setting: basket gallery + four prongs cradling the raised solitaire */}
+      {/* Setting: basket gallery + four prongs */}
       <group position={[0, GEM_Y, 0]}>
         <mesh position={[0, -0.22, 0]} castShadow>
-          <torusGeometry args={[0.205, 0.024, 14, 44]} />
+          <torusGeometry args={[0.205, 0.024, 16, 48]} />
           <MetalMaterial metal={metal} progress={introProgress} />
         </mesh>
         {prongs.map((ang, i) => {

@@ -5,17 +5,17 @@ import { motion } from "framer-motion";
 import { useConfigurator } from "@/store/configurator";
 import { useCart } from "@/hooks/useProduct";
 import { BagIcon } from "@/components/ui/icons";
-
 import { Magnetic } from "@/components/ui/Magnetic";
 
 const LINKS = [
-  { label: "The Ring", href: "#ring" },
-  { label: "Atelier", href: "#atelier" },
-  { label: "Materials", href: "#materials" },
+  { label: "The Ring", href: "#ring", section: "ring" },
+  { label: "Atelier", href: "#atelier", section: "atelier" },
+  { label: "Materials", href: "#materials", section: "materials" },
 ];
 
 export function Header() {
   const [scrolled, setScrolled] = useState(false);
+  const [active, setActive] = useState<string | null>(null);
   const openCart = useConfigurator((s) => s.openCart);
   const { data: cart } = useCart();
   const count = cart?.itemCount ?? 0;
@@ -25,6 +25,22 @@ export function Header() {
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // IntersectionObserver tracks which section owns the viewport — active nav link
+  useEffect(() => {
+    const targets = LINKS.map((l) => document.getElementById(l.section)).filter(Boolean) as HTMLElement[];
+    if (!targets.length) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) setActive(e.target.id);
+        }
+      },
+      { rootMargin: "-20% 0px -70% 0px", threshold: 0 },
+    );
+    targets.forEach((t) => io.observe(t));
+    return () => io.disconnect();
   }, []);
 
   return (
@@ -42,7 +58,10 @@ export function Header() {
         className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6 sm:px-10"
       >
         <Magnetic strength={10}>
-          <a href="#" className="-m-2 flex min-h-11 items-center gap-2 rounded-md p-2 outline-none focus-visible:ring-2 focus-visible:ring-gold">
+          <a
+            href="#"
+            className="-m-2 flex min-h-11 items-center gap-2 rounded-md p-2 outline-none focus-visible:ring-2 focus-visible:ring-gold"
+          >
             <span className="text-gold">◆</span>
             <span className="text-[0.95rem] font-medium uppercase tracking-[0.4em] text-ink">
               Aurelle
@@ -50,18 +69,28 @@ export function Header() {
           </a>
         </Magnetic>
 
-        <nav className="hidden items-center gap-10 md:flex">
-          {LINKS.map((l) => (
-            <Magnetic key={l.href} strength={10}>
-              <a
-                href={l.href}
-                className="group relative -m-2 block min-h-11 rounded-md p-2 text-[0.82rem] tracking-wide text-ink-soft outline-none transition-colors hover:text-ink focus-visible:ring-2 focus-visible:ring-gold"
-              >
-                {l.label}
-                <span className="absolute bottom-1 left-2 right-2 h-px scale-x-0 bg-gold transition-transform duration-300 origin-left group-hover:scale-x-100" />
-              </a>
-            </Magnetic>
-          ))}
+        <nav className="hidden items-center gap-10 md:flex" aria-label="Primary navigation">
+          {LINKS.map((l) => {
+            const isActive = active === l.section;
+            return (
+              <Magnetic key={l.href} strength={10}>
+                <a
+                  href={l.href}
+                  className="group relative -m-2 block min-h-11 rounded-md p-2 text-[0.82rem] tracking-wide outline-none transition-colors focus-visible:ring-2 focus-visible:ring-gold"
+                  style={{ color: isActive ? "var(--color-gold)" : undefined }}
+                  aria-current={isActive ? "page" : undefined}
+                >
+                  <span className={`transition-colors duration-300 ${isActive ? "text-gold" : "text-ink-soft group-hover:text-ink"}`}>
+                    {l.label}
+                  </span>
+                  <span
+                    className="absolute bottom-1 left-2 right-2 h-px bg-gold transition-transform duration-300 origin-left"
+                    style={{ transform: isActive ? "scaleX(1)" : "scaleX(0)" }}
+                  />
+                </a>
+              </Magnetic>
+            );
+          })}
         </nav>
 
         <Magnetic strength={15}>

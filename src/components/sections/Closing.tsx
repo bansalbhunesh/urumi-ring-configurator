@@ -1,13 +1,5 @@
 "use client";
 
-/* ============================================================
-   CLOSING — animation universe: FALL + BURST CTA
-
-   The finale drops in from above (like the curtain falling) and
-   the CTA springs up with burst energy — the last physics world
-   before the page ends.
-   ============================================================ */
-
 import { motion } from "framer-motion";
 import { InceptionReveal } from "@/components/ui/InceptionReveal";
 import { SplitText } from "@/components/ui/SplitText";
@@ -21,32 +13,59 @@ export function Closing() {
       data-ring="finale"
       className="relative flex min-h-[100svh] flex-col items-center justify-between overflow-hidden px-6 pt-28 pb-24 text-center sm:pt-32"
     >
-      {/* Quote falls from above — cinematic curtain-drop */}
-      <InceptionReveal mode="fall" className="relative z-10 mx-auto max-w-lg">
+      {/* Subtle ambient glow for the finale — the ring has returned */}
+      <div
+        className="pointer-events-none absolute inset-0"
+        aria-hidden
+        style={{
+          background:
+            "radial-gradient(ellipse 60% 50% at 50% 40%, rgba(200,165,107,0.09) 0%, transparent 70%)",
+        }}
+      />
+
+      <InceptionReveal mode="fall" className="relative z-10 mx-auto max-w-xl">
         <span className="eyebrow">Forever</span>
-        <p className="font-display mt-4 text-balance text-[1.6rem] leading-snug text-ink sm:text-[2rem]">
-          Somewhere, someone is about to ask the most important question of their
-          life.
-        </p>
-        <p className="font-display mt-3 text-xl italic text-gold sm:text-2xl">
+        <SplitText as="p" className="font-display mt-6 text-balance text-[1.65rem] leading-snug text-ink sm:text-[2.1rem]">
+          Somewhere, someone is about to ask the most important question of their life.
+        </SplitText>
+        <motion.p
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 1, ease: CI, delay: 0.6 }}
+          className="font-display mt-4 text-xl italic text-gold sm:text-2xl"
+        >
           This is what they&apos;ll be holding.
-        </p>
-        <p className="mt-8 text-[0.8rem] uppercase tracking-[0.28em] text-muted">
+        </motion.p>
+        <div className="mx-auto mt-6 max-w-[8rem]">
+          <div className="rule-gold h-px" />
+        </div>
+        <p className="mt-6 text-[0.8rem] uppercase tracking-[0.28em] text-muted">
           Some choices last forever
         </p>
       </InceptionReveal>
 
-      {/* CTA springs up with burst — final kinetic moment */}
-      <InceptionReveal mode="burst" delay={0.3} className="relative z-10">
-        <motion.a
-          href="#ring"
-          className="inline-flex h-12 items-center rounded-full border border-line px-7 text-[0.8rem] uppercase tracking-[0.18em] text-ink outline-none transition-colors hover:border-gold hover:text-gold focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-porcelain"
-          whileHover={{ scale: 1.05, transition: { type: "spring", stiffness: 400, damping: 20 } }}
-          whileTap={{ scale: 0.96 }}
+      <div className="relative z-10 flex flex-col items-center gap-4">
+        <InceptionReveal mode="burst" delay={0.3}>
+          <motion.a
+            href="#ring"
+            className="inline-flex h-14 items-center rounded-full bg-gold/10 border border-gold/60 px-10 text-[0.82rem] uppercase tracking-[0.2em] text-gold outline-none transition-all hover:bg-gold hover:text-black focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-porcelain"
+            whileHover={{ scale: 1.04, transition: { type: "spring", stiffness: 400, damping: 22 } }}
+            whileTap={{ scale: 0.97 }}
+          >
+            Configure yours
+          </motion.a>
+        </InceptionReveal>
+        <motion.p
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 1, ease: CI, delay: 0.8 }}
+          className="text-[0.7rem] tracking-wide text-muted"
         >
-          Configure yours
-        </motion.a>
-      </InceptionReveal>
+          Complimentary shipping · Lifetime warranty · 30-day returns
+        </motion.p>
+      </div>
     </section>
   );
 }

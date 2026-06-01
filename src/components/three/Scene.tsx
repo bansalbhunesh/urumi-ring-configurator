@@ -4,6 +4,7 @@ import { Suspense, useEffect, useMemo, useRef, useState, type RefObject } from "
 import { Canvas, useFrame } from "@react-three/fiber";
 import {
   Environment,
+  Lightformer,
   ContactShadows,
   PerspectiveCamera,
   MeshReflectorMaterial,
@@ -16,12 +17,8 @@ import { getScrollY, setRingReveal, useConfigurator } from "@/store/configurator
 /* ----------------------------------------------------------------------------
    One fixed, alpha canvas renders the ring for the whole page. The ring lives
    in a deterministic on-screen "stage" chosen per scroll zone so it never
-   collides with copy: right column on wide screens, top on mobile, centred for
-   the closing finale. The camera is calm — small, flattering reframings only.
-   No world-bending, no wormholes. The product is the only spectacle.
-
-   Loaded via next/dynamic({ ssr:false }) so the WebGL context only ever spins
-   up on the client.
+   collides with copy. The camera is calm — small, flattering reframings only.
+   Loaded via next/dynamic({ ssr:false }) so WebGL only spins up on the client.
 ---------------------------------------------------------------------------- */
 
 type Stage = {
@@ -33,12 +30,8 @@ type Stage = {
 
 const damp = THREE.MathUtils.damp;
 
-/* Diamond caustics (moodboard: refracted light cast by the stone). Rather than
-   geometry-derived caustics (an extra render pass that would fight the ring's
-   per-frame reposition/scale), this projects a procedural caustic web onto the
-   stage floor: layered domain-warped light folds, warm gold, pooled under the
-   ring by a radial mask and faded to nothing at the edges. Additive, depth-write
-   off, so it only ever adds light. Desktop-only; reduced-motion freezes it. */
+/* Diamond caustics — procedural warm light web cast below the ring.
+   Additive, depth-write off. Desktop-only; reduced-motion freezes it. */
 const CAUSTIC_VERT = /* glsl */ `
   varying vec2 vUv;
   void main() {
@@ -68,7 +61,7 @@ const CAUSTIC_FRAG = /* glsl */ `
     float val = pow(abs(c), 8.0);
     float d = distance(vUv, vec2(0.5));
     float mask = smoothstep(0.5, 0.06, d);
-    gl_FragColor = vec4(uColor * val, clamp(val, 0.0, 1.0) * mask * 0.28);
+    gl_FragColor = vec4(uColor * val, clamp(val, 0.0, 1.0) * mask * 0.32);
   }
 `;
 function CausticFloor({ reduceMotion }: { reduceMotion: boolean }) {
@@ -98,9 +91,7 @@ function CausticFloor({ reduceMotion }: { reduceMotion: boolean }) {
   );
 }
 
-/* Liquid-metal floor (moodboard: chrome/mercury reflections). Heavily blurred so
-   it reads as a soft polished sheen, not a literal mirror double — worst case it
-   degrades to a plain dark floor. Desktop-only (renders an FBO each frame). */
+/* Liquid-metal floor — soft polished sheen, degrades to plain dark. Desktop-only. */
 function ReflectiveFloor() {
   return (
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.4, 0]}>
@@ -140,7 +131,6 @@ function ScrollDirector({
   const intro = useRef(0);
   const groupYaw = useRef(0);
 
-  // Camera flourish on metal/stone change: brief 10% push-in, then ease back.
   const changeSeq = useConfigurator((s) => s.changeSeq);
   const prevSeq = useRef(0);
   const flourishZ = useRef(0);
@@ -153,9 +143,6 @@ function ScrollDirector({
     else if (intro.current < 1) intro.current = Math.min(1, intro.current + dt / 0.9);
     const introEase = 1 - Math.pow(1 - intro.current, 3);
 
-    // Which section owns the viewport centre? Each section declares data-ring
-    // ("hero" | "stage" | "hidden" | "finale"), so adding full-width sections
-    // where the ring should step aside is a markup change, not a code change.
     const center = y + vh * 0.5;
     let ring = "hero";
     let frame = "full";
@@ -175,14 +162,12 @@ function ScrollDirector({
     const hero: Stage = isDesktop
       ? { pos: new THREE.Vector3(1.5, 0, 0), scale: 1.0, camZ: 7.2, lookY: 0.5 }
       : { pos: new THREE.Vector3(0, 1.72, 0), scale: 0.52, camZ: 8.7, lookY: 0.95 };
-    // Stage framings — the ring is presented from varied angles as you scroll.
     const STAGE: Record<string, Stage> = {
       full: { pos: new THREE.Vector3(1.62, -0.05, 0), scale: 1.05, camZ: 6.7, lookY: 0.66 },
       stone: { pos: new THREE.Vector3(1.5, -0.15, 0), scale: 1.12, camZ: 5.9, lookY: 1.0 },
       band: { pos: new THREE.Vector3(1.64, 0.05, 0), scale: 1.0, camZ: 6.9, lookY: 0.32 },
     };
     const hidden: Stage = { pos: new THREE.Vector3(0, 0.35, 0), scale: 0.0001, camZ: 8.7, lookY: 0.6 };
-    // bgfloat: ring stays visible but small — atmosphere without dominating the text
     const bgfloat: Stage = isDesktop
       ? { pos: new THREE.Vector3(1.0, 0.18, 0), scale: 0.36, camZ: 8.0, lookY: 0.6 }
       : { pos: new THREE.Vector3(0, 0.55, 0), scale: 0.20, camZ: 9.5, lookY: 0.55 };
@@ -197,8 +182,6 @@ function ScrollDirector({
     else if (ring === "stage") target = wide ? STAGE[frame] ?? STAGE.full : hidden;
     else target = hero;
 
-    // On mobile the fixed ring would sit behind the hero controls as you scroll;
-    // fade it out as you move into the panel. It returns for the finale.
     let mobileFade = 1;
     if (!isDesktop && ring === "hero") {
       mobileFade = 1 - THREE.MathUtils.smoothstep(y, vh * 0.12, vh * 0.5);
@@ -207,7 +190,6 @@ function ScrollDirector({
     const targetScale =
       target.scale * mobileFade * (intro.current < 1 ? introEase : 1);
 
-    // Camera flourish: push in 0.65 units when metal or stone changes
     if (changeSeq !== prevSeq.current) {
       prevSeq.current = changeSeq;
       flourishZ.current = -0.65;
@@ -222,11 +204,6 @@ function ScrollDirector({
     camPos.current.z = damp(camPos.current.z, target.camZ + flourishZ.current, k, dt);
     camLook.current.y = damp(camLook.current.y, target.lookY, k, dt);
 
-    // Scroll-scrubbed turntable. The ring's base rotation is driven directly by
-    // page scroll progress, so scrolling scrubs a slow cinematic reveal and the
-    // ring holds its frame when you stop — the live-3D equivalent of an Apple
-    // image-sequence scroll, but interactive and asset-free. Drag/parallax still
-    // compose on top via the inner group inside <TwistRing>.
     const maxScroll =
       typeof document !== "undefined"
         ? Math.max(1, document.documentElement.scrollHeight - vh)
@@ -235,9 +212,6 @@ function ScrollDirector({
     const yawTarget = progress * Math.PI * 2 * 1.15;
     groupYaw.current = damp(groupYaw.current, yawTarget, reduceMotion ? 999 : 3.2, dt);
 
-    // Act III — drive the metal materialise from the ring's scale: it grows into
-    // being as it enters the stage, and is guaranteed solid whenever it's at full
-    // scale (so it can never be left half-dissolved while visible).
     setRingReveal(THREE.MathUtils.clamp(scale.current / 0.55, 0, 1));
 
     const g = ringGroupRef.current;
@@ -252,29 +226,63 @@ function ScrollDirector({
 
   return (
     <>
-      {/* HDRI studio environment — full 360° IBL from a real studio capture.
-         Gives the metal physically-correct multi-directional reflections that
-         Lightformers alone cannot produce. */}
-      <ambientLight intensity={0.22} />
-      <Environment preset="studio" environmentIntensity={0.72} />
+      {/* Professional jewelry studio environment — three-point lighting with
+          a dedicated gem-brilliance top ring. Each light has a deliberate role:
+          KEY shapes the metal, RIM separates it from the dark, FILL prevents
+          dead shadows, TOP feeds the diamond's pavilion facets. */}
+      <ambientLight intensity={0.10} />
 
+      {/* KEY — large diffuse rect, upper-left, warm-neutral. Main modelling light. */}
       <spotLight
-        position={[-4, 7, 5]}
-        angle={0.5}
+        position={[-5, 9, 6]}
+        angle={0.42}
         penumbra={1}
-        intensity={2.0}
+        intensity={3.6}
         color="#fff6ec"
         castShadow
         shadow-bias={-0.0001}
-        shadow-mapSize={[1024, 1024]}
+        shadow-mapSize={[2048, 2048]}
       />
-      <pointLight position={[3.5, -1, 2.5]} intensity={0.26} color="#dcc49a" />
+      {/* RIM — cool accent from upper-right-back. Separates metal from the void. */}
+      <spotLight
+        position={[6, 5, -5]}
+        angle={0.55}
+        penumbra={1}
+        intensity={1.8}
+        color="#c8d8ff"
+      />
+      {/* FILL — warm, soft, prevents full-black shadow side. */}
+      <pointLight position={[3.5, -1, 3]} intensity={0.5} color="#e8cda0" />
+      {/* TOP — feeds light downward into the pavilion so the diamond sparkles. */}
+      <pointLight position={[0, 6, 1]} intensity={1.2} color="#fff8f0" />
+
+      {/* IBL environment — rendered from these Lightformers into a 512-res cube
+          map. Gives the metal physically-correct multi-directional reflections and
+          provides a rich background for the diamond's transmission shader to sample.
+          Resolution 512 is the sweet spot: 4× sharper than 256, negligible cost. */}
+      <Environment resolution={512} environmentIntensity={1.15}>
+        {/* Studio key panel — large, bright, warm-neutral */}
+        <Lightformer form="rect" intensity={7} color="#fff8f0"
+          scale={[1.6, 10, 1]} position={[-5, 2, 3]} rotation={[0, -0.85, 0]} />
+        {/* Cool rim strip from behind */}
+        <Lightformer form="rect" intensity={3.5} color="#c8d8ff"
+          scale={[1.4, 8, 1]} position={[5, 3, -4]} rotation={[0, 0.75, 0]} />
+        {/* Warm fill from below-right — lifts the shadow side */}
+        <Lightformer form="rect" intensity={2} color="#fde8c0"
+          scale={[9, 4, 1]} position={[3, -3, 3]} rotation={[0.4, -0.4, 0]} />
+        {/* Hot top ring — feeds pavilion facets from directly above */}
+        <Lightformer form="ring" intensity={3} color="#fff4e8"
+          scale={[5, 5, 1]} position={[0, 6, 0]} rotation={[Math.PI / 2, 0, 0]} />
+        {/* Background crush — ensures shadows stay deep and precious */}
+        <Lightformer form="rect" intensity={0.2} color="#10090a"
+          scale={[30, 30, 1]} position={[0, 0, -8]} />
+      </Environment>
 
       <ContactShadows
         position={[0, -1.35, 0]}
-        opacity={0.55}
+        opacity={0.6}
         scale={6}
-        blur={3}
+        blur={2.8}
         far={4.5}
         color="#1a130b"
       />
@@ -290,16 +298,16 @@ function ScrollDirector({
 
       {isDesktop && !reduceMotion && (
         <EffectComposer enableNormalPass={false}>
-          {/* A whisper of bloom — only the diamond's hottest sparkle should ever
-             glow. The metal must read as polished metal, never as a light source. */}
+          {/* Whisper of bloom — only the diamond's hottest sparkle glows.
+              High threshold keeps metal clean; low intensity keeps it subtle. */}
           <Bloom
-            intensity={0.18}
-            luminanceThreshold={0.96}
-            luminanceSmoothing={0.22}
+            intensity={0.12}
+            luminanceThreshold={0.98}
+            luminanceSmoothing={0.18}
             mipmapBlur
           />
-          {/* Firm vignette to darken the frame edges and focus the eye on the ring. */}
-          <Vignette eskil={false} offset={0.2} darkness={0.88} />
+          {/* Vignette focuses the eye — darkens edges, ring is the light source. */}
+          <Vignette eskil={false} offset={0.22} darkness={0.84} />
         </EffectComposer>
       )}
     </>
