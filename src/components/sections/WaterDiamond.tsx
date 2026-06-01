@@ -147,6 +147,7 @@ export function WaterDiamond() {
 
   return (
     <section
+      id="water-diamond"
       ref={ref}
       data-ring="hidden"
       className="relative min-h-[140svh] overflow-hidden"

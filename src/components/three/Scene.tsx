@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useMemo, useRef, useState, type RefObject } from "react";
+import { Suspense, memo, useEffect, useMemo, useRef, useState, type RefObject } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import {
   Environment,
@@ -277,23 +277,33 @@ function ScrollDirector({
         </group>
       </Suspense>
 
-      {isDesktop && !reduceMotion && (
-        <EffectComposer enableNormalPass={false}>
-          {/* Whisper of bloom — only the diamond's hottest sparkle glows.
-              High threshold keeps metal clean; low intensity keeps it subtle. */}
-          <Bloom
-            intensity={0.12}
-            luminanceThreshold={0.98}
-            luminanceSmoothing={0.18}
-            mipmapBlur
-          />
-          {/* Vignette focuses the eye — darkens edges, ring is the light source. */}
-          <Vignette eskil={false} offset={0.22} darkness={0.84} />
-        </EffectComposer>
-      )}
     </>
   );
 }
+
+/* PostFX is memoised separately from ScrollDirector so it never re-renders
+   when stone/metal changes (changeSeq). EffectComposer.addPass crashes if
+   called during re-renders triggered by those state changes. */
+const PostFX = memo(function PostFX({
+  isDesktop,
+  reduceMotion,
+}: {
+  isDesktop: boolean;
+  reduceMotion: boolean;
+}) {
+  if (!isDesktop || reduceMotion) return null;
+  return (
+    <EffectComposer enableNormalPass={false}>
+      <Bloom
+        intensity={0.12}
+        luminanceThreshold={0.98}
+        luminanceSmoothing={0.18}
+        mipmapBlur
+      />
+      <Vignette eskil={false} offset={0.22} darkness={0.84} />
+    </EffectComposer>
+  );
+});
 
 export default function Scene() {
   const [isDesktop, setIsDesktop] = useState(
@@ -351,6 +361,7 @@ export default function Scene() {
           reduceMotion={reduceMotion}
           ringGroupRef={ringGroupRef}
         />
+        <PostFX isDesktop={isDesktop} reduceMotion={reduceMotion} />
       </Canvas>
     </div>
   );

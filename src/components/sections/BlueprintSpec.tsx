@@ -62,6 +62,7 @@ export function BlueprintSpec() {
 
   return (
     <section
+      id="blueprint"
       ref={ref}
       data-ring="hidden"
       className="relative min-h-[120svh] overflow-hidden bg-[#020b18] py-24"

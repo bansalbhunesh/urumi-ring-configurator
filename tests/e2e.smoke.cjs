@@ -116,9 +116,11 @@ async function main() {
   // add to bag -> Celebration (~1.5s) -> cart auto-opens (real UX flow)
   const dialog = page.locator('[role="dialog"][aria-label="Your bag"]');
   try {
-    const waitPost = page.waitForResponse((r) => r.url().includes("/api/cart") && r.request().method() === "POST", { timeout: 20000 });
-    await page.locator('#ring button:has-text("Add to Bag"):not([disabled])').first().click({ timeout: 15000 });
-    const r = await waitPost;
+    // Use Promise.all so waitPost rejection is always handled (avoids unhandled rejection when click times out first)
+    const [r] = await Promise.all([
+      page.waitForResponse((r) => r.url().includes("/api/cart") && r.request().method() === "POST", { timeout: 25000 }),
+      page.locator('#ring button:has-text("Add to Bag"):not([disabled])').first().click({ timeout: 20000, force: true }),
+    ]);
     check("studio: Add to Bag posts to cart", r.ok(), `status ${r.status()}`);
     await dialog.waitFor({ state: "visible", timeout: 12000 });
     check("cart: auto-opens after celebration", await dialog.isVisible());
@@ -139,11 +141,22 @@ async function main() {
     await dialog.waitFor({ state: "hidden", timeout: 8000 });
   } catch (e) { fail("cart: manual open", String(e)); }
 
-  // new sections
-  check("section: #on-hand exists", await page.locator("#on-hand").count() > 0);
-  check("section: #on-hand data-ring=hidden", (await page.locator("#on-hand").getAttribute("data-ring")) === "hidden");
-  check("section: #holographic exists", await page.locator("#holographic").count() > 0);
-  check("section: #holographic data-ring=hidden", (await page.locator("#holographic").getAttribute("data-ring")) === "hidden");
+  // all sections present
+  for (const [id, label] of [
+    ["on-hand", "#on-hand"], ["holographic", "#holographic"],
+    ["atelier", "#craft (id=atelier)"], ["materials", "#materials"],
+    ["blueprint", "#blueprint"], ["water-diamond", "#water-diamond"],
+    ["showcase", "#showcase"], ["promise", "#promise"],
+    ["reviews", "#reviews"], ["finale", "#finale"],
+  ]) {
+    check(`section: ${label} exists`, await page.locator(`#${id}`).count() > 0);
+  }
+  const dataRings = await page.evaluate(() => ({
+    onHand: document.querySelector("#on-hand")?.getAttribute("data-ring"),
+    holographic: document.querySelector("#holographic")?.getAttribute("data-ring"),
+  }));
+  check("section: #on-hand data-ring=hidden", dataRings.onHand === "hidden");
+  check("section: #holographic data-ring=hidden", dataRings.holographic === "hidden");
 
   // holographic images load
   try {
