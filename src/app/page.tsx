@@ -7,6 +7,9 @@ import { ActOne } from "@/components/sections/ActOne";
 import { Craft } from "@/components/sections/Craft";
 import { Materials } from "@/components/sections/Materials";
 import { Showcase } from "@/components/sections/Showcase";
+import { WaterDiamond } from "@/components/sections/WaterDiamond";
+import { BlueprintSpec } from "@/components/sections/BlueprintSpec";
+import { MirrorRoom } from "@/components/sections/MirrorRoom";
 import { PromiseSection } from "@/components/sections/Promise";
 import { Testimonials } from "@/components/sections/Testimonials";
 import { Closing } from "@/components/sections/Closing";
@@ -20,6 +23,7 @@ import { Toast } from "@/components/ui/Toast";
 import { ScrollCue } from "@/components/ui/ScrollCue";
 import { ConfigUrlSync } from "@/components/ui/ConfigUrlSync";
 import { MetalAtmosphere } from "@/components/ui/MetalAtmosphere";
+import { ScrollProgressLine } from "@/components/ui/animations/ScrollProgressLine";
 
 import { GlobalCanvas } from "@/components/three/GlobalCanvas";
 
@@ -32,6 +36,7 @@ export default function Home() {
       <SoundToggle />
       <ScrollCue />
       <MetalAtmosphere />
+      <ScrollProgressLine />
       <GlobalCanvas />
       <Header />
       <main className="bg-transparent">
@@ -46,13 +51,19 @@ export default function Home() {
         {/* 5 — editorial: craft, materials, stones */}
         <Craft />
         <Materials />
-        {/* 6 — photoreal beat: the real GLB ring, drag to inspect */}
+        {/* 6 — water distortion: diamond emerges through rippling water */}
+        <WaterDiamond />
+        {/* 7 — photoreal beat: the real GLB ring, drag to inspect */}
         <Showcase />
-        {/* 7 — palette flip: the promise statement on cream */}
+        {/* 8 — blueprint: engineering spec overlay */}
+        <BlueprintSpec />
+        {/* 9 — mirror room: infinite reflections */}
+        <MirrorRoom />
+        {/* 10 — palette flip: the promise statement on cream */}
         <PromiseSection />
-        {/* 8 — social proof */}
+        {/* 11 — social proof */}
         <Testimonials />
-        {/* 9 — finale CTA */}
+        {/* 12 — finale CTA */}
         <Closing />
       </main>
       <Footer />

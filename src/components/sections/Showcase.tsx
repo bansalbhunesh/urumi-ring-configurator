@@ -4,7 +4,6 @@ import { Suspense, useEffect, useRef, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import {
   Environment,
-  Lightformer,
   ContactShadows,
   OrbitControls,
 } from "@react-three/drei";
@@ -59,18 +58,7 @@ export function Showcase() {
             <spotLight position={[5.5, 4, -4]} angle={0.55} penumbra={1} intensity={2.0} color="#c8d8ff" />
             <pointLight position={[0, 5, 1]} intensity={1.4} color="#fff4e8" />
 
-            <Environment resolution={512} environmentIntensity={1.2}>
-              <Lightformer form="rect" intensity={7} color="#fff8f0"
-                scale={[1.6, 10, 1]} position={[4.5, 1.5, 3]} rotation={[0, -0.7, 0]} />
-              <Lightformer form="rect" intensity={3.5} color="#cde0ff"
-                scale={[1.4, 8, 1]} position={[-5, 3, -4]} rotation={[0, 0.7, 0]} />
-              <Lightformer form="rect" intensity={2} color="#fde8c0"
-                scale={[9, 4, 1]} position={[3, -3, 3]} rotation={[0.35, -0.35, 0]} />
-              <Lightformer form="ring" intensity={3} color="#fff4e8"
-                scale={[5, 5, 1]} position={[0, 6, 0]} rotation={[Math.PI / 2, 0, 0]} />
-              <Lightformer form="rect" intensity={0.2} color="#10090a"
-                scale={[30, 30, 1]} position={[0, 0, -8]} />
-            </Environment>
+            <Environment files="/hdri/studio.hdr" environmentIntensity={1.15} />
             <Suspense fallback={null}>
               <RingModel metalId={metal} />
             </Suspense>

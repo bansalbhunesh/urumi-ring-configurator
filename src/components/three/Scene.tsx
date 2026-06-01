@@ -226,57 +226,38 @@ function ScrollDirector({
 
   return (
     <>
-      {/* Professional jewelry studio environment — three-point lighting with
-          a dedicated gem-brilliance top ring. Each light has a deliberate role:
-          KEY shapes the metal, RIM separates it from the dark, FILL prevents
-          dead shadows, TOP feeds the diamond's pavilion facets. */}
-      <ambientLight intensity={0.10} />
+      {/* Real studio HDRI — Poly Haven "studio_small_08" (CC0). A soft,
+          low-contrast indoor studio with large softboxes and an octabox highlight.
+          Sets scene.environment for physically-correct IBL on both metal and gem.
+          Falls back gracefully if the file is missing (Suspense/error boundary). */}
+      <Environment
+        files="/hdri/studio.hdr"
+        environmentIntensity={1.08}
+      />
 
-      {/* KEY — large diffuse rect, upper-left, warm-neutral. Main modelling light. */}
+      {/* Three-point sculpture lights on top of the IBL — each has a role:
+          KEY shapes the twist, RIM separates metal from the dark, FILL lifts
+          shadows, TOP feeds the diamond's pavilion from directly above. */}
+      <ambientLight intensity={0.08} />
       <spotLight
         position={[-5, 9, 6]}
-        angle={0.42}
+        angle={0.40}
         penumbra={1}
-        intensity={3.6}
+        intensity={3.2}
         color="#fff6ec"
         castShadow
         shadow-bias={-0.0001}
         shadow-mapSize={[2048, 2048]}
       />
-      {/* RIM — cool accent from upper-right-back. Separates metal from the void. */}
       <spotLight
         position={[6, 5, -5]}
         angle={0.55}
         penumbra={1}
-        intensity={1.8}
+        intensity={1.6}
         color="#c8d8ff"
       />
-      {/* FILL — warm, soft, prevents full-black shadow side. */}
-      <pointLight position={[3.5, -1, 3]} intensity={0.5} color="#e8cda0" />
-      {/* TOP — feeds light downward into the pavilion so the diamond sparkles. */}
-      <pointLight position={[0, 6, 1]} intensity={1.2} color="#fff8f0" />
-
-      {/* IBL environment — rendered from these Lightformers into a 512-res cube
-          map. Gives the metal physically-correct multi-directional reflections and
-          provides a rich background for the diamond's transmission shader to sample.
-          Resolution 512 is the sweet spot: 4× sharper than 256, negligible cost. */}
-      <Environment resolution={512} environmentIntensity={1.15}>
-        {/* Studio key panel — large, bright, warm-neutral */}
-        <Lightformer form="rect" intensity={7} color="#fff8f0"
-          scale={[1.6, 10, 1]} position={[-5, 2, 3]} rotation={[0, -0.85, 0]} />
-        {/* Cool rim strip from behind */}
-        <Lightformer form="rect" intensity={3.5} color="#c8d8ff"
-          scale={[1.4, 8, 1]} position={[5, 3, -4]} rotation={[0, 0.75, 0]} />
-        {/* Warm fill from below-right — lifts the shadow side */}
-        <Lightformer form="rect" intensity={2} color="#fde8c0"
-          scale={[9, 4, 1]} position={[3, -3, 3]} rotation={[0.4, -0.4, 0]} />
-        {/* Hot top ring — feeds pavilion facets from directly above */}
-        <Lightformer form="ring" intensity={3} color="#fff4e8"
-          scale={[5, 5, 1]} position={[0, 6, 0]} rotation={[Math.PI / 2, 0, 0]} />
-        {/* Background crush — ensures shadows stay deep and precious */}
-        <Lightformer form="rect" intensity={0.2} color="#10090a"
-          scale={[30, 30, 1]} position={[0, 0, -8]} />
-      </Environment>
+      <pointLight position={[3.5, -1, 3]} intensity={0.45} color="#e8cda0" />
+      <pointLight position={[0, 6, 1]} intensity={1.0} color="#fff8f0" />
 
       <ContactShadows
         position={[0, -1.35, 0]}

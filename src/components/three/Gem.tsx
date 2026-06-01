@@ -24,6 +24,8 @@ function easeOutBack(x: number) {
 export function Gem({ mobile }: { mobile: boolean }) {
   const targetStone = useConfigurator((s) => s.stone);
   const [displayStone, setDisplayStone] = useState<StoneId>(targetStone);
+  const { scene } = useThree();
+  const envTexture = (scene.environment as THREE.Texture | null) ?? undefined;
 
   const geometry = useMemo(() => gemGeometryFor(displayStone), [displayStone]);
   useEffect(() => () => geometry.dispose(), [geometry]);
@@ -67,6 +69,7 @@ export function Gem({ mobile }: { mobile: boolean }) {
           /* Two-pass refraction — renders the inside of the gem for correct
              internal reflections. This single prop is responsible for the
              "depth inside the diamond" effect. */
+          background={envTexture}
           backside
           backsideThickness={0.12}
           samples={mobile ? 6 : 12}
