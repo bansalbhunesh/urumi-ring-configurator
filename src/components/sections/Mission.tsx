@@ -66,7 +66,7 @@ export function Mission() {
           as="h2"
           mode="push"
           stagger={0.06}
-          className="display-1 max-w-[15ch] justify-center text-balance text-ink"
+          className="font-display max-w-[14ch] justify-center text-balance font-semibold leading-[0.92] tracking-[-0.025em] text-ink [overflow-wrap:normal] text-[clamp(2.5rem,10vw,8rem)]"
         >
           Somewhere, a well begins.
         </SplitText>
