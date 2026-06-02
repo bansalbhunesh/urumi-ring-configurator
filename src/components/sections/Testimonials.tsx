@@ -35,7 +35,7 @@ const EASE = [0.22, 1, 0.36, 1] as const;
 
 function Stars({ n }: { n: number }) {
   return (
-    <div className="flex gap-1" aria-label={`${n} out of 5 stars`}>
+    <div className="flex gap-1" role="img" aria-label={`${n} out of 5 stars`}>
       {Array.from({ length: 5 }).map((_, i) => (
         <motion.svg
           key={i}

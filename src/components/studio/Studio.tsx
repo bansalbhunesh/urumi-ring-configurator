@@ -25,7 +25,8 @@ const VIEWS = [
 function Rise({ text, className, delay = 0 }: { text: string; className?: string; delay?: number }) {
   const words = text.split(" ");
   return (
-    <span className={className} aria-label={text}>
+    <span className={className}>
+      <span className="sr-only">{text}</span>
       {words.map((w, i) => (
         <span key={i} className="inline-block overflow-hidden align-bottom" aria-hidden>
           <motion.span
