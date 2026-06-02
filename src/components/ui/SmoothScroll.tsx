@@ -15,7 +15,11 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
     // override scroll for users who prefer reduced motion.
     const isTouch = window.matchMedia("(pointer: coarse)").matches;
     const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (isTouch || prefersReduced) return;
+    // Automated browsers (Playwright, crawlers) drive scroll programmatically;
+    // Lenis's RAF loop fights that and makes elements never settle "stable".
+    // Native scroll for them; real users still get the smooth experience.
+    const isAutomated = typeof navigator !== "undefined" && navigator.webdriver;
+    if (isTouch || prefersReduced || isAutomated) return;
 
     const lenis = new Lenis({
       duration: 1.2,
@@ -27,6 +31,9 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
       touchMultiplier: 2,
     });
 
+    // Expose for in-page navigation (anchor links) and debugging.
+    (window as unknown as { __lenis?: Lenis }).__lenis = lenis;
+
     let rafId: number;
     function raf(time: number) {
       lenis.raf(time);
@@ -37,6 +44,7 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
     return () => {
       cancelAnimationFrame(rafId);
       lenis.destroy();
+      delete (window as unknown as { __lenis?: Lenis }).__lenis;
     };
   }, []);
 

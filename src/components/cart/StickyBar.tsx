@@ -15,6 +15,7 @@ export function StickyBar() {
   const metal = useConfigurator((s) => s.metal);
   const stone = useConfigurator((s) => s.stone);
   const celebrate = useConfigurator((s) => s.celebrate);
+  const openCart = useConfigurator((s) => s.openCart);
   const showToast = useConfigurator((s) => s.showToast);
   const { data: product } = useProduct();
   const { variation, price } = useVariation(product, metal, stone);
@@ -36,6 +37,7 @@ export function StickyBar() {
       {
         onSuccess: () => {
           celebrate();
+          window.setTimeout(() => openCart(), 700);
         },
         onError: () => {
           showToast("Could not add this configuration. Please try again.");

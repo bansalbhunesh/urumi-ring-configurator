@@ -146,7 +146,7 @@ export function Studio() {
             </div>
 
             <p className="mt-4 text-center text-[0.72rem] tracking-wide text-muted">
-              Complimentary shipping · Lifetime warranty · 30-day returns
+              Complimentary insured shipping · Lifetime warranty · 60-day returns
             </p>
           </motion.div>
         </div>

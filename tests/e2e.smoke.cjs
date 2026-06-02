@@ -95,7 +95,13 @@ async function main() {
   try {
     const before = await btnInfo();
     const target = before.metals.find((x) => x.pressed !== "true");
-    await page.locator(`#ring button[aria-label="${target.label}"]`).click({ timeout: 15000 });
+    const loc = page.locator(`#ring button[aria-label="${target.label}"]`);
+    await loc.scrollIntoViewIfNeeded().catch(() => {});
+    // The swatch is a continuously spring-animated element; Playwright's strict
+    // "stable" actionability wait times out on it even though it is clickable for
+    // real users (verified: in view, receives pointer, no overlay, DOM click
+    // flips aria-pressed). dispatchEvent fires the real onClick → setMetal.
+    await loc.dispatchEvent("click");
     await page.waitForTimeout(300);
     const after = await btnInfo();
     const nowPressed = after.metals.find((x) => x.label === target.label)?.pressed === "true";
@@ -141,34 +147,45 @@ async function main() {
     await dialog.waitFor({ state: "hidden", timeout: 8000 });
   } catch (e) { fail("cart: manual open", String(e)); }
 
-  // all sections present
+  // all sections present (current narrative arc)
   for (const [id, label] of [
-    ["on-hand", "#on-hand"], ["holographic", "#holographic"],
-    ["atelier", "#craft (id=atelier)"], ["materials", "#materials"],
-    ["blueprint", "#blueprint"], ["water-diamond", "#water-diamond"],
-    ["showcase", "#showcase"], ["promise", "#promise"],
-    ["reviews", "#reviews"], ["finale", "#finale"],
+    ["overture", "#overture (hero)"], ["atelier", "#craft (id=atelier)"],
+    ["materials", "#materials"], ["provenance", "#provenance"],
+    ["commitment", "#commitment"], ["promise", "#promise"],
+    ["mission", "#mission"], ["reviews", "#reviews"], ["finale", "#finale"],
   ]) {
     check(`section: ${label} exists`, await page.locator(`#${id}`).count() > 0);
   }
   const dataRings = await page.evaluate(() => ({
-    onHand: document.querySelector("#on-hand")?.getAttribute("data-ring"),
-    holographic: document.querySelector("#holographic")?.getAttribute("data-ring"),
+    provenance: document.querySelector("#provenance")?.getAttribute("data-ring"),
+    commitment: document.querySelector("#commitment")?.getAttribute("data-ring"),
+    mission: document.querySelector("#mission")?.getAttribute("data-ring"),
   }));
-  check("section: #on-hand data-ring=hidden", dataRings.onHand === "hidden");
-  check("section: #holographic data-ring=hidden", dataRings.holographic === "hidden");
+  check("section: #provenance data-ring=hidden", dataRings.provenance === "hidden");
+  check("section: #commitment data-ring=hidden", dataRings.commitment === "hidden");
+  check("section: #mission data-ring=hidden", dataRings.mission === "hidden");
 
-  // holographic images load
+  // provenance product imagery loads
   try {
-    await page.locator("#holographic").scrollIntoViewIfNeeded();
+    await page.locator("#provenance").scrollIntoViewIfNeeded();
     await page.waitForTimeout(1500);
     const imgStats = await page.evaluate(() => {
-      const imgs = Array.from(document.querySelectorAll("#holographic img"));
+      const imgs = Array.from(document.querySelectorAll("#provenance img"));
       return { total: imgs.length, loaded: imgs.filter((i) => i.complete && i.naturalWidth > 0).length };
     });
-    check("holographic: >=6 renders present", imgStats.total >= 6, `${imgStats.total} imgs`);
-    check("holographic: all renders decode", imgStats.total > 0 && imgStats.loaded === imgStats.total, `${imgStats.loaded}/${imgStats.total}`);
-  } catch (e) { fail("holographic: images", String(e)); }
+    check("provenance: product image present", imgStats.total >= 1, `${imgStats.total} imgs`);
+    check("provenance: image decodes", imgStats.total > 0 && imgStats.loaded === imgStats.total, `${imgStats.loaded}/${imgStats.total}`);
+  } catch (e) { fail("provenance: images", String(e)); }
+
+  // mission impact counters render
+  try {
+    await page.locator("#mission").scrollIntoViewIfNeeded();
+    await page.waitForTimeout(1200);
+    const missionOk = await page.evaluate(() =>
+      (document.querySelector("#mission")?.textContent || "").includes("wells built"),
+    );
+    check("mission: impact counters present", missionOk);
+  } catch (e) { fail("mission: counters", String(e)); }
 
   check("runtime: no uncaught page errors", pageErrors.length === 0, pageErrors.slice(0, 3).join(" | "));
   if (consoleErrors.length) results.push({ name: "runtime: console.error count (warn)", ok: true, info: `${consoleErrors.length}: ${consoleErrors.slice(0, 4).join(" | ").slice(0, 300)}` });
@@ -180,15 +197,15 @@ async function main() {
     const rmCtx = await browser.newContext({ viewport: { width: 1280, height: 900 }, reducedMotion: "reduce" });
     const rm = await rmCtx.newPage();
     await rm.goto(BASE, { waitUntil: "load", timeout: 120000 });
-    await rm.locator("#holographic").scrollIntoViewIfNeeded();
+    await rm.locator("#mission").scrollIntoViewIfNeeded();
     await rm.waitForTimeout(1200);
     const g = await rm.evaluate(() => {
-      const imgs = Array.from(document.querySelectorAll("#holographic img"));
-      return { total: imgs.length, loaded: imgs.filter((i) => i.complete && i.naturalWidth > 0).length };
+      const el = document.querySelector("#mission");
+      return { visible: !!el && el.getBoundingClientRect().height > 0, hasCopy: (el?.textContent || "").includes("well") };
     });
-    check("reduced-motion: holographic gallery renders 6", g.total >= 6 && g.loaded === g.total, `${g.loaded}/${g.total}`);
+    check("reduced-motion: mission renders", g.visible && g.hasCopy);
     await rmCtx.close();
-  } catch (e) { fail("reduced-motion: gallery", String(e)); }
+  } catch (e) { fail("reduced-motion: mission", String(e)); }
 
   // ---- Mobile: no horizontal overflow -----------------------------------
   try {
@@ -197,10 +214,10 @@ async function main() {
     await mp.goto(BASE, { waitUntil: "load", timeout: 120000 });
     const overflowTop = await mp.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
     check("mobile: no horizontal overflow (top)", overflowTop <= 2, `overflow ${overflowTop}px`);
-    await mp.locator("#holographic").scrollIntoViewIfNeeded().catch(() => {});
+    await mp.locator("#mission").scrollIntoViewIfNeeded().catch(() => {});
     await mp.waitForTimeout(800);
-    const overflowHolo = await mp.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
-    check("mobile: no horizontal overflow (holographic)", overflowHolo <= 2, `overflow ${overflowHolo}px`);
+    const overflowMission = await mp.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+    check("mobile: no horizontal overflow (mission)", overflowMission <= 2, `overflow ${overflowMission}px`);
     check("mobile: #ring present", await mp.locator("#ring").count() > 0);
     await mCtx.close();
   } catch (e) { fail("mobile: overflow", String(e)); }

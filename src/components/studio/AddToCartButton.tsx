@@ -18,6 +18,7 @@ export function AddToCartButton({
 }) {
   const add = useAddToCart();
   const celebrate = useConfigurator((s) => s.celebrate);
+  const openCart = useConfigurator((s) => s.openCart);
   const showToast = useConfigurator((s) => s.showToast);
   const [done, setDone] = useState(false);
 
@@ -32,6 +33,9 @@ export function AddToCartButton({
           setDone(true);
           celebrate();
           playCelebrate();
+          // Let the "Added" confirmation register, then glide the bag open —
+          // the crafted beat the configurator was missing.
+          window.setTimeout(() => openCart(), 700);
           window.setTimeout(() => setDone(false), 2200);
         },
         onError: () => {

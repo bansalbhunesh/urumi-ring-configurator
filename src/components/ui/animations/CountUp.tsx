@@ -21,6 +21,7 @@ export function CountUp({
   decimals = 0,
   prefix = "",
   suffix = "",
+  group = false,
   className,
 }: {
   to: number;
@@ -29,6 +30,8 @@ export function CountUp({
   decimals?: number;
   prefix?: string;
   suffix?: string;
+  /** Group thousands with separators (e.g. 22,345). */
+  group?: boolean;
   className?: string;
 }) {
   const ref = useRef<HTMLSpanElement>(null);
@@ -54,9 +57,16 @@ export function CountUp({
     return () => { if (raf.current) cancelAnimationFrame(raf.current); };
   }, [inView, from, to, duration]);
 
+  const formatted = group
+    ? value.toLocaleString("en-US", {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals,
+      })
+    : value.toFixed(decimals);
+
   return (
     <span ref={ref} className={className}>
-      {prefix}{value.toFixed(decimals)}{suffix}
+      {prefix}{formatted}{suffix}
     </span>
   );
 }

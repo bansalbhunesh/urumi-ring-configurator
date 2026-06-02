@@ -7,21 +7,24 @@ import { SplitText } from "@/components/ui/SplitText";
 const REVIEWS = [
   {
     stars: 5,
-    quote: "She said yes before I finished the sentence. The ring did half the talking.",
-    name: "Daniel R.",
-    role: "Asked in the rain, anyway",
+    quote:
+      "I knew the moment I saw the way the two bands twist around each other — that was us. She cried before I even finished asking.",
+    name: "Scott & Mara",
+    role: "Their ring built a well in Siem Reap",
   },
   {
     stars: 5,
-    quote: "I've caught myself staring at my own hand in meetings. Productivity down, joy up.",
-    name: "Priya M.",
-    role: "Newly, gloriously engaged",
+    quote:
+      "A week after it shipped, we got the coordinates of our well. Same ring on her hand, clean water on the other side of the world.",
+    name: "Hannah D.",
+    role: "Their ring built a well in Amhara",
   },
   {
     stars: 5,
-    quote: "Configured it at 2am, three times, until it was exactly her. Worth every minute.",
-    name: "Marcus T.",
-    role: "Reformed perfectionist",
+    quote:
+      "They sent real photos of the diamond before I ever committed — no pressure, just care. It catches the light in a way photos never did justice.",
+    name: "Chris W.",
+    role: "Their ring built a well in Kampong Thom",
   },
 ];
 
@@ -77,7 +80,7 @@ export function Testimonials() {
             <div className="flex items-center gap-3">
               <Stars n={5} />
               <span className="text-[0.8rem] uppercase tracking-[0.16em] text-ink-soft">
-                4.9 / 5 · 1,400+ couples
+                5.0 / 5 · every ring, a well
               </span>
             </div>
           </Reveal>

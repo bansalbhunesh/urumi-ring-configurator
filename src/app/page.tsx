@@ -4,7 +4,10 @@ import { Studio } from "@/components/studio/Studio";
 import { ActOne } from "@/components/sections/ActOne";
 import { Craft } from "@/components/sections/Craft";
 import { Materials } from "@/components/sections/Materials";
+import { Provenance } from "@/components/sections/Provenance";
+import { Commitment } from "@/components/sections/Commitment";
 import { PromiseSection } from "@/components/sections/Promise";
+import { Mission } from "@/components/sections/Mission";
 import { Testimonials } from "@/components/sections/Testimonials";
 import { Closing } from "@/components/sections/Closing";
 import { CartDrawer } from "@/components/cart/CartDrawer";
@@ -34,7 +37,10 @@ export default function Home() {
         <Studio />
         <Craft />
         <Materials />
+        <Provenance />
+        <Commitment />
         <PromiseSection />
+        <Mission />
         <Testimonials />
         <Closing />
       </main>

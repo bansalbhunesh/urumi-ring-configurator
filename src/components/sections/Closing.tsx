@@ -92,7 +92,7 @@ export function Closing() {
           transition={{ duration: 1, ease: CI, delay: 0.55 }}
           className="text-[0.7rem] tracking-wide text-muted"
         >
-          Complimentary shipping · Lifetime warranty · 30-day returns
+          Complimentary insured shipping · Lifetime warranty · 60-day returns
         </motion.p>
       </div>
     </section>
