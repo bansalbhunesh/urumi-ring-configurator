@@ -48,12 +48,19 @@ interface ConfiguratorState {
   changeSeq: number;
   lastChanged: "metal" | "stone" | null;
 
+  /** Inner-band engraving — the words only the two of them will read. */
+  engraving: string;
+  /** US ring size. */
+  size: number;
+
   cartOpen: boolean;
   toast: string | null;
   celebrating: boolean;
 
   setMetal: (metal: MetalId) => void;
   setStone: (stone: StoneId) => void;
+  setEngraving: (text: string) => void;
+  setSize: (size: number) => void;
   setPreviewMetal: (metal: MetalId | null) => void;
   openCart: () => void;
   closeCart: () => void;
@@ -69,6 +76,8 @@ export const useConfigurator = create<ConfiguratorState>((set) => ({
   previewMetal: null,
   changeSeq: 0,
   lastChanged: null,
+  engraving: "",
+  size: 6.5,
   cartOpen: false,
   toast: null,
   celebrating: false,
@@ -85,6 +94,10 @@ export const useConfigurator = create<ConfiguratorState>((set) => ({
         ? s
         : { stone, lastChanged: "stone", changeSeq: s.changeSeq + 1 },
     ),
+  setEngraving: (text) =>
+    // Keep it to what actually fits inside a band: a short, gentle line.
+    set({ engraving: text.replace(/\s+/g, " ").slice(0, 24) }),
+  setSize: (size) => set({ size }),
   setPreviewMetal: (metal) => set({ previewMetal: metal }),
   openCart: () => set({ cartOpen: true }),
   closeCart: () => set({ cartOpen: false }),

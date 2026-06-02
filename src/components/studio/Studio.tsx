@@ -8,6 +8,7 @@ import { useVariation } from "@/hooks/useVariation";
 import { METAL_BY_ID, STONE_BY_ID } from "@/lib/config";
 import { MetalSelector } from "./MetalSelector";
 import { StoneSelector } from "./StoneSelector";
+import { EngravingField } from "./EngravingField";
 import { PriceTag } from "./PriceTag";
 import { AddToCartButton } from "./AddToCartButton";
 
@@ -45,6 +46,8 @@ function Rise({ text, className, delay = 0 }: { text: string; className?: string
 export function Studio() {
   const metal = useConfigurator((s) => s.metal);
   const stone = useConfigurator((s) => s.stone);
+  const engraving = useConfigurator((s) => s.engraving);
+  const size = useConfigurator((s) => s.size);
   const { data: product, isLoading } = useProduct();
   const { variation, price } = useVariation(product, metal, stone);
   const symbol = product?.currencySymbol ?? "$";
@@ -131,14 +134,23 @@ export function Studio() {
               <StoneSelector />
             </div>
 
+            <div className="o-dashline my-8" />
+
+            <EngravingField />
+
             <div className="mt-9">
               <span className="eyebrow">Your configuration</span>
               <div className="mt-2 font-sans text-2xl font-semibold leading-none tabular-nums text-ink">
                 <PriceTag value={price} symbol={symbol} />
               </div>
               <p className="mt-2.5 text-[0.8rem] tracking-wide text-ink-soft">
-                {metalLabel} · {stoneLabel}
+                {metalLabel} · {stoneLabel} · US {size}
               </p>
+              {engraving && (
+                <p className="mt-1 text-[0.8rem] italic tracking-wide text-gold/90">
+                  Engraved: &ldquo;{engraving}&rdquo;
+                </p>
+              )}
             </div>
 
             <div className="mt-6">

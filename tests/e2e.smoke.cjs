@@ -119,6 +119,27 @@ async function main() {
     check("studio: stone switch updates selection", nowPressed, target.label);
   } catch (e) { fail("studio: stone switch", String(e)); }
 
+  // personalisation: inner-band engraving (live preview) + ring size
+  try {
+    await page.evaluate(() => {
+      const inp = document.querySelector('#ring input[aria-label="Inner-band engraving"]');
+      const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value").set;
+      setter.call(inp, "Forever, & a day");
+      inp.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+    await page.waitForTimeout(200);
+    const engraved = await page.evaluate(() =>
+      (document.querySelector("#ring")?.textContent || "").includes("Forever, & a day"),
+    );
+    check("studio: engraving shows in configuration", engraved);
+    await page.locator('#ring button[aria-label="US ring size 7"]').dispatchEvent("click");
+    await page.waitForTimeout(150);
+    const sized = await page.evaluate(() =>
+      (document.querySelector("#ring")?.textContent || "").includes("US 7"),
+    );
+    check("studio: ring size updates selection", sized);
+  } catch (e) { fail("studio: personalisation", String(e)); }
+
   // add to bag -> Celebration (~1.5s) -> cart auto-opens (real UX flow)
   const dialog = page.locator('[role="dialog"][aria-label="Your bag"]');
   try {
