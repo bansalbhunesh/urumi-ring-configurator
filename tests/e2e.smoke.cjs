@@ -152,7 +152,8 @@ async function main() {
     ["overture", "#overture (hero)"], ["atelier", "#craft (id=atelier)"],
     ["materials", "#materials"], ["provenance", "#provenance"],
     ["commitment", "#commitment"], ["promise", "#promise"],
-    ["mission", "#mission"], ["reviews", "#reviews"], ["finale", "#finale"],
+    ["mission", "#mission"], ["reviews", "#reviews"], ["worn", "#worn"],
+    ["finale", "#finale"],
   ]) {
     check(`section: ${label} exists`, await page.locator(`#${id}`).count() > 0);
   }

@@ -8,6 +8,7 @@ import { Provenance } from "@/components/sections/Provenance";
 import { Commitment } from "@/components/sections/Commitment";
 import { PromiseSection } from "@/components/sections/Promise";
 import { Mission } from "@/components/sections/Mission";
+import { Worn } from "@/components/sections/Worn";
 import { Testimonials } from "@/components/sections/Testimonials";
 import { Closing } from "@/components/sections/Closing";
 import { CartDrawer } from "@/components/cart/CartDrawer";
@@ -42,6 +43,7 @@ export default function Home() {
         <PromiseSection />
         <Mission />
         <Testimonials />
+        <Worn />
         <Closing />
       </main>
       <Footer />
