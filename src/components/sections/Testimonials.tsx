@@ -4,13 +4,16 @@ import { motion } from "framer-motion";
 import { Reveal, RevealStagger, RevealItem } from "@/components/ui/Reveal";
 import { SplitText } from "@/components/ui/SplitText";
 
-const REVIEWS = [
+type Review = { stars: number; quote: string; name: string; role: string; image?: string };
+
+const REVIEWS: Review[] = [
   {
     stars: 5,
     quote:
       "I knew the moment I saw the way the two bands twist around each other — that was us. She cried before I even finished asking.",
     name: "Scott & Mara",
     role: "Their ring built a well in Siem Reap",
+    image: "/img/doamore/well.jpeg",
   },
   {
     stars: 5,
@@ -94,6 +97,17 @@ export function Testimonials() {
                 whileHover={{ y: -4, transition: { type: "spring", stiffness: 320, damping: 28 } }}
               >
                 <div>
+                  {r.image && (
+                    <div className="mb-5 overflow-hidden rounded-xl ring-1 ring-line/60">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={r.image}
+                        alt={`${r.name}'s Twist ring`}
+                        className="aspect-[5/4] w-full object-cover"
+                        loading="lazy"
+                      />
+                    </div>
+                  )}
                   <Stars n={r.stars} />
                   <blockquote className="mt-5 font-display text-[1.28rem] leading-snug text-ink">
                     &ldquo;{r.quote}&rdquo;

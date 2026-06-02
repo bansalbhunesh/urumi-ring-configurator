@@ -11,8 +11,8 @@
    slow parallax lift as it scrolls; the copy arrives beside it.
    ============================================================ */
 
-import { useRef } from "react";
-import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import { motion, useScroll, useTransform, useReducedMotion, AnimatePresence } from "framer-motion";
 import { Reveal } from "@/components/ui/Reveal";
 import { SplitText } from "@/components/ui/SplitText";
 
@@ -25,6 +25,16 @@ export function Worn() {
   });
   const y = useTransform(scrollYProgress, [0, 1], reduce ? ["0%", "0%"] : ["8%", "-8%"]);
   const scale = useTransform(scrollYProgress, [0, 0.5, 1], reduce ? [1, 1, 1] : [1.08, 1.02, 1.08]);
+
+  // The ring, alive on the hand — a slow turn between two angles.
+  const SHOTS = ["/img/doamore/twist-lifestyle.jpg", "/img/doamore/twist-lifestyle-angle.jpg"];
+  const [shot, setShot] = useState(0);
+  useEffect(() => {
+    if (reduce) return;
+    const id = window.setInterval(() => setShot((s) => (s + 1) % SHOTS.length), 4600);
+    return () => window.clearInterval(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reduce]);
 
   return (
     <section
@@ -40,13 +50,19 @@ export function Worn() {
         <div className="relative order-2 lg:order-1">
           <div className="relative mx-auto aspect-square w-full max-w-lg overflow-hidden rounded-sm">
             <motion.div className="absolute inset-0" style={{ y, scale }}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/img/doamore/twist-lifestyle.jpg"
-                alt="The Twist engagement ring worn on the hand"
-                className="h-full w-full object-cover"
-                loading="lazy"
-              />
+              <AnimatePresence initial={false}>
+                <motion.img
+                  key={shot}
+                  src={SHOTS[shot]}
+                  alt="The Twist engagement ring worn on the hand"
+                  className="absolute inset-0 h-full w-full object-cover"
+                  loading="lazy"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 1.6, ease: [0.16, 1, 0.3, 1] }}
+                />
+              </AnimatePresence>
             </motion.div>
             {/* dissolve the photo's edges into the page so the hand floats out of the dark */}
             <div

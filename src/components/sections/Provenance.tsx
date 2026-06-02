@@ -47,7 +47,7 @@ export function Provenance() {
               aria-hidden
             />
             <motion.div
-              className="relative h-full w-full overflow-hidden rounded-[2px] p-4"
+              className="group relative h-full w-full overflow-hidden rounded-[2px] p-4"
               style={{
                 // A warm studio plate — the photograph is on white, so we frame
                 // it as a deliberate gallery print rather than fighting it.
@@ -65,11 +65,21 @@ export function Provenance() {
               <img
                 src="/img/doamore/twist-round-white-gold.jpg"
                 alt="The Twist engagement ring — recycled white gold, pavé twist band"
-                className="h-full w-full object-contain"
+                className="h-full w-full object-contain transition-opacity duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:opacity-0"
                 loading="lazy"
               />
-              <span className="absolute bottom-3 left-4 font-mono text-[0.6rem] uppercase tracking-[0.2em] text-paper-ink/45">
+              {/* second view — revealed on hover, a turn of the wrist */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/img/doamore/twist-round-white-gold-angle.jpg"
+                alt="The Twist engagement ring, three-quarter view"
+                className="absolute inset-4 h-[calc(100%-2rem)] w-[calc(100%-2rem)] object-contain opacity-0 transition-opacity duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:opacity-100"
+                loading="lazy"
+                aria-hidden
+              />
+              <span className="absolute bottom-3 left-4 z-10 font-mono text-[0.6rem] uppercase tracking-[0.2em] text-paper-ink/45">
                 Plate 01 · The Twist
+                <span className="ml-2 opacity-0 transition-opacity duration-500 group-hover:opacity-100">· ¾ view</span>
               </span>
             </motion.div>
             {/* hairline frame corners — the inspector's crop marks */}

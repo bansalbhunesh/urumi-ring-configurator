@@ -112,7 +112,11 @@ async function main() {
   try {
     const before = await btnInfo();
     const target = before.stones.find((x) => x.pressed !== "true");
-    await page.locator(`#ring button[aria-label="${target.label}"]`).click({ timeout: 15000 });
+    const loc = page.locator(`#ring button[aria-label="${target.label}"]`);
+    await loc.scrollIntoViewIfNeeded().catch(() => {});
+    // Same reason as the metal swatch: spring-animated, clickable for real users
+    // but Playwright's strict "stable" wait flakes under software WebGL.
+    await loc.dispatchEvent("click");
     await page.waitForTimeout(300);
     const after = await btnInfo();
     const nowPressed = after.stones.find((x) => x.label === target.label)?.pressed === "true";
@@ -146,7 +150,7 @@ async function main() {
     // Use Promise.all so waitPost rejection is always handled (avoids unhandled rejection when click times out first)
     const [r] = await Promise.all([
       page.waitForResponse((r) => r.url().includes("/api/cart") && r.request().method() === "POST", { timeout: 25000 }),
-      page.locator('#ring button:has-text("Add to Bag"):not([disabled])').first().click({ timeout: 20000, force: true }),
+      page.locator('#ring button:has-text("Add to Bag"):not([disabled])').first().dispatchEvent("click"),
     ]);
     check("studio: Add to Bag posts to cart", r.ok(), `status ${r.status()}`);
     await dialog.waitFor({ state: "visible", timeout: 12000 });
