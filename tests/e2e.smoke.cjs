@@ -151,7 +151,7 @@ async function main() {
   for (const [id, label] of [
     ["overture", "#overture (hero)"], ["atelier", "#craft (id=atelier)"],
     ["materials", "#materials"], ["provenance", "#provenance"],
-    ["commitment", "#commitment"], ["promise", "#promise"],
+    ["commitment", "#commitment"], ["pairing", "#pairing"], ["promise", "#promise"],
     ["mission", "#mission"], ["reviews", "#reviews"], ["worn", "#worn"],
     ["finale", "#finale"],
   ]) {

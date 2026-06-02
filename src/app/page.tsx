@@ -6,6 +6,7 @@ import { Craft } from "@/components/sections/Craft";
 import { Materials } from "@/components/sections/Materials";
 import { Provenance } from "@/components/sections/Provenance";
 import { Commitment } from "@/components/sections/Commitment";
+import { FinishTheLook } from "@/components/sections/FinishTheLook";
 import { PromiseSection } from "@/components/sections/Promise";
 import { Mission } from "@/components/sections/Mission";
 import { Worn } from "@/components/sections/Worn";
@@ -40,6 +41,7 @@ export default function Home() {
         <Materials />
         <Provenance />
         <Commitment />
+        <FinishTheLook />
         <PromiseSection />
         <Mission />
         <Testimonials />
