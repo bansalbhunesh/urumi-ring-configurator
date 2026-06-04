@@ -1,13 +1,9 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { METALS } from "@/lib/config";
-import { useConfigurator } from "@/store/configurator";
+import { METAL_PREMIUM, METALS } from "@/lib/config";
+import { nudgeRing, useConfigurator } from "@/store/configurator";
 import { playShimmer } from "@/hooks/useSound";
-
-/* Hover-to-preview: hovering a swatch previews the metal on the live ring
-   without committing. Leaving snaps it back. Click commits permanently.
-   A UI paradigm they haven't seen on jewelry. */
 
 export function MetalSelector() {
   const metal = useConfigurator((s) => s.metal);
@@ -21,7 +17,6 @@ export function MetalSelector() {
   return (
     <div>
       <span className="eyebrow">Metal</span>
-      {/* Active metal name at display weight — the centrepiece of the choice */}
       <div className="mb-4 mt-1.5 flex items-baseline gap-3">
         <motion.span
           key={active?.label}
@@ -41,21 +36,26 @@ export function MetalSelector() {
           {active?.caption}
         </motion.span>
       </div>
-      <div className="flex items-center gap-3">
+      <div className="atelier-tray flex items-start gap-3 border-y border-line py-3">
         {METALS.map((m) => {
           const selected = m.id === metal;
+          const premium = METAL_PREMIUM[m.id];
           return (
             <button
               key={m.id}
               type="button"
-              onClick={() => { setMetal(m.id); playShimmer(); }}
+              onClick={() => {
+                setMetal(m.id);
+                nudgeRing("metal");
+                playShimmer();
+              }}
               onFocus={() => setPreview(m.id)}
               onBlur={() => setPreview(null)}
               onPointerEnter={() => setPreview(m.id)}
               onPointerLeave={() => setPreview(null)}
               aria-pressed={selected}
-              aria-label={m.label}
-              className="group relative flex min-h-20 min-w-20 flex-col items-center gap-2 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-porcelain"
+              aria-label={`${m.label}, ${m.caption}`}
+              className="group relative flex min-h-24 min-w-20 flex-col items-center gap-2 outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-porcelain"
             >
               <span className="relative grid place-items-center">
                 <motion.span
@@ -64,11 +64,10 @@ export function MetalSelector() {
                     background: `radial-gradient(120% 120% at 30% 25%, ${m.swatch[0]}, ${m.swatch[1]})`,
                     boxShadow: "inset 0 1px 2px rgba(255,255,255,0.6), 0 3px 10px rgba(28,26,23,0.14)",
                   }}
-                  whileHover={{ scale: 1.08 }}
-                  whileTap={{ scale: 0.95 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 22 }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.97 }}
+                  transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
                 />
-                {/* Ring indicator stays on the *committed* metal, not the preview */}
                 {selected && (
                   <motion.span
                     layoutId="metal-ring"
@@ -83,6 +82,9 @@ export function MetalSelector() {
                 }`}
               >
                 {m.label}
+              </span>
+              <span className="font-mono text-[0.58rem] uppercase tracking-[0.12em] text-muted">
+                {premium === 0 ? "base" : `+$${premium}`}
               </span>
             </button>
           );

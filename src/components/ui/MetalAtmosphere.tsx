@@ -11,12 +11,22 @@ import type { MetalId } from "@/lib/types";
    the choice. Kept low-alpha so it never muddies the restrained dark stage; the
    reduced-motion path still cross-fades (it's a colour change, not autoplay). */
 const ATMOSPHERE: Record<MetalId, string> = {
+  "white-gold-14k":
+    "radial-gradient(72% 56% at 56% 10%, rgba(176,202,255,0.08), transparent 60%), radial-gradient(48% 50% at 82% 86%, rgba(110,132,184,0.04), transparent 72%)",
   "white-gold":
     "radial-gradient(72% 56% at 56% 10%, rgba(176,202,255,0.10), transparent 60%), radial-gradient(48% 50% at 82% 86%, rgba(110,132,184,0.05), transparent 72%)",
+  "yellow-gold-14k":
+    "radial-gradient(72% 56% at 56% 10%, rgba(255,208,128,0.09), transparent 60%), radial-gradient(48% 50% at 82% 86%, rgba(150,108,48,0.04), transparent 72%)",
   "yellow-gold":
     "radial-gradient(72% 56% at 56% 10%, rgba(255,208,128,0.11), transparent 60%), radial-gradient(48% 50% at 82% 86%, rgba(150,108,48,0.05), transparent 72%)",
+  "rose-gold-14k":
+    "radial-gradient(72% 56% at 56% 10%, rgba(255,188,172,0.09), transparent 60%), radial-gradient(48% 50% at 82% 86%, rgba(150,92,82,0.04), transparent 72%)",
   "rose-gold":
     "radial-gradient(72% 56% at 56% 10%, rgba(255,188,172,0.11), transparent 60%), radial-gradient(48% 50% at 82% 86%, rgba(150,92,82,0.05), transparent 72%)",
+  platinum:
+    "radial-gradient(72% 56% at 56% 10%, rgba(218,226,236,0.10), transparent 60%), radial-gradient(48% 50% at 82% 86%, rgba(126,134,146,0.05), transparent 72%)",
+  palladium:
+    "radial-gradient(72% 56% at 56% 10%, rgba(202,198,196,0.10), transparent 60%), radial-gradient(48% 50% at 82% 86%, rgba(128,120,116,0.05), transparent 72%)",
 };
 
 export function MetalAtmosphere() {

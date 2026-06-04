@@ -28,7 +28,7 @@ export function Mission() {
     <section
       id="mission"
       data-ring="hidden"
-      className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-6 py-40 text-center"
+      className="relative flex min-h-[86svh] flex-col items-center justify-center overflow-hidden px-6 py-28 text-center"
     >
       {/* still water — one slow caustic shimmer, cool against the warm studio */}
       <motion.div
@@ -66,7 +66,7 @@ export function Mission() {
           as="h2"
           mode="push"
           stagger={0.06}
-          className="font-display max-w-[14ch] justify-center text-balance font-semibold leading-[0.92] tracking-[-0.025em] text-ink [overflow-wrap:normal] text-[clamp(2.5rem,10vw,8rem)]"
+          className="font-display max-w-[14ch] justify-center text-balance font-semibold leading-[0.94] tracking-[-0.02em] text-ink [overflow-wrap:normal] text-[clamp(2.4rem,8vw,6.5rem)]"
         >
           Somewhere, a well begins.
         </SplitText>
@@ -81,7 +81,7 @@ export function Mission() {
       </Reveal>
 
       {/* Impact counters */}
-      <div className="relative mt-20 grid w-full max-w-3xl grid-cols-1 gap-12 sm:grid-cols-3">
+      <div className="relative mt-14 grid w-full max-w-3xl grid-cols-1 gap-10 sm:grid-cols-3">
         {STATS.map((s, i) => (
           <Reveal key={s.label} mode="rise" delay={0.2 + i * 0.12}>
             <div className="flex flex-col items-center">
@@ -100,7 +100,7 @@ export function Mission() {
         ))}
       </div>
 
-      <Reveal mode="rise" delay={0.4} className="relative mt-20">
+      <Reveal mode="rise" delay={0.4} className="relative mt-14">
         <p className="font-display text-2xl text-ink/90 sm:text-3xl">
           One ring. <span className="text-gold">Two forevers.</span>
         </p>

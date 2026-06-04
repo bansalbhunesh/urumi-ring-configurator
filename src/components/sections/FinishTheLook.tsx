@@ -44,7 +44,7 @@ export function FinishTheLook() {
     <section
       id="pairing"
       data-ring="hidden"
-      className="relative px-6 py-32 sm:px-10 lg:px-16 lg:py-48"
+      className="relative px-6 py-24 sm:px-10 lg:px-16 lg:py-32"
     >
       <div className="mx-auto max-w-6xl">
         <div className="max-w-2xl">
@@ -64,7 +64,7 @@ export function FinishTheLook() {
           </Reveal>
         </div>
 
-        <RevealStagger delay={0.15} stagger={0.16} className="mt-16 grid gap-8 md:grid-cols-2">
+        <RevealStagger delay={0.15} stagger={0.16} className="mt-12 grid gap-8 md:grid-cols-2">
           {BANDS.map((b) => (
             <RevealItem key={b.name} mode="rise">
               <article className="group flex h-full flex-col">

@@ -17,6 +17,13 @@
   --color-gold: oklch(73% 0.090 68);
   --color-gold-bright: oklch(83% 0.075 82);
   --color-gold-warm: oklch(47% 0.062 62);
+  --color-bench: oklch(11% 0.020 68);
+  --color-bench-deep: oklch(6% 0.014 62);
+  --color-bench-panel: oklch(17% 0.020 68);
+  --color-bench-ink: oklch(91% 0.030 78);
+  --color-bench-muted: oklch(67% 0.030 74);
+  --color-bench-line: oklch(40% 0.038 70);
+  --color-bench-gold: oklch(70% 0.112 69);
   /* Inverted (light) section, à la the reference's flip to cream */
   --color-paper: oklch(92% 0.018 85);
   --color-paper-ink: oklch(8% 0.014 55);
@@ -294,5 +301,1163 @@ input[type="range"].lux-range::-moz-range-thumb {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
+  }
+}
+
+/* Hallmark reset pass: product-first editorial, not dark cinematic demo. */
+:root {
+  color-scheme: light;
+  --color-ivory: oklch(94% 0.020 78);
+  --color-ivory-deep: oklch(88% 0.025 74);
+  --color-porcelain: oklch(97% 0.013 78);
+  --color-champagne: oklch(91% 0.030 76);
+  --color-ink: oklch(18% 0.018 55);
+  --color-ink-soft: oklch(38% 0.020 55);
+  --color-muted: oklch(56% 0.018 60);
+  --color-line: oklch(78% 0.025 70);
+  --color-gold: oklch(58% 0.086 72);
+  --color-gold-bright: oklch(68% 0.088 78);
+  --color-gold-warm: oklch(45% 0.070 66);
+  --color-border: oklch(78% 0.025 70);
+  --color-card: oklch(97% 0.013 78);
+  --color-card-foreground: oklch(18% 0.018 55);
+  --color-muted-foreground: oklch(56% 0.018 60);
+  --color-bench: oklch(11% 0.020 68);
+  --color-bench-deep: oklch(6% 0.014 62);
+  --color-bench-panel: oklch(17% 0.020 68);
+  --color-bench-ink: oklch(91% 0.030 78);
+  --color-bench-muted: oklch(67% 0.030 74);
+  --color-bench-line: oklch(40% 0.038 70);
+  --color-bench-gold: oklch(70% 0.112 69);
+}
+
+body {
+  background-color: var(--color-ivory);
+  background-image:
+    radial-gradient(58% 42% at 72% 14%, color-mix(in oklch, var(--color-gold) 16%, transparent), transparent 68%),
+    linear-gradient(180deg, var(--color-porcelain) 0%, var(--color-ivory) 42%, var(--color-champagne) 100%);
+  color: var(--color-ink);
+}
+
+body::before {
+  background:
+    linear-gradient(90deg, color-mix(in oklch, var(--color-line) 48%, transparent) 1px, transparent 1px),
+    linear-gradient(180deg, color-mix(in oklch, var(--color-line) 34%, transparent) 1px, transparent 1px);
+  background-size: 72px 72px;
+  mask-image: linear-gradient(180deg, black 0%, transparent 68%);
+  opacity: 0.3;
+  animation: none;
+}
+
+.bg-stage,
+.bg-stage-soft {
+  background: var(--color-ivory);
+}
+
+.bench-chapter {
+  background:
+    radial-gradient(80% 70% at 62% 38%, color-mix(in oklch, var(--color-bench-gold) 12%, transparent), transparent 64%),
+    linear-gradient(180deg, var(--color-bench-deep) 0%, var(--color-bench) 72%, var(--color-ivory) 100%);
+}
+
+.bench-surface {
+  background:
+    linear-gradient(90deg, color-mix(in oklch, var(--color-bench-line) 36%, transparent) 1px, transparent 1px),
+    linear-gradient(180deg, color-mix(in oklch, var(--color-bench-line) 28%, transparent) 1px, transparent 1px),
+    radial-gradient(70% 54% at 54% 42%, color-mix(in oklch, var(--color-bench-panel) 86%, transparent), transparent 72%),
+    linear-gradient(135deg, var(--color-bench-deep), var(--color-bench));
+  background-size: 88px 88px, 88px 88px, auto, auto;
+}
+
+.bench-surface::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.22;
+  background-image:
+    repeating-linear-gradient(90deg, transparent 0 16px, rgba(255, 232, 190, 0.06) 16px 17px),
+    repeating-linear-gradient(0deg, transparent 0 23px, rgba(0, 0, 0, 0.2) 23px 24px);
+  mix-blend-mode: soft-light;
+}
+
+.bench-loupe {
+  border-radius: 999px;
+  border: 1px solid color-mix(in oklch, var(--color-bench-gold) 65%, transparent);
+  background:
+    radial-gradient(circle, rgba(255, 243, 223, 0.055) 0 42%, transparent 43%),
+    repeating-radial-gradient(circle, color-mix(in oklch, var(--color-bench-line) 58%, transparent) 0 1px, transparent 1px 42px);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 238, 205, 0.08),
+    0 0 90px rgba(210, 160, 95, 0.08);
+  mask-image: radial-gradient(circle, black 0 67%, transparent 74%);
+}
+
+.bench-label,
+.bench-scroll-cue {
+  font-family: var(--font-sans);
+  text-transform: uppercase;
+  letter-spacing: 0.24em;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--color-bench-gold);
+}
+
+.bench-scroll-cue {
+  color: var(--color-bench-muted);
+}
+
+.bench-annotation {
+  max-width: 11rem;
+  border: 1px solid color-mix(in oklch, var(--color-bench-line) 72%, transparent);
+  background: color-mix(in oklch, var(--color-bench-panel) 72%, transparent);
+  padding: 0.55rem 0.7rem;
+  font-family: var(--font-sans);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  line-height: 1.35;
+  text-transform: uppercase;
+  color: var(--color-bench-ink);
+  backdrop-filter: blur(10px);
+}
+
+.configuration-sheet {
+  border: 1px solid var(--color-line);
+  background:
+    linear-gradient(90deg, color-mix(in oklch, var(--color-line) 24%, transparent) 1px, transparent 1px),
+    linear-gradient(180deg, color-mix(in oklch, var(--color-line) 18%, transparent) 1px, transparent 1px),
+    color-mix(in oklch, var(--color-porcelain) 94%, transparent);
+  background-size: 32px 32px;
+  box-shadow: 0 40px 110px -60px rgba(28, 20, 12, 0.6);
+}
+
+.anatomy-chapter {
+  background:
+    radial-gradient(64% 58% at 62% 36%, color-mix(in oklch, var(--color-bench-gold) 10%, transparent), transparent 68%),
+    linear-gradient(180deg, var(--color-bench) 0%, oklch(8% 0.016 70) 52%, var(--color-bench-deep) 100%);
+}
+
+.anatomy-field {
+  background:
+    linear-gradient(90deg, color-mix(in oklch, var(--color-bench-line) 34%, transparent) 1px, transparent 1px),
+    linear-gradient(180deg, color-mix(in oklch, var(--color-bench-line) 24%, transparent) 1px, transparent 1px),
+    radial-gradient(circle at 52% 45%, color-mix(in oklch, var(--color-bench-panel) 74%, transparent), transparent 55%),
+    radial-gradient(circle at 80% 12%, rgba(255, 226, 179, 0.12), transparent 28%);
+  background-size: 54px 54px, 54px 54px, auto, auto;
+}
+
+.anatomy-field::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.18;
+  background:
+    repeating-linear-gradient(104deg, transparent 0 18px, rgba(255, 238, 210, 0.055) 18px 19px),
+    repeating-linear-gradient(0deg, transparent 0 31px, rgba(0, 0, 0, 0.3) 31px 32px);
+  mix-blend-mode: soft-light;
+}
+
+.anatomy-field::after {
+  content: "";
+  position: absolute;
+  inset: 9svh 6vw;
+  border: 1px solid color-mix(in oklch, var(--color-bench-line) 54%, transparent);
+  pointer-events: none;
+  mask-image: linear-gradient(90deg, transparent 0%, black 16%, black 84%, transparent 100%);
+}
+
+.anatomy-plate {
+  border-radius: 999px;
+  border: 1px solid color-mix(in oklch, var(--color-bench-line) 76%, transparent);
+  background:
+    radial-gradient(circle, rgba(255, 239, 209, 0.055) 0 34%, transparent 35%),
+    repeating-radial-gradient(circle, color-mix(in oklch, var(--color-bench-line) 52%, transparent) 0 1px, transparent 1px 54px);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 238, 205, 0.05),
+    0 0 130px rgba(208, 155, 86, 0.08);
+  mask-image: radial-gradient(circle, black 0 62%, transparent 75%);
+}
+
+.anatomy-arc {
+  position: absolute;
+  inset: 9%;
+  border-radius: 999px;
+  border: 1px solid color-mix(in oklch, var(--color-bench-gold) 52%, transparent);
+}
+
+.anatomy-arc-a {
+  clip-path: polygon(0 0, 54% 0, 54% 100%, 0 100%);
+}
+
+.anatomy-arc-b {
+  inset: 18%;
+  rotate: 34deg;
+  clip-path: polygon(46% 0, 100% 0, 100% 100%, 46% 100%);
+  opacity: 0.74;
+}
+
+.anatomy-axis-x,
+.anatomy-axis-y {
+  position: absolute;
+  background: color-mix(in oklch, var(--color-bench-line) 58%, transparent);
+}
+
+.anatomy-axis-x {
+  left: 0;
+  top: 50%;
+  height: 1px;
+  width: 100%;
+}
+
+.anatomy-axis-y {
+  left: 50%;
+  top: 0;
+  height: 100%;
+  width: 1px;
+}
+
+.anatomy-tick {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  height: 50%;
+  width: 1px;
+  transform-origin: 50% 0;
+}
+
+.anatomy-tick::before {
+  content: "";
+  position: absolute;
+  left: -0.5px;
+  top: 0;
+  height: 0.72rem;
+  width: 1px;
+  background: color-mix(in oklch, var(--color-bench-gold) 54%, transparent);
+}
+
+.anatomy-callout {
+  max-width: 19rem;
+  border: 1px solid color-mix(in oklch, var(--color-bench-gold) 38%, var(--color-bench-line));
+  background:
+    linear-gradient(90deg, color-mix(in oklch, var(--color-bench-line) 18%, transparent) 1px, transparent 1px),
+    color-mix(in oklch, var(--color-bench-panel) 92%, transparent);
+  background-size: 24px 24px;
+  padding: 0.85rem 0.95rem;
+  backdrop-filter: blur(12px);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 236, 197, 0.04),
+    0 18px 70px rgba(0, 0, 0, 0.34);
+}
+
+.anatomy-callout span {
+  display: inline-flex;
+  margin-bottom: 0.75rem;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  color: var(--color-bench-gold);
+}
+
+.anatomy-callout h3 {
+  font-family: var(--font-display);
+  font-size: clamp(1.2rem, 1.8vw, 1.7rem);
+  line-height: 1.04;
+  color: oklch(96% 0.026 78);
+}
+
+.anatomy-callout p {
+  margin-top: 0.7rem;
+  font-size: 0.78rem;
+  line-height: 1.55;
+  color: oklch(78% 0.028 74);
+}
+
+.anatomy-ledger {
+  border: 1px solid color-mix(in oklch, var(--color-bench-line) 72%, transparent);
+  background:
+    linear-gradient(90deg, color-mix(in oklch, var(--color-bench-line) 22%, transparent) 1px, transparent 1px),
+    color-mix(in oklch, var(--color-bench-panel) 84%, transparent);
+  background-size: 32px 32px;
+  backdrop-filter: blur(14px);
+}
+
+.materials-chapter {
+  background:
+    radial-gradient(58% 52% at 68% 34%, rgba(220, 233, 255, 0.1), transparent 62%),
+    radial-gradient(58% 52% at 18% 78%, color-mix(in oklch, var(--color-bench-gold) 9%, transparent), transparent 66%),
+    linear-gradient(180deg, var(--color-bench-deep) 0%, oklch(9% 0.018 74) 54%, var(--color-bench) 100%);
+}
+
+.materials-field {
+  background:
+    linear-gradient(90deg, color-mix(in oklch, var(--color-bench-line) 30%, transparent) 1px, transparent 1px),
+    linear-gradient(180deg, color-mix(in oklch, var(--color-bench-line) 20%, transparent) 1px, transparent 1px),
+    repeating-linear-gradient(112deg, transparent 0 42px, rgba(255, 239, 210, 0.045) 42px 43px),
+    radial-gradient(circle at 50% 45%, color-mix(in oklch, var(--color-bench-panel) 70%, transparent), transparent 52%);
+  background-size: 72px 72px, 72px 72px, auto, auto;
+}
+
+.materials-field::after {
+  content: "";
+  position: absolute;
+  inset: 12svh 7vw;
+  border: 1px solid color-mix(in oklch, var(--color-bench-line) 48%, transparent);
+  pointer-events: none;
+}
+
+.materials-prism {
+  background:
+    linear-gradient(90deg, transparent 0%, rgba(255, 241, 210, 0.08) 42%, rgba(212, 229, 255, 0.1) 50%, transparent 100%);
+  filter: blur(10px);
+  opacity: 0.82;
+  transform: translateX(-50%) skewX(-9deg);
+  mix-blend-mode: screen;
+}
+
+.material-rail,
+.stone-console,
+.material-summary {
+  border: 1px solid color-mix(in oklch, var(--color-bench-line) 72%, transparent);
+  background:
+    linear-gradient(90deg, color-mix(in oklch, var(--color-bench-line) 20%, transparent) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(255, 241, 216, 0.03), rgba(0, 0, 0, 0.18)),
+    color-mix(in oklch, var(--color-bench-panel) 96%, black);
+  background-size: 28px 28px;
+  backdrop-filter: blur(18px) saturate(1.08);
+  box-shadow:
+    0 24px 90px rgba(0, 0, 0, 0.44),
+    inset 0 1px 0 rgba(255, 237, 202, 0.05);
+}
+
+.material-swatch,
+.stone-vial {
+  border: 1px solid color-mix(in oklch, var(--color-bench-line) 68%, transparent);
+  background: color-mix(in oklch, var(--color-bench-deep) 78%, transparent);
+}
+
+.ring-film {
+  --film-bench-opacity: 1;
+  --film-bench-y: 0px;
+  --film-loupe-scale: 0.78;
+  --film-scan-x: 15%;
+  --film-scan-opacity: 0;
+  --film-anatomy-opacity: 0;
+  --film-material-opacity: 0;
+  --film-material-y: 36px;
+  --film-tray-x: -28px;
+  --film-lock-opacity: 0;
+  --film-lock-y: 28px;
+  --film-tray-opacity: 0;
+  --film-tray-y: 56px;
+  --film-flare-x: -12%;
+  --film-flare-opacity: 0;
+  --film-pad-opacity: 0.78;
+  --film-pad-scale: 0.86;
+  --film-cradle-opacity: 0;
+  --film-bench-shift: 0px;
+  background:
+    radial-gradient(46% 34% at 58% 42%, color-mix(in oklch, var(--color-bench-gold) 16%, transparent), transparent 68%),
+    radial-gradient(70% 60% at 50% 105%, rgba(255, 231, 188, 0.09), transparent 52%),
+    linear-gradient(180deg, var(--color-bench-deep) 0%, var(--color-bench) 48%, oklch(7% 0.016 74) 100%);
+}
+
+.ring-film-field {
+  background:
+    linear-gradient(90deg, color-mix(in oklch, var(--color-bench-line) 18%, transparent) 1px, transparent 1px),
+    linear-gradient(180deg, color-mix(in oklch, var(--color-bench-line) 13%, transparent) 1px, transparent 1px),
+    repeating-linear-gradient(112deg, transparent 0 52px, rgba(255, 239, 210, 0.026) 52px 53px),
+    radial-gradient(circle at 50% 47%, color-mix(in oklch, var(--color-bench-panel) 58%, transparent), transparent 50%);
+  background-size: 84px 84px, 84px 84px, auto, auto;
+}
+
+.ring-film-field::after {
+  content: "";
+  position: absolute;
+  inset: 10svh 7vw;
+  pointer-events: none;
+  border: 1px solid color-mix(in oklch, var(--color-bench-line) 50%, transparent);
+  mask-image: linear-gradient(90deg, transparent, black 12%, black 88%, transparent);
+}
+
+.ring-film-loupe {
+  transform: translate3d(-50%, calc(-50% + var(--film-bench-shift)), 0) scale(var(--film-loupe-scale));
+  border-radius: 999px;
+  border: 1px solid color-mix(in oklch, var(--color-bench-gold) 55%, transparent);
+  background:
+    radial-gradient(circle, rgba(255, 243, 223, 0.052) 0 34%, transparent 35%),
+    repeating-radial-gradient(circle, color-mix(in oklch, var(--color-bench-line) 50%, transparent) 0 1px, transparent 1px 48px);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 238, 205, 0.06),
+    0 0 120px rgba(210, 160, 95, 0.08);
+  mask-image: radial-gradient(circle, black 0 64%, transparent 76%);
+  will-change: transform;
+}
+
+.film-object-pad {
+  left: 50%;
+  top: 45%;
+  width: min(57vw, 46rem);
+  aspect-ratio: 1;
+  transform: translate3d(-42%, calc(-45% + var(--film-bench-shift)), 0) scale(var(--film-pad-scale));
+  opacity: calc(var(--film-pad-opacity) * 0.82);
+  border-radius: 999px;
+  border: 1px solid color-mix(in oklch, var(--color-bench-line) 62%, transparent);
+  background:
+    radial-gradient(circle, rgba(255, 244, 224, 0.055) 0 18%, transparent 19%),
+    radial-gradient(circle, transparent 0 46%, color-mix(in oklch, var(--color-bench-gold) 32%, transparent) 46.2% 46.5%, transparent 47%),
+    repeating-radial-gradient(circle, color-mix(in oklch, var(--color-bench-line) 44%, transparent) 0 1px, transparent 1px 42px);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 238, 205, 0.045),
+    0 44px 130px rgba(0, 0, 0, 0.36);
+  mask-image: radial-gradient(circle, black 0 62%, transparent 75%);
+  transform-origin: 50% 50%;
+  will-change: transform, opacity;
+}
+
+.film-object-pad::before,
+.film-object-pad::after {
+  content: "";
+  position: absolute;
+  inset: 10%;
+  border-radius: 999px;
+  border: 1px solid color-mix(in oklch, var(--color-bench-gold) 38%, transparent);
+}
+
+.film-object-pad::after {
+  inset: 22%;
+  rotate: -18deg;
+  opacity: 0.58;
+  border-style: dashed;
+}
+
+.film-object-pad__axis {
+  position: absolute;
+  background: color-mix(in oklch, var(--color-bench-line) 50%, transparent);
+}
+
+.film-object-pad__axis--x {
+  left: 0;
+  top: 50%;
+  height: 1px;
+  width: 100%;
+}
+
+.film-object-pad__axis--y {
+  left: 50%;
+  top: 0;
+  height: 100%;
+  width: 1px;
+}
+
+.film-object-pad__tick {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  height: 50%;
+  width: 1px;
+  transform-origin: 50% 0;
+}
+
+.film-object-pad__tick::before {
+  content: "";
+  position: absolute;
+  left: -0.5px;
+  top: 0;
+  height: 0.78rem;
+  width: 1px;
+  background: color-mix(in oklch, var(--color-bench-gold) 46%, transparent);
+}
+
+.film-object-cradle {
+  left: 50%;
+  top: 71%;
+  width: min(42vw, 32rem);
+  height: min(13vw, 8rem);
+  opacity: var(--film-cradle-opacity);
+  transform: translate3d(-31%, calc(-50% + var(--film-bench-shift)), 0) rotate(-4deg);
+  border-radius: 50%;
+  background:
+    radial-gradient(ellipse at center, rgba(255, 239, 211, 0.16), rgba(255, 223, 174, 0.055) 42%, transparent 68%);
+  filter: blur(2px);
+  mix-blend-mode: screen;
+  will-change: transform, opacity;
+}
+
+.ring-film-scan {
+  left: var(--film-scan-x);
+  opacity: var(--film-scan-opacity);
+  background: var(--color-bench-gold);
+  box-shadow:
+    0 0 34px rgba(222, 177, 101, 0.32),
+    0 0 0 1px rgba(255, 236, 190, 0.12);
+}
+
+.ring-film-scan::before,
+.ring-film-scan::after {
+  content: "";
+  position: absolute;
+  left: -0.45rem;
+  height: 0.9rem;
+  width: 0.9rem;
+  border: 1px solid var(--color-bench-gold);
+  background: var(--color-bench-deep);
+}
+
+.ring-film-scan::before {
+  top: 18%;
+}
+
+.ring-film-scan::after {
+  bottom: 18%;
+}
+
+.ring-film-flare {
+  left: var(--film-flare-x);
+  opacity: var(--film-flare-opacity);
+  transform: translateX(-50%) skewX(-10deg);
+  background:
+    linear-gradient(90deg, transparent 0%, rgba(255, 241, 210, 0.08) 28%, rgba(255, 232, 188, 0.2) 48%, rgba(214, 232, 255, 0.1) 58%, transparent 100%);
+  filter: blur(10px);
+  mix-blend-mode: screen;
+}
+
+.ring-film-tray {
+  opacity: var(--film-tray-opacity);
+  transform: translate3d(0, var(--film-tray-y), 0);
+  background:
+    linear-gradient(180deg, transparent 0%, rgba(255, 226, 178, 0.05) 18%, rgba(5, 3, 2, 0.9) 56%, rgba(5, 3, 2, 0.98) 100%),
+    linear-gradient(90deg, color-mix(in oklch, var(--color-bench-line) 20%, transparent) 1px, transparent 1px);
+  background-size: auto, 54px 54px;
+  border-top: 1px solid color-mix(in oklch, var(--color-bench-gold) 38%, transparent);
+  box-shadow:
+    0 -70px 150px rgba(0, 0, 0, 0.48),
+    inset 0 1px 0 rgba(255, 231, 190, 0.07);
+  will-change: transform, opacity;
+}
+
+.film-copy-bench {
+  opacity: var(--film-bench-opacity);
+  transform: translate3d(0, var(--film-bench-y), 0);
+  will-change: transform, opacity;
+}
+
+.film-copy-anatomy,
+.film-tags-layer {
+  opacity: var(--film-anatomy-opacity);
+  will-change: opacity;
+}
+
+.material-rail {
+  opacity: var(--film-material-opacity);
+  transform: translate3d(var(--film-tray-x), var(--film-material-y), 0);
+  will-change: transform, opacity;
+}
+
+.stone-console {
+  opacity: var(--film-material-opacity);
+  transform: translate3d(0, var(--film-material-y), 0);
+  will-change: transform, opacity;
+}
+
+.material-summary {
+  opacity: var(--film-material-opacity);
+  will-change: transform, opacity;
+}
+
+.material-summary-lock {
+  opacity: var(--film-lock-opacity);
+  transform: translate3d(0, var(--film-lock-y), 0);
+  will-change: transform, opacity;
+}
+
+.film-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  border: 1px solid color-mix(in oklch, var(--color-bench-gold) 38%, var(--color-bench-line));
+  background: color-mix(in oklch, var(--color-bench-panel) 74%, transparent);
+  padding: 0.58rem 0.7rem;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  line-height: 1.2;
+  text-transform: uppercase;
+  color: var(--color-bench-ink);
+  backdrop-filter: blur(10px);
+}
+
+.film-tag span {
+  color: var(--color-bench-gold);
+}
+
+.photo-handoff {
+  background:
+    radial-gradient(62% 60% at 72% 46%, rgba(185, 132, 72, 0.16), transparent 62%),
+    linear-gradient(180deg, oklch(7% 0.016 72) 0%, oklch(5.6% 0.012 70) 54%, var(--color-bench-deep) 100%);
+}
+
+.photo-handoff__field {
+  background:
+    linear-gradient(90deg, color-mix(in oklch, var(--color-bench-line) 14%, transparent) 1px, transparent 1px),
+    linear-gradient(180deg, color-mix(in oklch, var(--color-bench-line) 10%, transparent) 1px, transparent 1px),
+    radial-gradient(circle at 54% 48%, color-mix(in oklch, var(--color-bench-panel) 52%, transparent), transparent 56%);
+  background-size: 92px 92px, 92px 92px, auto;
+}
+
+.photo-handoff__aperture {
+  background:
+    radial-gradient(circle at 52% 50%, transparent 0 34%, rgba(0, 0, 0, 0.16) 58%, rgba(0, 0, 0, 0.62) 100%),
+    linear-gradient(90deg, rgba(255, 227, 178, 0.06), transparent 16%, transparent 84%, rgba(255, 227, 178, 0.05));
+}
+
+.photo-handoff__capture {
+  border: 1px solid color-mix(in oklch, var(--color-bench-gold) 44%, var(--color-bench-line));
+  background:
+    linear-gradient(90deg, color-mix(in oklch, var(--color-bench-line) 20%, transparent) 1px, transparent 1px),
+    linear-gradient(180deg, color-mix(in oklch, var(--color-bench-line) 16%, transparent) 1px, transparent 1px),
+    color-mix(in oklch, var(--color-bench-panel) 72%, transparent);
+  background-size: 32px 32px;
+  box-shadow:
+    0 44px 120px rgba(0, 0, 0, 0.46),
+    inset 0 0 0 1px rgba(255, 235, 198, 0.07);
+}
+
+.photo-handoff__scan {
+  position: absolute;
+  inset-block: 0;
+  left: 42%;
+  width: 1px;
+  background: var(--color-bench-gold);
+  box-shadow:
+    0 0 34px rgba(222, 177, 101, 0.42),
+    0 0 0 1px rgba(255, 236, 190, 0.12);
+}
+
+.photo-handoff__frame {
+  border: 1px solid color-mix(in oklch, var(--color-bench-gold) 35%, transparent);
+  background:
+    linear-gradient(90deg, color-mix(in oklch, var(--color-bench-line) 17%, transparent) 1px, transparent 1px),
+    linear-gradient(180deg, color-mix(in oklch, var(--color-bench-line) 14%, transparent) 1px, transparent 1px),
+    color-mix(in oklch, var(--color-bench-panel) 80%, transparent);
+  background-size: 28px 28px;
+  padding: 0.9rem;
+  box-shadow:
+    0 54px 120px rgba(0, 0, 0, 0.58),
+    inset 0 1px 0 rgba(255, 235, 198, 0.06);
+}
+
+.photo-proof-card {
+  border: 1px solid color-mix(in oklch, var(--color-bench-gold) 35%, transparent);
+  background:
+    linear-gradient(90deg, color-mix(in oklch, var(--color-bench-line) 17%, transparent) 1px, transparent 1px),
+    linear-gradient(180deg, color-mix(in oklch, var(--color-bench-line) 14%, transparent) 1px, transparent 1px),
+    color-mix(in oklch, var(--color-bench-panel) 80%, transparent);
+  background-size: 28px 28px;
+  padding: 0.9rem;
+  box-shadow:
+    0 54px 120px rgba(0, 0, 0, 0.58),
+    inset 0 1px 0 rgba(255, 235, 198, 0.06);
+}
+
+@media (max-width: 640px) {
+  .ring-film-field {
+    background-size: 58px 58px, 58px 58px, auto, auto;
+  }
+
+  .ring-film-loupe {
+    opacity: 0.72;
+  }
+
+  .film-copy-anatomy {
+    top: 5.6rem;
+  }
+
+  .film-copy-anatomy p {
+    max-width: 16rem;
+  }
+
+  .film-object-pad {
+    top: 52%;
+    width: 104vw;
+    opacity: calc(var(--film-pad-opacity) * 0.42);
+  }
+
+  .material-summary {
+    left: 0.75rem;
+    right: 0.75rem;
+    bottom: 0.75rem;
+  }
+
+  .stone-vial {
+    min-height: 4.8rem;
+  }
+
+  .photo-handoff__capture {
+    width: 76vw;
+  }
+
+  .photo-handoff {
+    min-height: auto;
+    padding: 6rem 0 2rem;
+  }
+
+  .photo-handoff > .sticky {
+    position: relative;
+    height: auto;
+    min-height: 100svh;
+    overflow: visible;
+  }
+
+  .photo-proof-grid {
+    position: relative;
+    inset: auto;
+    display: grid;
+    gap: 1rem;
+    padding: 18rem 1rem 0;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+.photo-handoff__frame-vignette {
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, 0.2), transparent 26%, transparent 72%, rgba(0, 0, 0, 0.28)),
+    radial-gradient(circle at 50% 44%, transparent 46%, rgba(0, 0, 0, 0.22) 100%);
+}
+
+/* End-to-end cinematic chapter rebuild -------------------------------------- */
+.cinematic-run {
+  background: var(--color-bench-deep);
+}
+
+.cinematic-chapter {
+  --chapter-progress: 0;
+}
+
+.chapter-sticky {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  height: 100svh;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.chapter-impact,
+.chapter-inspection,
+.chapter-config {
+  background:
+    radial-gradient(58% 42% at 58% 42%, color-mix(in oklch, var(--color-bench-gold) 12%, transparent), transparent 68%),
+    linear-gradient(180deg, var(--color-bench-deep) 0%, var(--color-bench) 58%, oklch(7% 0.016 74) 100%);
+}
+
+.chapter-field {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, color-mix(in oklch, var(--color-bench-line) 16%, transparent) 1px, transparent 1px),
+    linear-gradient(180deg, color-mix(in oklch, var(--color-bench-line) 12%, transparent) 1px, transparent 1px),
+    repeating-linear-gradient(112deg, transparent 0 52px, rgba(255, 239, 210, 0.025) 52px 53px),
+    radial-gradient(circle at 50% 50%, color-mix(in oklch, var(--color-bench-panel) 46%, transparent), transparent 58%);
+  background-size: 84px 84px, 84px 84px, auto, auto;
+}
+
+.chapter-field--dense {
+  background-size: 72px 72px, 72px 72px, auto, auto;
+}
+
+.chapter-field::after {
+  content: "";
+  position: absolute;
+  inset: 10svh 7vw;
+  border: 1px solid color-mix(in oklch, var(--color-bench-line) 46%, transparent);
+  mask-image: linear-gradient(90deg, transparent, black 12%, black 88%, transparent);
+}
+
+.chapter-reticle {
+  position: absolute;
+  left: 50%;
+  top: 48%;
+  z-index: 1;
+  width: min(62vw, 46rem);
+  aspect-ratio: 1;
+  transform: translate3d(-35%, -48%, 0) scale(calc(0.86 + var(--chapter-progress) * 0.1));
+  border-radius: 999px;
+  border: 1px solid color-mix(in oklch, var(--color-bench-line) 62%, transparent);
+  opacity: 0.72;
+  background:
+    radial-gradient(circle, rgba(255, 244, 224, 0.052) 0 18%, transparent 19%),
+    radial-gradient(circle, transparent 0 46%, color-mix(in oklch, var(--color-bench-gold) 30%, transparent) 46.2% 46.5%, transparent 47%),
+    repeating-radial-gradient(circle, color-mix(in oklch, var(--color-bench-line) 42%, transparent) 0 1px, transparent 1px 42px);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 238, 205, 0.045),
+    0 44px 130px rgba(0, 0, 0, 0.36);
+  mask-image: radial-gradient(circle, black 0 63%, transparent 76%);
+  will-change: transform;
+  pointer-events: none;
+}
+
+.chapter-reticle span {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  height: 50%;
+  width: 1px;
+  transform-origin: 50% 0;
+}
+
+.chapter-reticle span::before {
+  content: "";
+  position: absolute;
+  left: -0.5px;
+  top: 0;
+  height: 0.72rem;
+  width: 1px;
+  background: color-mix(in oklch, var(--color-bench-gold) 44%, transparent);
+}
+
+.chapter-surface {
+  position: absolute;
+  left: 50%;
+  top: 72%;
+  z-index: 1;
+  width: min(48vw, 34rem);
+  height: min(14vw, 8rem);
+  transform: translate3d(-27%, -50%, 0) rotate(-4deg);
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(255, 239, 211, 0.16), rgba(255, 223, 174, 0.055) 42%, transparent 68%);
+  filter: blur(2px);
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+.chapter-copy {
+  position: absolute;
+  z-index: 24;
+  left: clamp(1.5rem, 4.5vw, 4rem);
+  top: clamp(6rem, 13svh, 8rem);
+  max-width: 36rem;
+  pointer-events: none;
+}
+
+.chapter-copy--impact {
+  opacity: max(0, calc(1 - var(--chapter-progress) * 2.25));
+  transform: translate3d(0, calc(var(--chapter-progress) * -60px), 0);
+}
+
+.chapter-copy--inspection {
+  opacity: clamp(0, calc((var(--chapter-progress) + 0.1) * 1.4), 1);
+}
+
+.impact-meter {
+  position: absolute;
+  inset: auto clamp(1.5rem, 5vw, 5rem) 9svh auto;
+  z-index: 22;
+  display: grid;
+  gap: 0.75rem;
+  width: min(21rem, 34vw);
+  color: var(--color-bench-muted);
+  opacity: clamp(0.25, calc(1 - var(--chapter-progress) * 1.5), 0.85);
+}
+
+.impact-meter span {
+  display: block;
+  height: 1px;
+  transform: scaleX(calc(0.25 + var(--chapter-progress) * 0.75));
+  transform-origin: right;
+  background: linear-gradient(90deg, transparent, var(--color-bench-gold));
+}
+
+.impact-notes {
+  position: absolute;
+  left: clamp(1.5rem, 5vw, 4rem);
+  bottom: 7svh;
+  z-index: 24;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  opacity: clamp(0, calc((var(--chapter-progress) - 0.2) * 3), 1);
+}
+
+.impact-notes span {
+  border: 1px solid color-mix(in oklch, var(--color-bench-line) 70%, transparent);
+  padding: 0.48rem 0.58rem;
+  font-size: 0.58rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-bench-muted);
+  background: color-mix(in oklch, var(--color-bench-panel) 68%, transparent);
+}
+
+.inspection-loupe {
+  position: absolute;
+  left: 50%;
+  top: 44%;
+  z-index: 2;
+  width: min(62vw, 43rem);
+  aspect-ratio: 1;
+  transform: translate3d(-34%, -48%, 0) scale(calc(0.9 + var(--chapter-progress) * 0.16));
+  border-radius: 999px;
+  border: 1px solid color-mix(in oklch, var(--color-bench-gold) 54%, transparent);
+  background:
+    radial-gradient(circle, rgba(255, 243, 223, 0.052) 0 34%, transparent 35%),
+    repeating-radial-gradient(circle, color-mix(in oklch, var(--color-bench-line) 50%, transparent) 0 1px, transparent 1px 48px);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 238, 205, 0.06),
+    0 0 120px rgba(210, 160, 95, 0.08);
+  mask-image: radial-gradient(circle, black 0 64%, transparent 76%);
+}
+
+.inspection-tags {
+  position: absolute;
+  inset: 0;
+  z-index: 34;
+  opacity: clamp(0, calc((var(--chapter-progress) - 0.12) * 4), 1);
+}
+
+.config-stage-keepout {
+  position: absolute;
+  left: 50%;
+  top: 53%;
+  z-index: 2;
+  width: min(34vw, 28rem);
+  aspect-ratio: 1;
+  transform: translate3d(-50%, -50%, 0);
+  border-radius: 999px;
+  border: 1px dashed color-mix(in oklch, var(--color-bench-gold) 26%, transparent);
+  opacity: 0.55;
+  background: radial-gradient(circle, rgba(255, 238, 205, 0.07), transparent 64%);
+}
+
+.config-copy {
+  position: absolute;
+  left: clamp(1.5rem, 4.5vw, 4rem);
+  top: 5.7rem;
+  z-index: 34;
+  max-width: 32rem;
+  opacity: clamp(0, calc((var(--chapter-progress) - 0.02) * 4), 1);
+  pointer-events: none;
+}
+
+.bench-panel {
+  position: absolute;
+  z-index: 38;
+  pointer-events: auto;
+  border: 1px solid color-mix(in oklch, var(--color-bench-line) 72%, transparent);
+  background:
+    linear-gradient(90deg, color-mix(in oklch, var(--color-bench-line) 20%, transparent) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(255, 241, 216, 0.035), rgba(0, 0, 0, 0.2)),
+    color-mix(in oklch, var(--color-bench-panel) 92%, black);
+  background-size: 28px 28px, auto, auto;
+  backdrop-filter: blur(18px) saturate(1.08);
+  box-shadow:
+    0 24px 90px rgba(0, 0, 0, 0.48),
+    inset 0 1px 0 rgba(255, 237, 202, 0.05);
+  opacity: clamp(0, calc((var(--chapter-progress) - 0.08) * 4), 1);
+}
+
+.config-metal-panel {
+  left: clamp(1rem, 4.5vw, 4rem);
+  bottom: 5svh;
+  width: min(42rem, 42vw);
+  padding: clamp(1rem, 1.5vw, 1.35rem);
+}
+
+.config-stone-panel {
+  right: clamp(1rem, 4.5vw, 4rem);
+  top: 17svh;
+  width: min(34rem, 36vw);
+  padding: clamp(1rem, 1.5vw, 1.35rem);
+}
+
+.config-summary {
+  right: clamp(1rem, 4.5vw, 4rem);
+  bottom: 5svh;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: 1.25rem;
+  width: min(32rem, 33vw);
+  padding: clamp(1rem, 1.5vw, 1.35rem);
+  opacity: clamp(0, calc((var(--chapter-progress) - 0.42) * 3.2), 1);
+}
+
+@media (max-width: 767px) {
+  .cinematic-chapter {
+    min-height: auto !important;
+    padding: 6rem 1rem 2rem;
+  }
+
+  .chapter-sticky {
+    position: relative;
+    height: auto;
+    min-height: 92svh;
+    overflow: visible;
+  }
+
+  .chapter-field,
+  .chapter-reticle,
+  .chapter-surface,
+  .inspection-loupe,
+  .config-stage-keepout,
+  .impact-meter {
+    opacity: 0.35;
+  }
+
+  .chapter-copy,
+  .config-copy,
+  .config-metal-panel,
+  .config-stone-panel,
+  .config-summary {
+    position: relative;
+    left: auto;
+    right: auto;
+    top: auto;
+    bottom: auto;
+    width: auto;
+    max-width: none;
+    transform: none;
+    opacity: 1;
+    margin: 0;
+  }
+
+  .chapter-copy {
+    padding-top: 0;
+  }
+
+  .config-copy {
+    margin-bottom: 1rem;
+  }
+
+  .bench-panel {
+    margin-top: 1rem;
+  }
+
+  .config-summary {
+    grid-template-columns: 1fr;
+    text-align: left;
+  }
+}
+
+.material-swatch:hover,
+.stone-vial:hover,
+.material-swatch[data-selected="true"],
+.stone-vial[data-selected="true"] {
+  border-color: color-mix(in oklch, var(--color-bench-gold) 74%, var(--color-bench-line));
+  background: color-mix(in oklch, var(--color-bench-panel) 92%, transparent);
+}
+
+.material-swatch span:first-child {
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.42),
+    inset 0 -14px 22px rgba(0, 0, 0, 0.18),
+    0 12px 32px rgba(0, 0, 0, 0.2);
+}
+
+.material-swatch[data-selected="true"] span:first-child,
+.stone-vial[data-selected="true"] .stone-sample {
+  outline: 1px solid var(--color-bench-gold);
+  outline-offset: 4px;
+}
+
+.can-drag-ring {
+  cursor: grab;
+}
+
+.can-drag-ring.is-dragging-ring {
+  cursor: grabbing;
+}
+
+.atelier-tray {
+  position: relative;
+  background:
+    linear-gradient(90deg, color-mix(in oklch, var(--color-line) 28%, transparent) 1px, transparent 1px),
+    linear-gradient(180deg, color-mix(in oklch, var(--color-line) 18%, transparent) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+.stone-sample {
+  transform-style: preserve-3d;
+}
+
+.stone-sample.is-selected {
+  animation: stone-inspect 5s var(--ease-lux) infinite;
+}
+
+@keyframes stone-inspect {
+  0%, 100% { transform: rotateY(-8deg) rotateX(0deg); }
+  50% { transform: rotateY(8deg) rotateX(3deg); }
+}
+
+.inspection-plate {
+  position: absolute;
+  left: 50%;
+  top: 45%;
+  width: min(56vw, 46rem);
+  aspect-ratio: 1;
+  transform: translate(-42%, -43%);
+  border-radius: 999px;
+  opacity: 0.68;
+  background:
+    radial-gradient(circle, color-mix(in oklch, var(--color-porcelain) 80%, transparent) 0 44%, transparent 45%),
+    repeating-radial-gradient(circle, color-mix(in oklch, var(--color-line) 42%, transparent) 0 1px, transparent 1px 38px),
+    linear-gradient(90deg, transparent calc(50% - 1px), color-mix(in oklch, var(--color-line) 34%, transparent) 50%, transparent calc(50% + 1px)),
+    linear-gradient(0deg, transparent calc(50% - 1px), color-mix(in oklch, var(--color-line) 34%, transparent) 50%, transparent calc(50% + 1px));
+  mask-image: radial-gradient(circle, black 0 58%, transparent 73%);
+}
+
+@media (max-width: 1023px) {
+  .inspection-plate {
+    top: 29%;
+    width: min(88vw, 25rem);
+    transform: translate(-50%, -50%);
+    opacity: 0.46;
+  }
+
+  .film-object-pad {
+    top: 32%;
+    width: min(88vw, 27rem);
+    transform: translate3d(-50%, -50%, 0) scale(var(--film-pad-scale));
+  }
+
+  .film-object-cradle {
+    top: 51%;
+    width: min(72vw, 24rem);
+    height: 7rem;
+    transform: translate3d(-50%, -50%, 0) rotate(-4deg);
+  }
+}
+
+@media (max-width: 639px) {
+  .material-rail {
+    bottom: 9.25rem;
+    padding: 0.75rem;
+  }
+
+  .material-rail p.font-display {
+    font-size: 1.85rem;
+  }
+
+  .material-swatch {
+    min-height: 5.8rem;
+    padding: 0.55rem;
+  }
+
+  .material-swatch span:first-child {
+    height: 1.9rem;
+  }
+
+  .stone-vial {
+    min-height: 5.6rem;
+    padding: 0.5rem;
+  }
+
+  .stone-vial .stone-sample {
+    height: 2.4rem;
+    width: 2.4rem;
   }
 }

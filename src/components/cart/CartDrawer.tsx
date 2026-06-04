@@ -40,10 +40,10 @@ function QuantityStepper({
         aria-label="Decrease quantity"
         className="grid h-7 w-7 place-items-center rounded-full text-ink-soft transition-colors hover:bg-champagne hover:text-ink disabled:opacity-40 outline-none focus-visible:ring-1 focus-visible:ring-gold"
       >
-        −
+        -
       </button>
       <span className="min-w-[1.4rem] text-center text-[0.8rem] font-medium text-ink">
-        {busy ? "…" : quantity}
+        {busy ? "..." : quantity}
       </span>
       <button
         type="button"
@@ -87,8 +87,6 @@ export function CartDrawer() {
   useEffect(() => {
     if (!open) return;
     closeRef.current?.focus();
-    setCheckoutError(null);
-
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         close();
@@ -239,7 +237,7 @@ export function CartDrawer() {
                               {item.name}
                             </p>
                             <p className="mt-1 text-[0.8rem] text-muted">
-                              {item.attributes.map((a) => a.value).join(" · ")}
+                              {item.attributes.map((a) => a.value).join(" / ")}
                             </p>
                             <p className="mt-0.5 text-[0.7rem] uppercase tracking-wide text-muted">
                               {item.sku}
@@ -299,12 +297,12 @@ export function CartDrawer() {
                   disabled={checkout.isPending}
                   className="mt-5 h-13 w-full rounded-full bg-ink py-3.5 text-[0.9rem] uppercase tracking-[0.08em] text-porcelain outline-none transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-ivory disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  {checkout.isPending ? "Opening checkout…" : "Proceed to Checkout"}
+                  {checkout.isPending ? "Opening checkout..." : "Proceed to Checkout"}
                 </button>
                 <p className="mt-3 text-center text-[0.72rem] text-muted">
                   {cart?.live
-                    ? "Your bag is secured · 256-bit encrypted checkout"
-                    : "Demo mode — connect a live store to complete purchase"}
+                    ? "Your bag is secured / 256-bit encrypted checkout"
+                    : "Demo mode - connect a live store to complete purchase"}
                 </p>
               </div>
             )}
@@ -314,3 +312,4 @@ export function CartDrawer() {
     </AnimatePresence>
   );
 }
+

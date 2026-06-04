@@ -40,7 +40,7 @@ export function Worn() {
     <section
       id="worn"
       data-ring="hidden"
-      className="relative overflow-hidden px-6 py-32 sm:px-10 lg:px-16 lg:py-48"
+      className="relative overflow-hidden px-6 py-24 sm:px-10 lg:px-16 lg:py-32"
     >
       <div
         ref={ref}
@@ -82,7 +82,7 @@ export function Worn() {
             <span className="eyebrow">Worn</span>
           </Reveal>
           <Reveal mode="rise" delay={0.05} className="mt-5">
-            <SplitText as="h2" className="display-2 text-balance text-ink">
+            <SplitText as="h2" className="font-display text-balance text-[clamp(2.4rem,5vw,5.2rem)] font-semibold leading-[0.95] tracking-[-0.02em] text-ink">
               The only place it was ever meant to be.
             </SplitText>
           </Reveal>

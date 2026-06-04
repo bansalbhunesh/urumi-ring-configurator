@@ -11,11 +11,21 @@ export function ScrollTracker() {
   const ticking = useRef(false);
   const lastY = useRef(0);
   const lastTime = useRef(0);
+  const velocity = useRef(0);
 
   useEffect(() => {
+    let raf = 0;
     lastY.current = window.scrollY;
     lastTime.current = performance.now();
     setScrollY(window.scrollY);
+
+    const tick = () => {
+      velocity.current *= 0.88;
+      if (Math.abs(velocity.current) < 0.002) velocity.current = 0;
+      setScrollVel(velocity.current);
+      setScrollY(window.scrollY);
+      raf = requestAnimationFrame(tick);
+    };
 
     const onScroll = () => {
       if (ticking.current) return;
@@ -24,7 +34,7 @@ export function ScrollTracker() {
         const now = performance.now();
         const dt = now - lastTime.current;
         const dy = window.scrollY - lastY.current;
-        if (dt > 0) setScrollVel(dy / dt);
+        if (dt > 0) velocity.current = dy / dt;
         setScrollY(window.scrollY);
         lastY.current = window.scrollY;
         lastTime.current = now;
@@ -32,8 +42,12 @@ export function ScrollTracker() {
       });
     };
 
+    raf = requestAnimationFrame(tick);
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", onScroll);
+    };
   }, []);
 
   return null;

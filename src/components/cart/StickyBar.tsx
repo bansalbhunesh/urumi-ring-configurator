@@ -24,7 +24,13 @@ export function StickyBar() {
 
   const [visible, setVisible] = useState(false);
   useEffect(() => {
-    const onScroll = () => setVisible(window.scrollY > window.innerHeight * 0.55);
+    const onScroll = () => {
+      const materials = document.getElementById("materials");
+      const cinematicReleaseY = materials
+        ? materials.offsetTop + materials.offsetHeight - window.innerHeight * 0.4
+        : window.innerHeight * 0.55;
+      setVisible(window.scrollY > cinematicReleaseY);
+    };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);

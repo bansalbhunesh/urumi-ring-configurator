@@ -58,7 +58,7 @@ function Stars({ n }: { n: number }) {
 
 export function Testimonials() {
   return (
-    <section id="reviews" data-ring="hidden" className="relative z-10 px-6 py-32 sm:px-10 lg:py-44">
+    <section id="reviews" data-ring="hidden" className="relative z-10 px-6 py-24 sm:px-10 lg:py-32">
       {/* Warm ambient glow — grounds the section without competing with the cards */}
       <div
         className="pointer-events-none absolute inset-0"
@@ -89,16 +89,16 @@ export function Testimonials() {
           </Reveal>
         </div>
 
-        <RevealStagger delay={0.15} stagger={0.13} className="mt-14 grid gap-6 md:grid-cols-3">
+        <RevealStagger delay={0.15} stagger={0.13} className="mt-10 grid gap-6 md:grid-cols-3">
           {REVIEWS.map((r) => (
             <RevealItem key={r.name} mode="rise">
               <motion.figure
-                className="group flex h-full flex-col justify-between rounded-2xl border border-line bg-champagne/20 p-7 backdrop-blur-sm transition-colors duration-500 hover:border-gold/30 hover:bg-champagne/35"
+                className="group flex h-full flex-col justify-between rounded-sm border border-line bg-champagne/20 p-7 backdrop-blur-sm transition-colors duration-500 hover:border-gold/30 hover:bg-champagne/35"
                 whileHover={{ y: -4, transition: { type: "spring", stiffness: 320, damping: 28 } }}
               >
                 <div>
                   {r.image && (
-                    <div className="mb-5 overflow-hidden rounded-xl ring-1 ring-line/60">
+                    <div className="mb-5 overflow-hidden rounded-sm ring-1 ring-line/60">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={r.image}
@@ -129,7 +129,7 @@ export function Testimonials() {
         </RevealStagger>
 
         {/* Quiet closing line — bridges toward the finale */}
-        <Reveal mode="rise" delay={0.3} className="mt-16 text-center">
+        <Reveal mode="rise" delay={0.3} className="mt-12 text-center">
           <div className="mx-auto max-w-[6rem]">
             <div className="rule-gold h-px" />
           </div>

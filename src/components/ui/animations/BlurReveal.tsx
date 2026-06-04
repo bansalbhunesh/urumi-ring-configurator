@@ -11,14 +11,11 @@ import type { ReactNode, CSSProperties } from "react";
    and y-lift for a luxurious entrance.
    ============================================================ */
 
-type BlurRevealType = "words" | "chars" | "block";
-
 interface BlurRevealProps {
   children: ReactNode;
   className?: string;
   delay?: number;
   duration?: number;
-  type?: BlurRevealType;
   as?: "div" | "span" | "p" | "h1" | "h2" | "h3";
   style?: CSSProperties;
   once?: boolean;
@@ -31,7 +28,6 @@ export function BlurReveal({
   className,
   delay = 0,
   duration = 1.1,
-  type = "block",
   as: Tag = "div",
   style,
   once = true,

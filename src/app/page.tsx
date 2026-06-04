@@ -1,13 +1,10 @@
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
-import { Studio } from "@/components/studio/Studio";
-import { ActOne } from "@/components/sections/ActOne";
-import { Craft } from "@/components/sections/Craft";
-import { Materials } from "@/components/sections/Materials";
+import { RingFilm } from "@/components/sections/RingFilm";
+import { PhotoHandoff } from "@/components/sections/PhotoHandoff";
 import { Provenance } from "@/components/sections/Provenance";
 import { Commitment } from "@/components/sections/Commitment";
 import { FinishTheLook } from "@/components/sections/FinishTheLook";
-import { PromiseSection } from "@/components/sections/Promise";
 import { Mission } from "@/components/sections/Mission";
 import { Worn } from "@/components/sections/Worn";
 import { Testimonials } from "@/components/sections/Testimonials";
@@ -16,33 +13,22 @@ import { CartDrawer } from "@/components/cart/CartDrawer";
 import { StickyBar } from "@/components/cart/StickyBar";
 import { ScrollTracker } from "@/components/ui/ScrollTracker";
 import { Toast } from "@/components/ui/Toast";
-import { ScrollCue } from "@/components/ui/ScrollCue";
 import { ConfigUrlSync } from "@/components/ui/ConfigUrlSync";
-import { MetalAtmosphere } from "@/components/ui/MetalAtmosphere";
-import { ScrollProgressLine } from "@/components/ui/animations/ScrollProgressLine";
 import { GlobalCanvas } from "@/components/three/GlobalCanvas";
-import { Loader } from "@/components/ui/Loader";
 
 export default function Home() {
   return (
     <>
-      <Loader />
       <ConfigUrlSync />
       <ScrollTracker />
-      <ScrollCue />
-      <MetalAtmosphere />
-      <ScrollProgressLine />
       <GlobalCanvas />
       <Header />
       <main className="bg-transparent">
-        <ActOne />
-        <Studio />
-        <Craft />
-        <Materials />
+        <RingFilm />
+        <PhotoHandoff />
         <Provenance />
         <Commitment />
         <FinishTheLook />
-        <PromiseSection />
         <Mission />
         <Testimonials />
         <Worn />

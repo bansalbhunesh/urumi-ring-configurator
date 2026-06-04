@@ -1,29 +1,89 @@
 "use client";
 
-import { Component, useEffect, useMemo, useRef, type ReactNode } from "react";
+import { Component, useMemo, type ReactNode } from "react";
 import { useGLTF } from "@react-three/drei";
-import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { METAL_BY_ID } from "@/lib/config";
 import type { MetalId } from "@/lib/types";
-
-/* ----------------------------------------------------------------------------
-   Optional photoreal ring. Drop a GLB at /public/models/ring.glb and it is
-   loaded here, auto-centred, auto-scaled. If absent, <ModelBoundary> falls
-   back to the procedural TwistRing.
-
-   Material override: strips baked albedo, sets metalness=1, roughness=0.08
-   (mirror-polished), envMapIntensity=1.8 so the IBL environment gives proper
-   jewellery-grade reflections.
----------------------------------------------------------------------------- */
+import { Gem } from "./Gem";
 
 export const RING_MODEL_URL = "/models/ring.glb";
-const TARGET_SIZE = 2.7;
+const TARGET_SIZE = 2.95;
 
-export function RingModel({ metalId }: { metalId: MetalId }) {
+function metalMaterial(metalId: MetalId) {
+  const metal = METAL_BY_ID[metalId];
+  const color = new THREE.Color(metal.color).lerp(new THREE.Color("#fffaf2"), 0.28);
+  return new THREE.MeshPhysicalMaterial({
+    color,
+    metalness: 1,
+    roughness: THREE.MathUtils.clamp(metal.roughness * 1.1, 0.16, 0.32),
+    clearcoat: 0.22,
+    clearcoatRoughness: 0.18,
+    envMapIntensity: 5.6,
+    specularIntensity: 1.32,
+    specularColor: new THREE.Color("#fff7ec"),
+    sheen: 0.08,
+    sheenRoughness: 0.35,
+    sheenColor: new THREE.Color("#ffe7c0"),
+  });
+}
+
+function paveMaterial() {
+  return new THREE.MeshPhysicalMaterial({
+    color: new THREE.Color("#ffffff"),
+    metalness: 0,
+    roughness: 0.01,
+    transparent: true,
+    opacity: 0.76,
+    transmission: 0.72,
+    thickness: 0.1,
+    ior: 2.42,
+    envMapIntensity: 6.2,
+    specularIntensity: 2.6,
+    attenuationDistance: 2.2,
+    attenuationColor: new THREE.Color("#f7fbff"),
+    depthWrite: false,
+  });
+}
+
+function classifyMesh(mesh: THREE.Mesh) {
+  const name = mesh.name.toLowerCase();
+  const materialNames = Array.isArray(mesh.material)
+    ? mesh.material.map((material) => material.name.toLowerCase()).join(" ")
+    : mesh.material.name.toLowerCase();
+  const signature = `${name} ${materialNames}`;
+
+  if (signature.includes("centerdiamond")) return "center";
+  if (signature.includes("pavediamonds")) return "pave";
+  if (signature.includes("metal")) return "metal";
+  if (name === "tripo_part_0") return "center";
+
+  const box = new THREE.Box3().setFromObject(mesh);
+  const center = new THREE.Vector3();
+  const size = new THREE.Vector3();
+  box.getCenter(center);
+  box.getSize(size);
+
+  const smallShoulderStone =
+    center.x < -0.32 &&
+    center.y < -0.04 &&
+    size.x < 0.04 &&
+    size.y < 0.12;
+
+  return smallShoulderStone ? "pave" : "metal";
+}
+
+export function RingModel({ metalId, mobile = false }: { metalId: MetalId; mobile?: boolean }) {
   const { scene } = useGLTF(RING_MODEL_URL);
+  const materials = useMemo(
+    () => ({
+      metal: metalMaterial(metalId),
+      pave: paveMaterial(),
+    }),
+    [metalId],
+  );
 
-  const root = useMemo(() => {
+  const { root, gemPos, gemScaleFactor } = useMemo(() => {
     const clone = scene.clone(true);
     const box = new THREE.Box3().setFromObject(clone);
     const size = new THREE.Vector3();
@@ -33,52 +93,67 @@ export function RingModel({ metalId }: { metalId: MetalId }) {
     clone.position.sub(center);
     const maxDim = Math.max(size.x, size.y, size.z) || 1;
     clone.scale.setScalar(TARGET_SIZE / maxDim);
+    clone.updateMatrixWorld(true);
+
+    /* Default gem placement — in case no "center" mesh is found in the GLB. */
+    let gemPos: [number, number, number] = [0, 1.2, 0];
+    let gemScaleFactor = 1.8;
+
     clone.traverse((o) => {
       const m = o as THREE.Mesh;
       if (m.isMesh) {
         m.castShadow = true;
         m.receiveShadow = true;
+        const kind = classifyMesh(m);
+        if (kind === "center") {
+          /* Hide the static GLB diamond and record its bounding-box centre
+             so the live procedural Gem sits in exactly the same spot. */
+          const dBox = new THREE.Box3().setFromObject(m);
+          const dCenter = new THREE.Vector3();
+          const dSize = new THREE.Vector3();
+          dBox.getCenter(dCenter);
+          dBox.getSize(dSize);
+          gemPos = [dCenter.x, dCenter.y, dCenter.z];
+          const glbGemRadius = Math.max(dSize.x, dSize.z) / 2;
+          // 0.172 is the round procedural girdle radius. Clamp keeps AI GLB
+          // bounds from making elongated replacement stones cartoon-large.
+          gemScaleFactor = THREE.MathUtils.clamp(glbGemRadius / 0.172, 0.68, 2.35);
+          m.visible = false;
+        } else {
+          if (kind === "metal" && m.geometry) {
+            m.geometry = m.geometry.clone();
+            m.geometry.computeVertexNormals();
+          }
+          m.material = materials[kind];
+        }
       }
     });
-    return clone;
-  }, [scene]);
 
-  /* Strip baked maps, force true precious-metal material on every mesh.
-     Generated GLBs bake a pale near-matte albedo at metalness ~0 — plastic/bone.
-     We drive it as a pure metal so the colour tints clean reflections. */
-  const matsRef = useRef<THREE.MeshStandardMaterial[]>([]);
-  useEffect(() => {
-    const mats: THREE.MeshStandardMaterial[] = [];
-    root.traverse((o) => {
-      const m = o as THREE.Mesh;
-      if (!m.isMesh || !m.material) return;
-      const src = m.material as THREE.MeshStandardMaterial;
-      const mat = src.clone();
-      mat.map = null;
-      mat.emissiveMap = null;
-      mat.aoMap = null;
-      mat.emissive = new THREE.Color(0x000000);
-      mat.metalness = 1;
-      mat.roughness = 0.08;
-      mat.envMapIntensity = 1.8;
-      mat.needsUpdate = true;
-      m.material = mat;
-      mats.push(mat);
-    });
-    matsRef.current = mats;
-  }, [root]);
+    return { root: clone, gemPos, gemScaleFactor };
+  }, [scene, materials]);
 
-  useFrame((_, dt) => {
-    const metal = METAL_BY_ID[metalId];
-    const c = new THREE.Color(metal.color);
-    for (const mat of matsRef.current) {
-      mat.color.lerp(c, 1 - Math.exp(-8 * dt));
-      mat.metalness = 1;
-      mat.roughness = THREE.MathUtils.damp(mat.roughness, metal.roughness, 8, dt);
-    }
-  });
+  return (
+    <group>
+      <primitive object={root} />
+      <group position={gemPos} scale={gemScaleFactor}>
+        <Gem mobile={mobile} />
+      </group>
+    </group>
+  );
+}
 
-  return <primitive object={root} />;
+export function HybridRingModel({
+  metalId,
+  mobile,
+}: {
+  metalId: MetalId;
+  mobile: boolean;
+}) {
+  return (
+    <group>
+      <RingModel metalId={metalId} mobile={mobile} />
+    </group>
+  );
 }
 
 export class ModelBoundary extends Component<
@@ -94,3 +169,5 @@ export class ModelBoundary extends Component<
     return this.state.failed ? this.props.fallback : this.props.children;
   }
 }
+
+useGLTF.preload(RING_MODEL_URL);

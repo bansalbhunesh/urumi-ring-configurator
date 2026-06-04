@@ -53,7 +53,7 @@ export function Commitment() {
     <section
       id="commitment"
       data-ring="hidden"
-      className="relative px-6 py-28 sm:px-10 lg:px-16 lg:py-40"
+      className="relative px-6 py-20 sm:px-10 lg:px-16 lg:py-28"
     >
       <div className="mx-auto max-w-6xl">
         <div className="max-w-2xl">
@@ -73,9 +73,9 @@ export function Commitment() {
           </Reveal>
         </div>
 
-        <div className="rule-gold mt-14" />
+        <div className="rule-gold mt-10" />
 
-        <RevealStagger delay={0.1} stagger={0.12} className="mt-12 grid gap-x-10 gap-y-12 sm:grid-cols-2 lg:grid-cols-4">
+        <RevealStagger delay={0.1} stagger={0.12} className="mt-10 grid gap-x-10 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
           {PROMISES.map((p) => (
             <RevealItem key={p.title} mode="rise">
               <div className="group">

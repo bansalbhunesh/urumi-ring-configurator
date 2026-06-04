@@ -39,6 +39,50 @@ export function setRingPose(yaw: number | null, pitch: number | null = yaw) {
   _ringPitchTarget = pitch;
 }
 
+export type RingMotionReason = "metal" | "stone" | "pointer" | "park" | "reset";
+export type RingMotionMode = "physical" | "parked" | "reduced" | "hidden";
+export type ActiveChapter =
+  | "impact"
+  | "inspection"
+  | "config"
+  | "photo"
+  | "ledger"
+  | "finale";
+
+let _ringMotionMode: RingMotionMode = "physical";
+let _activeChapter: ActiveChapter = "impact";
+export function getRingMotionMode() {
+  return _ringMotionMode;
+}
+export function setRingMotionMode(mode: RingMotionMode) {
+  _ringMotionMode = mode;
+}
+export function getActiveChapter() {
+  return _activeChapter;
+}
+export function setActiveChapter(chapter: ActiveChapter) {
+  _activeChapter = chapter;
+}
+
+let _ringMotionSeq = 0;
+let _ringMotionReason: RingMotionReason = "reset";
+export function getRingMotionSeq() {
+  return _ringMotionSeq;
+}
+export function getRingMotionReason() {
+  return _ringMotionReason;
+}
+export function nudgeRing(reason: RingMotionReason) {
+  _ringMotionSeq += 1;
+  _ringMotionReason = reason;
+  _ringMotionMode = reason === "park" ? "parked" : "physical";
+  _ringYawTarget = null;
+  _ringPitchTarget = null;
+}
+export function parkRingForConfigurator() {
+  nudgeRing("park");
+}
+
 interface ConfiguratorState {
   metal: MetalId;
   stone: StoneId;
@@ -47,6 +91,7 @@ interface ConfiguratorState {
   /** Monotonic counter bumped on any change — the 3D camera reads it to nudge. */
   changeSeq: number;
   lastChanged: "metal" | "stone" | null;
+  inspectionMode: boolean;
 
   /** Inner-band engraving — the words only the two of them will read. */
   engraving: string;
@@ -62,6 +107,7 @@ interface ConfiguratorState {
   setEngraving: (text: string) => void;
   setSize: (size: number) => void;
   setPreviewMetal: (metal: MetalId | null) => void;
+  setInspectionMode: (open: boolean) => void;
   openCart: () => void;
   closeCart: () => void;
   showToast: (message: string) => void;
@@ -76,6 +122,7 @@ export const useConfigurator = create<ConfiguratorState>((set) => ({
   previewMetal: null,
   changeSeq: 0,
   lastChanged: null,
+  inspectionMode: false,
   engraving: "",
   size: 6.5,
   cartOpen: false,
@@ -99,6 +146,7 @@ export const useConfigurator = create<ConfiguratorState>((set) => ({
     set({ engraving: text.replace(/\s+/g, " ").slice(0, 24) }),
   setSize: (size) => set({ size }),
   setPreviewMetal: (metal) => set({ previewMetal: metal }),
+  setInspectionMode: (inspectionMode) => set({ inspectionMode }),
   openCart: () => set({ cartOpen: true }),
   closeCart: () => set({ cartOpen: false }),
   showToast: (message) => set({ toast: message }),

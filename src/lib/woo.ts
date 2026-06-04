@@ -1,7 +1,9 @@
 import "server-only";
 import {
   METAL_FROM_TERM,
+  METALS,
   PRODUCT_SLUG,
+  STONES,
   STONE_FROM_TERM,
 } from "./config";
 import type {
@@ -37,8 +39,8 @@ const ENABLED = process.env.WOOCOMMERCE_ENABLED === "true";
 
 export const CART_TOKEN_COOKIE = "urumi_cart_token";
 
-const METAL_IDS = new Set<MetalId>(["white-gold", "yellow-gold", "rose-gold"]);
-const STONE_IDS = new Set<StoneId>(["round", "oval", "princess"]);
+const METAL_IDS = new Set<MetalId>(METALS.map((metal) => metal.id));
+const STONE_IDS = new Set<StoneId>(STONES.map((stone) => stone.id));
 
 interface StorePrices {
   currency_code: string;

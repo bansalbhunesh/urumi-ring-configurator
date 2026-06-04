@@ -8,17 +8,8 @@ import { gemGeometryFor, STONE_SCALE } from "./gemGeometry";
 import { useConfigurator } from "@/store/configurator";
 import type { StoneId } from "@/lib/types";
 
-/* ----------------------------------------------------------------------------
-   The centre stone — a 16-facet brilliant rendered with physically-based
-   transmission. backside={true} enables two-pass refraction (renders back
-   faces separately) giving the internal-reflection depth a real diamond has.
-   Tuned for low chromaticAberration so facets stay crisp rather than muddy.
----------------------------------------------------------------------------- */
-
-function easeOutBack(x: number) {
-  const c1 = 1.70158;
-  const c3 = c1 + 1;
-  return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2);
+function easeOutQuint(x: number) {
+  return 1 - Math.pow(1 - x, 5);
 }
 
 export function Gem({ mobile }: { mobile: boolean }) {
@@ -33,61 +24,54 @@ export function Gem({ mobile }: { mobile: boolean }) {
   const groupRef = useRef<THREE.Group>(null);
   const t = useRef(0);
   const age = useRef(0);
+  const settleRoll = useRef(0);
 
   useFrame((state, dt) => {
     age.current += dt;
-    const introDelayPassed = age.current > 1.2;
+    const introDelayPassed = age.current > 1.15;
     const swapping = displayStone !== targetStone;
-
-    const goal = (swapping || !introDelayPassed) ? 0 : 1;
+    const goal = swapping || !introDelayPassed ? 0 : 1;
     t.current = THREE.MathUtils.damp(t.current, goal, 13, dt);
 
-    if (swapping && t.current < 0.04) {
+    if (swapping && t.current < 0.035) {
       setDisplayStone(targetStone);
       t.current = 0.0001;
+      settleRoll.current = 0.12;
     }
 
-    const g = groupRef.current;
-    if (g) {
-      const pop = easeOutBack(THREE.MathUtils.clamp(t.current, 0, 1));
-      const [sx, sy, sz] = STONE_SCALE[displayStone];
-      g.scale.set(sx * pop, sy * pop, sz * pop);
-      // Spin during swap / intro only — holds still once formed
-      const spinRate = (1 - t.current) * 4.2;
-      g.rotation.y += dt * spinRate;
-      // Gentle idle sparkle shimmer: subtle y-oscillation catches light differently
-      g.position.y = Math.sin(state.clock.elapsedTime * 1.3) * 0.004;
-    }
+    const group = groupRef.current;
+    if (!group) return;
 
-    void state;
+    const formed = easeOutQuint(THREE.MathUtils.clamp(t.current, 0, 1));
+    const [sx, sy, sz] = STONE_SCALE[displayStone];
+    group.scale.set(sx * formed, sy * formed, sz * formed);
+
+    settleRoll.current = THREE.MathUtils.damp(settleRoll.current, (1 - t.current) * 0.055, 10, dt);
+    group.rotation.set(settleRoll.current * 0.28, settleRoll.current, -settleRoll.current * 0.2);
+    group.position.y = Math.sin(state.clock.elapsedTime * 0.9) * 0.0018;
   });
 
   return (
     <group ref={groupRef}>
       <mesh geometry={geometry} castShadow receiveShadow>
         <MeshTransmissionMaterial
-          /* Two-pass refraction — renders the inside of the gem for correct
-             internal reflections. This single prop is responsible for the
-             "depth inside the diamond" effect. */
           background={envTexture}
           backside
-          backsideThickness={0.12}
-          samples={mobile ? 6 : 12}
-          resolution={mobile ? 256 : 512}
+          backsideThickness={0.1}
+          samples={mobile ? 5 : 11}
+          resolution={mobile ? 224 : 448}
           transmission={1}
-          thickness={0.72}
+          thickness={0.58}
           ior={2.42}
-          /* Lower chromatic aberration = crisp fire, not muddy blur.
-             0.022 gives subtle rainbow dispersion at facet edges. */
-          chromaticAberration={0.022}
-          anisotropicBlur={0.04}
+          chromaticAberration={0.018}
+          anisotropicBlur={0.006}
           roughness={0}
-          distortion={0.04}
-          temporalDistortion={0.02}
+          distortion={0.006}
+          temporalDistortion={0.0015}
           clearcoat={1}
           clearcoatRoughness={0}
-          attenuationDistance={2.4}
-          attenuationColor="#ffffff"
+          attenuationDistance={3.4}
+          attenuationColor="#f7fbff"
           color="#ffffff"
         />
       </mesh>

@@ -12,7 +12,7 @@
 
 ## What this is
 
-A headless engagement-ring configurator built for DoAmore's twist solitaire. The shopper selects a metal and centre stone, watches every choice reflected **live on a physically-based 3D ring**, and adds to cart — all backed by a real WooCommerce Store API with a seeded mock that holds the same shape when the store is offline.
+A headless engagement-ring configurator built for DoAmore's twist solitaire. The shopper selects a metal and centre stone, watches every choice reflected **live on a physically-based 3D ring** — the metal band renders from a GLB while the centre stone is a procedural `MeshTransmissionMaterial` gem that swaps shape in real-time — and adds to cart. All backed by a real WooCommerce Store API with a seeded mock that holds the same shape when the store is offline.
 
 The design goal is not a product page. It is a film in ten acts: each section has its own lighting, camera language, and motion world. The product is not the story — the transformation is.
 
@@ -137,15 +137,17 @@ Seven Framer Motion components in `src/components/ui/animations/`:
 
 ---
 
-## 3D engineering
+### The ring — hybrid rendering: `RingModel.tsx` + `Gem.tsx`
 
-### The ring — `TwistRing.tsx`
+The production renderer is a hybrid: the Tripo3D-generated GLB provides the metal band and pavé shoulder stones, while the **centre diamond is replaced at runtime** with the procedural Gem component. On load, the GLB's "center" mesh is hidden and its bounding-box centre/size extracted; a `<Gem />` is positioned and scaled to sit exactly where the static diamond was.
 
-Procedural geometry only — no pre-baked mesh. A FrenetFrames walk along a parametric helix generates ribbon cross-sections; two helices interlock as the twist shank. On entry, a Simplex-noise GLSL dissolve shader materialises the ring from nothing — `uProgress` driven by the ring's own entry scale so it always finishes exactly when the ring is full-size.
+This means:
+- **Metal changes** re-material the GLB meshes (instant, no re-download).
+- **Stone shape changes** swap the procedural geometry inside the Gem with an easeOutBack pop-and-spin animation — visible immediately without touching the GLB.
 
-Rotation: drag accumulates `yaw`; pointer parallax adds a subtle `±0.06 rad` pitch; arrow-key fallback for keyboard users. Idle breathes with a sine-eased speed oscillation (not linear — it feels alive).
+A standalone procedural ring also exists (`TwistRing.tsx`) with FrenetFrames-generated helix geometry and a Simplex-noise GLSL dissolve entry shader — available as an alternative renderer.
 
-### The gem — `Gem.tsx`
+### Procedural gem — `Gem.tsx`
 
 `MeshTransmissionMaterial` with `backside={true}` for two-pass refraction — the back faces are rendered separately so internal reflections have real depth. The scene's HDRI is passed as `background` so the gem refracts actual studio light rather than a black void.
 
@@ -209,7 +211,9 @@ src/
 ```
 Click metal/stone → setMetal/setStone (Zustand)
     ↓                     ↓
-TwistRing (useFrame)   useVariation → price odometer → PriceTag
+RingModel (GLB band)   Gem (procedural, reads stone from Zustand)
+    ↓                     ↓
+useVariation → price odometer → PriceTag
     ↓
 Add to Bag → POST /api/cart → woo.ts (live) | mock.ts (fallback)
     ↓
@@ -239,8 +243,9 @@ Every design decision answers one question: **does this increase the perceived v
 - **One hero, one key light.** The ring is the only luminous object. Bloom threshold 0.98: only the diamond sparkles, metal never goes orange.
 - **Restraint over effects.** Ribbons, halos, star-dust and rainbow backgrounds were built, audited against real-GPU screenshots, and cut. The caustic floor and reflective floor remain because they *ground* the ring — they don't decorate around it.
 - **Material truth.** Metal reads precious through accurate PBR (`metalness 1`, tuned roughness per finish) plus studio IBL — not through emissive glow.
-- **Cinematic motion, not scroll animations.** Easing is `[0.22, 1, 0.36, 1]` everywhere. Idle is a breath. Configuration changes feel like events, not UI transitions.
+- **Cinematic motion, not scroll animations.** Easing is `[0.22, 1, 0.36, 1]` everywhere. Idle is a breath. Configuration changes feel like events, not UI transitions. Physics are heavily damped (linearDamping 2.2, angularDamping 2.8, restitution 0.08) so the ring floats with luxury weight — it's a falling jewel, not a pinball.
 - **Never fake the commerce.** Mock mode labels itself. Checkout is disabled rather than pretending. `live: boolean` travels through every API response shape.
+- **Sound as ceremony.** The header sound toggle enables procedural Web Audio feedback: metal ting (triangle wave pitch-drop), crystal ping (sine bell), and celebration chord (C major triad). Off by default, respecting browser autoplay policies.
 
 ---
 

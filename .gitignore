@@ -50,3 +50,6 @@ mobile.png
 interact*.png
 final.png
 .audit/
+
+# GLB photogrammetry source frames (local only)
+glb-source/

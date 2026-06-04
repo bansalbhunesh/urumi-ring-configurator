@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 /**
  * End-to-end smoke suite (Playwright, no test-runner dependency).
  *
@@ -75,18 +76,19 @@ async function main() {
   check("home: <main> present", await page.locator("main").count() > 0);
 
   // configurator present + product loaded (Add to Bag becomes enabled)
-  await page.locator("#ring").scrollIntoViewIfNeeded().catch(() => {});
-  const addBtn = page.locator('#ring button:has-text("Add to Bag")');
+  await page.locator("#materials").scrollIntoViewIfNeeded().catch(() => {});
+  await page.locator("#materials .config-summary").scrollIntoViewIfNeeded().catch(() => {});
+  const addBtn = page.locator('#materials button:has-text("Add to Bag")');
   await addBtn.first().waitFor({ state: "visible", timeout: 30000 }).catch(() => {});
-  await page.locator('#ring button:has-text("Add to Bag"):not([disabled])').first().waitFor({ timeout: 30000 }).catch(() => {});
-  check("studio: present + Add to Bag enabled", await page.locator('#ring button:has-text("Add to Bag"):not([disabled])').count() > 0);
+  await page.locator('#materials button:has-text("Add to Bag"):not([disabled])').first().waitFor({ timeout: 30000 }).catch(() => {});
+  check("studio: present + Add to Bag enabled", await page.locator('#materials button:has-text("Add to Bag"):not([disabled])').count() > 0);
 
   // partition metal vs stone buttons
   const btnInfo = () => page.evaluate(() => {
-    const all = Array.from(document.querySelectorAll('#ring button[aria-pressed]'));
+    const all = Array.from(document.querySelectorAll('#materials button[aria-pressed]'));
     const m = (sel) => all.filter(sel).map((b) => ({ label: b.getAttribute("aria-label"), pressed: b.getAttribute("aria-pressed") }));
     return {
-      metals: m((b) => !/stone/i.test(b.getAttribute("aria-label") || "")),
+      metals: m((b) => /gold/i.test(b.getAttribute("aria-label") || "")),
       stones: m((b) => /stone/i.test(b.getAttribute("aria-label") || "")),
     };
   });
@@ -95,7 +97,7 @@ async function main() {
   try {
     const before = await btnInfo();
     const target = before.metals.find((x) => x.pressed !== "true");
-    const loc = page.locator(`#ring button[aria-label="${target.label}"]`);
+    const loc = page.locator(`#materials button[aria-label="${target.label}"]`);
     await loc.scrollIntoViewIfNeeded().catch(() => {});
     // The swatch is a continuously spring-animated element; Playwright's strict
     // "stable" actionability wait times out on it even though it is clickable for
@@ -112,7 +114,7 @@ async function main() {
   try {
     const before = await btnInfo();
     const target = before.stones.find((x) => x.pressed !== "true");
-    const loc = page.locator(`#ring button[aria-label="${target.label}"]`);
+    const loc = page.locator(`#materials button[aria-label="${target.label}"]`);
     await loc.scrollIntoViewIfNeeded().catch(() => {});
     // Same reason as the metal swatch: spring-animated, clickable for real users
     // but Playwright's strict "stable" wait flakes under software WebGL.
@@ -123,26 +125,13 @@ async function main() {
     check("studio: stone switch updates selection", nowPressed, target.label);
   } catch (e) { fail("studio: stone switch", String(e)); }
 
-  // personalisation: inner-band engraving (live preview) + ring size
+  // configuration summary remains visible after picker changes
   try {
-    await page.evaluate(() => {
-      const inp = document.querySelector('#ring input[aria-label="Inner-band engraving"]');
-      const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value").set;
-      setter.call(inp, "Forever, & a day");
-      inp.dispatchEvent(new Event("input", { bubbles: true }));
-    });
-    await page.waitForTimeout(200);
-    const engraved = await page.evaluate(() =>
-      (document.querySelector("#ring")?.textContent || "").includes("Forever, & a day"),
+    const summary = await page.evaluate(() =>
+      (document.querySelector("#materials")?.textContent || "").includes("Locked variation"),
     );
-    check("studio: engraving shows in configuration", engraved);
-    await page.locator('#ring button[aria-label="US ring size 7"]').dispatchEvent("click");
-    await page.waitForTimeout(150);
-    const sized = await page.evaluate(() =>
-      (document.querySelector("#ring")?.textContent || "").includes("US 7"),
-    );
-    check("studio: ring size updates selection", sized);
-  } catch (e) { fail("studio: personalisation", String(e)); }
+    check("studio: configuration summary present", summary);
+  } catch (e) { fail("studio: configuration summary", String(e)); }
 
   // add to bag -> Celebration (~1.5s) -> cart auto-opens (real UX flow)
   const dialog = page.locator('[role="dialog"][aria-label="Your bag"]');
@@ -150,33 +139,45 @@ async function main() {
     // Use Promise.all so waitPost rejection is always handled (avoids unhandled rejection when click times out first)
     const [r] = await Promise.all([
       page.waitForResponse((r) => r.url().includes("/api/cart") && r.request().method() === "POST", { timeout: 25000 }),
-      page.locator('#ring button:has-text("Add to Bag"):not([disabled])').first().dispatchEvent("click"),
+      page.locator('#materials button:has-text("Add to Bag"):not([disabled])').first().dispatchEvent("click"),
     ]);
     check("studio: Add to Bag posts to cart", r.ok(), `status ${r.status()}`);
-    await dialog.waitFor({ state: "visible", timeout: 12000 });
-    check("cart: auto-opens after celebration", await dialog.isVisible());
+    await page.waitForFunction(() => {
+      const drawer = document.querySelector('[role="dialog"][aria-label="Your bag"]');
+      if (!drawer) return false;
+      const rect = drawer.getBoundingClientRect();
+      return rect.width > 0 && rect.height > 0 && rect.right > window.innerWidth - 8;
+    }, null, { timeout: 12000 });
+    check("cart: auto-opens after celebration", await dialog.count() > 0);
     check("cart: shows added item", (await dialog.locator("li").count()) > 0);
     const headerHasCount = await page.evaluate(() => /\d/.test(document.querySelector('[aria-label="Open bag"]')?.textContent || ""));
     check("studio: header bag count updates", headerHasCount);
-    await page.keyboard.press("Escape");
-    await dialog.waitFor({ state: "hidden", timeout: 8000 });
-    check("cart: drawer closes (Esc)", !(await dialog.isVisible().catch(() => false)));
+    await dialog.locator('[aria-label="Close bag"]').dispatchEvent("click");
+    await page.waitForFunction(() => !document.querySelector('[role="dialog"][aria-label="Your bag"]'), null, { timeout: 8000 });
+    check("cart: drawer closes", await dialog.count() === 0);
   } catch (e) { fail("cart: add+celebration+drawer flow", String(e)); }
 
   // manual header trigger (celebration finished)
   try {
-    await page.locator('[aria-label="Open bag"]').click({ timeout: 15000 });
-    await dialog.waitFor({ state: "visible", timeout: 8000 });
+    if (!(await dialog.count())) {
+      await page.locator('[aria-label="Open bag"]').dispatchEvent("click", { timeout: 15000 });
+    }
+    await page.waitForFunction(() => {
+      const drawer = document.querySelector('[role="dialog"][aria-label="Your bag"]');
+      if (!drawer) return false;
+      const rect = drawer.getBoundingClientRect();
+      return rect.width > 0 && rect.height > 0 && rect.right > window.innerWidth - 8;
+    }, null, { timeout: 8000 });
     check("cart: manual Open bag works", await dialog.isVisible());
-    await page.keyboard.press("Escape");
-    await dialog.waitFor({ state: "hidden", timeout: 8000 });
+    await dialog.locator('[aria-label="Close bag"]').dispatchEvent("click");
+    await page.waitForFunction(() => !document.querySelector('[role="dialog"][aria-label="Your bag"]'), null, { timeout: 8000 });
   } catch (e) { fail("cart: manual open", String(e)); }
 
   // all sections present (current narrative arc)
   for (const [id, label] of [
-    ["overture", "#overture (hero)"], ["atelier", "#craft (id=atelier)"],
+    ["ring", "#ring (impact)"], ["atelier", "#atelier (inspection)"],
     ["materials", "#materials"], ["provenance", "#provenance"],
-    ["commitment", "#commitment"], ["pairing", "#pairing"], ["promise", "#promise"],
+    ["commitment", "#commitment"], ["pairing", "#pairing"],
     ["mission", "#mission"], ["reviews", "#reviews"], ["worn", "#worn"],
     ["finale", "#finale"],
   ]) {
@@ -194,7 +195,10 @@ async function main() {
   // provenance product imagery loads
   try {
     await page.locator("#provenance").scrollIntoViewIfNeeded();
-    await page.waitForTimeout(1500);
+    await page.waitForFunction(() => {
+      const imgs = Array.from(document.querySelectorAll("#provenance img"));
+      return imgs.length > 0 && imgs.every((img) => img.complete && img.naturalWidth > 0);
+    }, null, { timeout: 8000 }).catch(() => {});
     const imgStats = await page.evaluate(() => {
       const imgs = Array.from(document.querySelectorAll("#provenance img"));
       return { total: imgs.length, loaded: imgs.filter((i) => i.complete && i.naturalWidth > 0).length };

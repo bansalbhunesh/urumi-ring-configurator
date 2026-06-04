@@ -1,5 +1,23 @@
-export type MetalId = "white-gold" | "yellow-gold" | "rose-gold";
-export type StoneId = "round" | "oval" | "princess";
+export type MetalId =
+  | "white-gold-14k"
+  | "white-gold"
+  | "yellow-gold-14k"
+  | "yellow-gold"
+  | "rose-gold-14k"
+  | "rose-gold"
+  | "platinum"
+  | "palladium";
+export type StoneId =
+  | "round"
+  | "oval"
+  | "princess"
+  | "cushion"
+  | "emerald"
+  | "radiant"
+  | "pear"
+  | "marquise"
+  | "heart"
+  | "asscher";
 
 export interface MetalOption {
   id: MetalId;

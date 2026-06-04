@@ -1,29 +1,16 @@
 "use client";
 
-/* ============================================================
-   PROVENANCE — animation universe: PRECISION REVEAL
-
-   Where the ring comes from, and why that matters. Do Amore's
-   credibility substance (recycled certified gold, spec truth,
-   the wooden box) rendered in our dark studio world.
-
-   The product still sits in a soft pool of light on the left;
-   the spec column draws itself in line by line on the right,
-   like an inspector's report being typed. The metaphor of the
-   twist — two paths interwoven — is stated plainly, once.
-   ============================================================ */
-
 import { motion } from "framer-motion";
 import { Reveal, RevealStagger, RevealItem } from "@/components/ui/Reveal";
 import { SplitText } from "@/components/ui/SplitText";
 
 const SPECS: { k: string; v: string }[] = [
-  { k: "Metal", v: "18k recycled gold · independently certified" },
-  { k: "Setting", v: "Pavé twist · four-claw basket" },
-  { k: "Diamonds", v: "28 stones · 0.10 ctw · VS clarity" },
-  { k: "Profile", v: "2.0 mm height · 2.2 mm width" },
-  { k: "Fit", v: "Comfort-fit · resizeable for life" },
-  { k: "Arrives in", v: "A box of sustainably harvested beech" },
+  { k: "Metal", v: "18k recycled gold, independently certified" },
+  { k: "Setting", v: "Twist solitaire with four-prong basket" },
+  { k: "Shoulder", v: "One polished strand, one pave strand" },
+  { k: "Diamonds", v: "Round brilliant center with side stones" },
+  { k: "Profile", v: "Slim split shank with comfort-fit interior" },
+  { k: "Configurator", v: "Variation, price, SKU, and cart stay synchronized" },
 ];
 
 export function Provenance() {
@@ -31,58 +18,40 @@ export function Provenance() {
     <section
       id="provenance"
       data-ring="hidden"
-      className="relative overflow-hidden px-6 py-32 sm:px-10 lg:px-16 lg:py-48"
+      className="relative overflow-hidden px-6 py-24 sm:px-10 lg:px-16 lg:py-32"
     >
       <div className="mx-auto grid max-w-6xl items-center gap-14 lg:grid-cols-2 lg:gap-20">
-        {/* Product in a pool of light */}
         <Reveal mode="rise" className="order-2 lg:order-1">
           <div className="relative mx-auto aspect-square w-full max-w-md">
-            {/* soft warm pool behind the ring */}
-            <div
-              className="absolute inset-0 -z-10 blur-2xl"
-              style={{
-                background:
-                  "radial-gradient(circle at 50% 45%, rgba(190,150,80,0.35), transparent 62%)",
-              }}
-              aria-hidden
-            />
             <motion.div
-              className="group relative h-full w-full overflow-hidden rounded-[2px] p-4"
-              style={{
-                // A warm studio plate — the photograph is on white, so we frame
-                // it as a deliberate gallery print rather than fighting it.
-                background:
-                  "linear-gradient(160deg, #f3ead9 0%, #e7d8c0 100%)",
-                boxShadow:
-                  "0 40px 90px -40px rgba(0,0,0,0.85), inset 0 0 0 1px rgba(190,150,80,0.35)",
-              }}
-              initial={{ scale: 1.04 }}
+              className="group relative h-full w-full overflow-hidden border border-line bg-porcelain p-4 shadow-soft"
+              initial={{ scale: 1.02 }}
               whileInView={{ scale: 1 }}
               viewport={{ once: true, margin: "-80px" }}
-              transition={{ duration: 1.6, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: 1.1, ease: [0.16, 1, 0.3, 1] }}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/img/doamore/twist-round-white-gold.jpg"
-                alt="The Twist engagement ring — recycled white gold, pavé twist band"
+                alt="The Twist engagement ring in white gold, front view"
                 className="h-full w-full object-contain transition-opacity duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:opacity-0"
                 loading="lazy"
               />
-              {/* second view — revealed on hover, a turn of the wrist */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/img/doamore/twist-round-white-gold-angle.jpg"
-                alt="The Twist engagement ring, three-quarter view"
+                alt="The Twist engagement ring in white gold, three-quarter view"
                 className="absolute inset-4 h-[calc(100%-2rem)] w-[calc(100%-2rem)] object-contain opacity-0 transition-opacity duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:opacity-100"
-                loading="lazy"
+                loading="eager"
                 aria-hidden
               />
               <span className="absolute bottom-3 left-4 z-10 font-mono text-[0.6rem] uppercase tracking-[0.2em] text-paper-ink/45">
-                Plate 01 · The Twist
-                <span className="ml-2 opacity-0 transition-opacity duration-500 group-hover:opacity-100">· ¾ view</span>
+                Plate 01 / The Twist
+                <span className="ml-2 opacity-0 transition-opacity duration-500 group-hover:opacity-100">
+                  / three-quarter
+                </span>
               </span>
             </motion.div>
-            {/* hairline frame corners — the inspector's crop marks */}
             {[
               "left-0 top-0 border-l border-t",
               "right-0 top-0 border-r border-t",
@@ -98,29 +67,25 @@ export function Provenance() {
           </div>
         </Reveal>
 
-        {/* The narrative + spec ledger */}
         <div className="order-1 lg:order-2">
           <Reveal mode="rise">
-            <span className="eyebrow">Origin &amp; craftsmanship</span>
+            <span className="eyebrow">Spec ledger</span>
           </Reveal>
 
           <Reveal mode="rise" delay={0.05} className="mt-5">
             <SplitText as="h2" className="display-3 text-ink">
-              Made to be traced back.
+              The product page should feel traceable.
             </SplitText>
           </Reveal>
 
           <Reveal mode="clip" delay={0.12} className="mt-6">
             <p className="max-w-md text-[1.05rem] leading-relaxed text-ink-soft">
-              Two bands drawn from the same vine — one set with pavé, one left as
-              pure metal — wound together until they read as one. The gold is{" "}
-              <span className="text-ink">100% recycled</span> and independently
-              certified, so the only thing this ring costs the earth is the
-              patience it took to make.
+              The visual system borrows from a jeweler&apos;s bench: plates, crop
+              marks, hairline rules, and close inspection. The emotion comes
+              from confidence in the object, not from decorative noise.
             </p>
           </Reveal>
 
-          {/* Spec ledger — draws in line by line */}
           <RevealStagger delay={0.2} stagger={0.09} className="mt-10 max-w-md">
             {SPECS.map((s) => (
               <RevealItem key={s.k} mode="clip">

@@ -255,8 +255,10 @@ export function TwistRing({
   const gl = useThree((s) => s.gl);
 
   useEffect(() => {
-    gl.domElement.style.cursor = "grab";
-    return () => { gl.domElement.style.cursor = "auto"; };
+    gl.domElement.classList.add("can-drag-ring");
+    return () => {
+      gl.domElement.classList.remove("can-drag-ring", "is-dragging-ring");
+    };
   }, [gl]);
 
   const drag = useRef({ active: false, lastX: 0, yaw: 0, vel: 0 });
@@ -265,7 +267,7 @@ export function TwistRing({
     drag.current.active = true;
     drag.current.lastX = e.clientX;
     drag.current.vel = 0;
-    gl.domElement.style.cursor = "grabbing";
+    gl.domElement.classList.add("is-dragging-ring");
     setRingPose(null, null);
     (e.target as Element)?.setPointerCapture?.(e.pointerId);
     e.stopPropagation();
@@ -281,7 +283,7 @@ export function TwistRing({
   };
   const onPointerUp = (e: ThreeEvent<PointerEvent>) => {
     drag.current.active = false;
-    gl.domElement.style.cursor = "grab";
+    gl.domElement.classList.remove("is-dragging-ring");
     if (Math.abs(drag.current.vel) < 0.006) {
       const snap = Math.round(drag.current.yaw / (Math.PI / 4)) * (Math.PI / 4);
       drag.current.yaw = snap;

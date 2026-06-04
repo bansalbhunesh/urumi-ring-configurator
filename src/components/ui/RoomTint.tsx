@@ -8,9 +8,14 @@ import type { MetalId } from "@/lib/types";
    that cools for white gold, warms for yellow, blushes for rose — felt, not
    noticed. The 3D environment carries the obvious signal; this carries the mood. */
 const TINT: Record<MetalId, string> = {
+  "white-gold-14k": "#dce4f2",
   "white-gold": "#dbe6ff",
+  "yellow-gold-14k": "#f6d995",
   "yellow-gold": "#ffe6b0",
+  "rose-gold-14k": "#f0bfae",
   "rose-gold": "#ffd6c9",
+  platinum: "#e1e2df",
+  palladium: "#cbc5c2",
 };
 
 export function RoomTint() {
