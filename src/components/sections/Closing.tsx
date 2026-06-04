@@ -1,99 +1,68 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { Reveal } from "@/components/ui/Reveal";
-import { SplitText } from "@/components/ui/SplitText";
-import { MagneticButton } from "@/components/ui/animations/MagneticButton";
+import { AddToCartButton } from "@/components/studio/AddToCartButton";
+import { PriceTag } from "@/components/studio/PriceTag";
+import { useProduct } from "@/hooks/useProduct";
+import { useVariation } from "@/hooks/useVariation";
+import { METAL_BY_ID, STONE_BY_ID } from "@/lib/config";
+import { useConfigurator } from "@/store/configurator";
 
-const CI = [0.22, 1, 0.36, 1] as const;
+const TRUST = ["Insured shipping", "Lifetime warranty", "60-day returns", "Conflict-free"] as const;
 
 export function Closing() {
+  const metal = useConfigurator((state) => state.metal);
+  const stone = useConfigurator((state) => state.stone);
+  const size = useConfigurator((state) => state.size);
+  const { data: product, isLoading } = useProduct();
+  const { variation, price } = useVariation(product, metal, stone);
+  const symbol = product?.currencySymbol ?? "$";
+  const activeStone = STONE_BY_ID[stone];
+
   return (
     <section
       id="finale"
       data-ring="finale"
-      className="relative flex min-h-[100svh] flex-col items-center justify-between overflow-hidden px-6 pt-28 pb-24 text-center sm:pt-32"
+      className="finale-chapter relative flex min-h-[100svh] flex-col justify-between overflow-hidden px-5 py-20 text-bench-ink sm:px-8 lg:px-14 lg:py-24"
     >
-      {/* Deep ambient glow — the ring has returned to centre stage */}
-      <div
-        className="pointer-events-none absolute inset-0"
-        aria-hidden
-        style={{
-          background:
-            "radial-gradient(ellipse 65% 55% at 50% 38%, rgba(200,165,107,0.12) 0%, transparent 68%)",
-        }}
-      />
+      <div className="finale-chapter__mark" aria-hidden />
 
-      {/* Fine horizontal rule above — entering the finale */}
-      <motion.div
-        className="relative z-10 w-full max-w-xs"
-        initial={{ scaleX: 0 }}
-        whileInView={{ scaleX: 1 }}
-        viewport={{ once: true }}
-        transition={{ duration: 1.4, ease: CI }}
-        style={{ originX: 0.5 }}
-      >
-        <div className="rule-gold h-px" />
-      </motion.div>
+      <div className="relative z-30 mx-auto w-full max-w-3xl text-center">
+        <p className="aurelle-kicker">The reveal</p>
+        <h2 className="mt-3 font-display text-[clamp(2.2rem,4.4vw,4.2rem)] font-semibold leading-[0.95]">
+          Your ring, ready.
+        </h2>
+        <p className="mx-auto mt-4 max-w-md text-[0.95rem] leading-relaxed text-bench-muted">
+          {METAL_BY_ID[metal].label} · {activeStone.label} {activeStone.carat} centre stone.
+          Some choices last forever — this is yours.
+        </p>
+      </div>
 
-      <Reveal mode="rise" className="relative z-10 mx-auto max-w-xl mt-8">
-        <span className="eyebrow">Forever</span>
-        <SplitText
-          as="p"
-          className="font-display mt-6 text-balance text-[1.65rem] leading-snug text-ink sm:text-[2.1rem]"
-          mode="push"
-          stagger={0.045}
-          delay={0.1}
-        >
-          Somewhere, someone is about to ask the most important question of their life.
-        </SplitText>
-        <motion.p
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 1.1, ease: CI, delay: 0.7 }}
-          className="font-display mt-5 text-xl italic text-gold sm:text-2xl"
-        >
-          This is what they&apos;ll be holding.
-        </motion.p>
-        <div className="mx-auto mt-7 max-w-[7rem]">
-          <div className="rule-gold h-px" />
+      <div className="relative z-30 mx-auto w-full max-w-5xl">
+        <div className="finale-reveal">
+          <div className="finale-reveal__spec">
+            <span>Configuration</span>
+            <div className="finale-reveal__chips">
+              <b>{METAL_BY_ID[metal].label}</b>
+              <b>{activeStone.label}</b>
+              <b>US {size}</b>
+            </div>
+          </div>
+
+          <div className="finale-reveal__buy">
+            <p className="font-sans text-[clamp(2rem,3vw,3rem)] font-semibold leading-none tabular-nums">
+              <PriceTag value={price} symbol={symbol} />
+            </p>
+            <div className="w-full max-w-xs">
+              <AddToCartButton variationId={variation?.id} loading={isLoading} />
+            </div>
+          </div>
         </div>
-        <motion.p
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 1, ease: CI, delay: 0.95 }}
-          className="mt-6 text-[0.8rem] uppercase tracking-[0.28em] text-muted"
-        >
-          Some choices last forever
-        </motion.p>
-      </Reveal>
 
-      <div className="relative z-10 flex flex-col items-center gap-5">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 1, ease: CI, delay: 0.3 }}
-        >
-          <MagneticButton
-            href="#materials"
-            className="inline-flex h-14 items-center rounded-full bg-gold/10 border border-gold/60 px-12 text-[0.82rem] uppercase tracking-[0.22em] text-gold outline-none transition-[background-color,border-color,color] hover:bg-gold hover:text-black focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-porcelain"
-            strength={0.28}
-          >
-            Configure yours
-          </MagneticButton>
-        </motion.div>
-        <motion.p
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 1, ease: CI, delay: 0.55 }}
-          className="text-[0.7rem] tracking-wide text-muted"
-        >
-          Complimentary insured shipping · Lifetime warranty · 60-day returns
-        </motion.p>
+        <div className="finale-trust">
+          {TRUST.map((item) => (
+            <span key={item}>{item}</span>
+          ))}
+        </div>
       </div>
     </section>
   );

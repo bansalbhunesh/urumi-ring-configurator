@@ -1,46 +1,82 @@
 "use client";
 
-import { Component, useMemo, type ReactNode } from "react";
+import { Component, useEffect, useMemo, useRef, type ReactNode } from "react";
 import { useGLTF } from "@react-three/drei";
+import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { METAL_BY_ID } from "@/lib/config";
 import type { MetalId } from "@/lib/types";
-import { Gem } from "./Gem";
+import { StoneGem } from "./StoneGem";
 
 export const RING_MODEL_URL = "/models/ring.glb";
 const TARGET_SIZE = 2.95;
 
-function metalMaterial(metalId: MetalId) {
-  const metal = METAL_BY_ID[metalId];
-  const color = new THREE.Color(metal.color).lerp(new THREE.Color("#fffaf2"), 0.28);
+const WARM_WHITE = new THREE.Color("#fff7ec");
+const WASH_GOLD = new THREE.Color("#ffcf8c");
+
+/* A single, premium precious-metal material that lives for the life of the ring.
+   Controlled roughness + restrained envMapIntensity keep it reading as soft
+   polished metal, not blown-out chrome. The colour/roughness are morphed toward
+   the chosen alloy each frame (MetalAnimator) so a metal change *flows* across
+   the band, with a brief gold wash riding over it like liquid light. */
+function createMetalMaterial() {
   return new THREE.MeshPhysicalMaterial({
-    color,
+    color: new THREE.Color("#ededf0").lerp(WARM_WHITE, 0.18),
     metalness: 1,
-    roughness: THREE.MathUtils.clamp(metal.roughness * 1.1, 0.16, 0.32),
-    clearcoat: 0.22,
-    clearcoatRoughness: 0.18,
-    envMapIntensity: 5.6,
-    specularIntensity: 1.32,
-    specularColor: new THREE.Color("#fff7ec"),
-    sheen: 0.08,
-    sheenRoughness: 0.35,
-    sheenColor: new THREE.Color("#ffe7c0"),
+    roughness: 0.22,
+    clearcoat: 0.18,
+    clearcoatRoughness: 0.22,
+    envMapIntensity: 1.25,
+    emissive: WASH_GOLD.clone(),
+    emissiveIntensity: 0,
   });
+}
+
+function MetalAnimator({
+  material,
+  metalId,
+}: {
+  material: THREE.MeshPhysicalMaterial;
+  metalId: MetalId;
+}) {
+  const targetColor = useMemo(() => {
+    const metal = METAL_BY_ID[metalId];
+    return new THREE.Color(metal.color).lerp(WARM_WHITE, 0.16);
+  }, [metalId]);
+  const targetRough = useMemo(
+    () => THREE.MathUtils.clamp(METAL_BY_ID[metalId].roughness * 1.6 + 0.13, 0.16, 0.34),
+    [metalId],
+  );
+  const wash = useRef(0);
+
+  // New alloy chosen → fire the liquid-light wash.
+  useEffect(() => {
+    wash.current = 1;
+  }, [metalId]);
+
+  useFrame((_, dt) => {
+    material.color.lerp(targetColor, 1 - Math.exp(-9 * dt));
+    material.roughness = THREE.MathUtils.damp(material.roughness, targetRough, 9, dt);
+    wash.current = Math.max(0, wash.current - dt * 1.9);
+    material.emissive.copy(WASH_GOLD);
+    material.emissiveIntensity = Math.sin(THREE.MathUtils.clamp(wash.current, 0, 1) * Math.PI) * 0.42;
+  });
+
+  return null;
 }
 
 function paveMaterial() {
   return new THREE.MeshPhysicalMaterial({
     color: new THREE.Color("#ffffff"),
     metalness: 0,
-    roughness: 0.01,
+    roughness: 0.04,
     transparent: true,
-    opacity: 0.76,
-    transmission: 0.72,
-    thickness: 0.1,
-    ior: 2.42,
-    envMapIntensity: 6.2,
-    specularIntensity: 2.6,
-    attenuationDistance: 2.2,
+    opacity: 0.82,
+    transmission: 0.62,
+    thickness: 0.12,
+    ior: 2.2,
+    envMapIntensity: 2.2,
+    attenuationDistance: 2.4,
     attenuationColor: new THREE.Color("#f7fbff"),
     depthWrite: false,
   });
@@ -148,24 +184,23 @@ function getClassifiedClone(scene: THREE.Object3D): ClassifiedClone {
 export function RingModel({ metalId, mobile = false }: { metalId: MetalId; mobile?: boolean }) {
   const { scene } = useGLTF(RING_MODEL_URL);
 
-  const { root, gemPos, gemScaleFactor } = useMemo(() => {
-    const classified = getClassifiedClone(scene);
-    const metalMat = metalMaterial(metalId);
-    const paveMat = paveMaterial();
+  const classified = useMemo(() => getClassifiedClone(scene), [scene]);
+  const metalRef = useRef<THREE.MeshPhysicalMaterial | null>(null);
+  if (!metalRef.current) metalRef.current = createMetalMaterial();
+  const metalMat = metalRef.current;
+  const paveMat = useMemo(() => paveMaterial(), []);
+
+  useEffect(() => {
     for (const mesh of classified.metalMeshes) mesh.material = metalMat;
     for (const mesh of classified.paveMeshes) mesh.material = paveMat;
-    return {
-      root: classified.root,
-      gemPos: classified.gemPos,
-      gemScaleFactor: classified.gemScaleFactor,
-    };
-  }, [scene, metalId]);
+  }, [classified, metalMat, paveMat]);
 
   return (
     <group>
-      <primitive object={root} />
-      <group position={gemPos} scale={gemScaleFactor}>
-        <Gem mobile={mobile} />
+      <primitive object={classified.root} />
+      <MetalAnimator material={metalMat} metalId={metalId} />
+      <group position={classified.gemPos} scale={classified.gemScaleFactor}>
+        <StoneGem mobile={mobile} />
       </group>
     </group>
   );

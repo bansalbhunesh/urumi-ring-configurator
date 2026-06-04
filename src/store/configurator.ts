@@ -49,6 +49,17 @@ export type ActiveChapter =
   | "ledger"
   | "finale";
 
+/* Orbit halo strength 0→1 — 1 while the configurator stage is in view (the ten
+   stones orbit the ring), 0 elsewhere. Set by the scene director, read by the
+   orbiting-stones halo each frame. Lives outside React to avoid re-renders. */
+let _orbitStrength = 0;
+export function getOrbitStrength() {
+  return _orbitStrength;
+}
+export function setOrbitStrength(v: number) {
+  _orbitStrength = v;
+}
+
 let _ringMotionMode: RingMotionMode = "physical";
 let _activeChapter: ActiveChapter = "impact";
 export function getRingMotionMode() {

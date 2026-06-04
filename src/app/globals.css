@@ -304,54 +304,55 @@ input[type="range"].lux-range::-moz-range-thumb {
   }
 }
 
-/* Hallmark reset pass: product-first editorial, not dark cinematic demo. */
+/* Aurelle — unified dark cinematic palette.
+   One room, one light: black velvet warmed by a single champagne pool.
+   No light flip, no grid — the ring is the only thing that should glow. */
 :root {
-  color-scheme: light;
-  --color-ivory: oklch(94% 0.020 78);
-  --color-ivory-deep: oklch(88% 0.025 74);
-  --color-porcelain: oklch(97% 0.013 78);
-  --color-champagne: oklch(91% 0.030 76);
-  --color-ink: oklch(18% 0.018 55);
-  --color-ink-soft: oklch(38% 0.020 55);
-  --color-muted: oklch(56% 0.018 60);
-  --color-line: oklch(78% 0.025 70);
-  --color-gold: oklch(58% 0.086 72);
-  --color-gold-bright: oklch(68% 0.088 78);
-  --color-gold-warm: oklch(45% 0.070 66);
-  --color-border: oklch(78% 0.025 70);
-  --color-card: oklch(97% 0.013 78);
-  --color-card-foreground: oklch(18% 0.018 55);
-  --color-muted-foreground: oklch(56% 0.018 60);
+  color-scheme: dark;
+  --color-ivory: oklch(4.2% 0.006 60);
+  --color-ivory-deep: oklch(2.4% 0.004 60);
+  --color-porcelain: oklch(6% 0.009 62);
+  --color-champagne: oklch(9% 0.012 62);
+  --color-ink: oklch(94% 0.020 82);
+  --color-ink-soft: oklch(80% 0.018 80);
+  --color-muted: oklch(64% 0.016 76);
+  --color-line: oklch(30% 0.020 66);
+  --color-gold: oklch(78% 0.098 74);
+  --color-gold-bright: oklch(88% 0.085 84);
+  --color-gold-warm: oklch(58% 0.078 64);
+  --color-border: oklch(30% 0.020 66);
+  --color-card: oklch(6% 0.009 62);
+  --color-card-foreground: oklch(94% 0.020 82);
+  --color-muted-foreground: oklch(64% 0.016 76);
   --color-bench: oklch(11% 0.020 68);
   --color-bench-deep: oklch(6% 0.014 62);
-  --color-bench-panel: oklch(17% 0.020 68);
-  --color-bench-ink: oklch(91% 0.030 78);
-  --color-bench-muted: oklch(67% 0.030 74);
+  --color-bench-panel: oklch(15% 0.020 66);
+  --color-bench-ink: oklch(93% 0.026 80);
+  --color-bench-muted: oklch(70% 0.028 74);
   --color-bench-line: oklch(40% 0.038 70);
-  --color-bench-gold: oklch(70% 0.112 69);
+  --color-bench-gold: oklch(78% 0.110 72);
 }
 
 body {
-  background-color: var(--color-ivory);
+  background-color: #060504;
+  /* warm champagne pool, high-centre, falling into black velvet */
   background-image:
-    radial-gradient(58% 42% at 72% 14%, color-mix(in oklch, var(--color-gold) 16%, transparent), transparent 68%),
-    linear-gradient(180deg, var(--color-porcelain) 0%, var(--color-ivory) 42%, var(--color-champagne) 100%);
+    radial-gradient(64% 48% at 50% 6%, rgba(214, 170, 104, 0.17), transparent 60%),
+    radial-gradient(42% 40% at 84% 72%, rgba(122, 98, 64, 0.07), transparent 72%),
+    linear-gradient(180deg, #0b0907 0%, #070605 50%, #040302 100%);
   color: var(--color-ink);
 }
 
+/* The single light — a soft warm pool that gently breathes (no grid). */
 body::before {
-  background:
-    linear-gradient(90deg, color-mix(in oklch, var(--color-line) 48%, transparent) 1px, transparent 1px),
-    linear-gradient(180deg, color-mix(in oklch, var(--color-line) 34%, transparent) 1px, transparent 1px);
-  background-size: 72px 72px;
-  mask-image: linear-gradient(180deg, black 0%, transparent 68%);
-  opacity: 0.3;
-  animation: none;
+  background: radial-gradient(46% 32% at 50% 3%, rgba(255, 240, 214, 0.17), transparent 72%);
+  opacity: 0.8;
+  animation: fx-breathe 16s var(--ease-lux) infinite;
 }
 
 .bg-stage,
 .bg-stage-soft {
-  background: var(--color-ivory);
+  background: #060504;
 }
 
 .bench-chapter {
@@ -1795,5 +1796,844 @@ body::before {
 
   .configurator-summary {
     grid-template-columns: 1fr;
+  }
+}
+
+/* Deadline recovery: product-first Oryzo-style chapter system ---------------- */
+.aurelle-product-story {
+  background:
+    radial-gradient(58% 42% at 72% 18%, rgba(222, 176, 105, 0.16), transparent 70%),
+    linear-gradient(180deg, #080604 0%, #0d0905 48%, #110d08 100%);
+}
+
+.aurelle-hero {
+  background:
+    radial-gradient(46% 52% at 72% 50%, rgba(255, 233, 196, 0.13), transparent 62%),
+    radial-gradient(28% 30% at 16% 26%, rgba(116, 96, 66, 0.18), transparent 74%),
+    linear-gradient(180deg, #080604 0%, #0d0905 68%, #120d08 100%);
+}
+
+.aurelle-hero__grain,
+.aurelle-inspection::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(90deg, rgba(255, 233, 196, 0.045) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(255, 233, 196, 0.032) 1px, transparent 1px);
+  background-size: 76px 76px;
+  mask-image: radial-gradient(ellipse at 64% 48%, black 0 48%, transparent 82%);
+}
+
+.aurelle-hero__orbit {
+  position: absolute;
+  right: clamp(1rem, 7vw, 7rem);
+  top: 50%;
+  width: min(52vw, 48rem);
+  aspect-ratio: 1;
+  transform: translateY(-50%);
+  border: 1px solid rgba(228, 187, 118, 0.18);
+  border-radius: 999px;
+  pointer-events: none;
+  background:
+    radial-gradient(circle, rgba(255, 242, 220, 0.055) 0 30%, transparent 31%),
+    repeating-radial-gradient(circle, rgba(228, 187, 118, 0.09) 0 1px, transparent 1px 54px);
+  mask-image: radial-gradient(circle, black 0 66%, transparent 79%);
+}
+
+.aurelle-hero__stage-note {
+  position: absolute;
+  right: clamp(1.25rem, 5vw, 5rem);
+  bottom: 7svh;
+  z-index: 31;
+  color: rgba(231, 199, 145, 0.72);
+  font-size: 0.64rem;
+  text-transform: uppercase;
+}
+
+.aurelle-config {
+  position: relative;
+  z-index: 34;
+  display: grid;
+  gap: clamp(0.78rem, 1.6svh, 1.08rem);
+  max-width: 31rem;
+  padding: clamp(0.82rem, 1.6vw, 1.12rem);
+  border: 1px solid rgba(228, 187, 118, 0.22);
+  background:
+    linear-gradient(180deg, rgba(255, 241, 220, 0.05), rgba(0, 0, 0, 0.18)),
+    rgba(12, 8, 5, 0.82);
+  box-shadow: 0 28px 100px rgba(0, 0, 0, 0.44);
+  backdrop-filter: blur(10px);
+}
+
+.aurelle-kicker {
+  color: rgba(231, 199, 145, 0.82);
+  font-size: 0.66rem;
+  font-weight: 650;
+  text-transform: uppercase;
+}
+
+.aurelle-config__price {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: 1rem;
+  border-top: 1px solid rgba(228, 187, 118, 0.2);
+  border-bottom: 1px solid rgba(228, 187, 118, 0.2);
+  padding: 0.68rem 0;
+}
+
+.aurelle-picker {
+  min-width: 0;
+}
+
+.aurelle-metal-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.aurelle-metal,
+.aurelle-stone {
+  border: 1px solid rgba(228, 187, 118, 0.2);
+  background: rgba(255, 241, 220, 0.035);
+  color: var(--color-bench-ink);
+  transition:
+    transform 180ms var(--ease-lux),
+    border-color 180ms var(--ease-lux),
+    background-color 180ms var(--ease-lux);
+}
+
+.aurelle-metal {
+  display: grid;
+  gap: 0.38rem;
+  min-height: 3.7rem;
+  padding: 0.42rem;
+  text-align: left;
+}
+
+.aurelle-metal__swatch {
+  display: block;
+  height: 1.08rem;
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.55),
+    inset 0 -10px 18px rgba(0, 0, 0, 0.22);
+}
+
+.aurelle-metal span:last-child,
+.aurelle-stone span {
+  display: block;
+  font-size: 0.66rem;
+  line-height: 1.05;
+}
+
+.aurelle-metal em,
+.aurelle-stone em {
+  display: block;
+  margin-top: 0.18rem;
+  color: rgba(213, 188, 147, 0.72);
+  font-size: 0.55rem;
+  font-style: normal;
+  text-transform: uppercase;
+}
+
+.aurelle-stone-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.46rem;
+}
+
+.aurelle-stone {
+  display: grid;
+  min-height: 4.18rem;
+  place-items: center;
+  gap: 0.1rem;
+  padding: 0.36rem 0.28rem;
+  text-align: center;
+}
+
+.aurelle-stone .stone-sample {
+  height: 1.9rem;
+  width: 1.9rem;
+}
+
+.stone-sample-3d {
+  overflow: hidden;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 50% 48%, rgba(255, 255, 255, 0.12), transparent 48%),
+    radial-gradient(circle at 50% 58%, rgba(228, 187, 118, 0.1), transparent 66%);
+}
+
+.aurelle-stone svg {
+  height: 1.58rem;
+  width: 1.58rem;
+}
+
+.aurelle-metal:hover,
+.aurelle-stone:hover,
+.aurelle-metal[data-selected="true"],
+.aurelle-stone[data-selected="true"] {
+  border-color: rgba(235, 197, 127, 0.78);
+  background: rgba(255, 241, 220, 0.085);
+  transform: translateY(-1px);
+}
+
+.aurelle-metal:focus-visible,
+.aurelle-stone:focus-visible {
+  outline: 2px solid var(--color-bench-gold);
+  outline-offset: 3px;
+}
+
+.aurelle-metal[data-selected="true"] .aurelle-metal__swatch,
+.aurelle-stone[data-selected="true"] .stone-sample {
+  outline: 1px solid rgba(235, 197, 127, 0.84);
+  outline-offset: 3px;
+}
+
+.aurelle-action-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.aurelle-text-link {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  border: 1px solid rgba(228, 187, 118, 0.28);
+  padding: 0 1rem;
+  color: rgba(231, 199, 145, 0.86);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+}
+
+.aurelle-ring-frame {
+  position: relative;
+  z-index: 18;
+  min-height: min(72svh, 48rem);
+  border: 1px solid rgba(228, 187, 118, 0.16);
+  background:
+    radial-gradient(ellipse at 50% 68%, rgba(255, 233, 196, 0.08), transparent 46%),
+    linear-gradient(180deg, rgba(255, 244, 224, 0.03), rgba(0, 0, 0, 0.08));
+  box-shadow: inset 0 1px 0 rgba(255, 244, 224, 0.05);
+}
+
+.aurelle-ring-frame__rule {
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(232, 194, 124, 0.42), transparent);
+}
+
+.aurelle-ring-frame__rule--top {
+  top: 22%;
+}
+
+.aurelle-ring-frame__rule--bottom {
+  bottom: 18%;
+}
+
+.aurelle-ring-frame__caption {
+  position: absolute;
+  right: 1rem;
+  top: 1rem;
+  color: rgba(213, 188, 147, 0.65);
+  font-size: 0.62rem;
+  text-transform: uppercase;
+}
+
+.aurelle-inspection {
+  background:
+    radial-gradient(44% 46% at 28% 48%, rgba(255, 232, 196, 0.12), transparent 70%),
+    linear-gradient(180deg, #120d08 0%, #090705 100%);
+}
+
+.aurelle-inspection__plate {
+  position: relative;
+  z-index: 18;
+  min-height: min(68svh, 45rem);
+  border: 1px solid rgba(228, 187, 118, 0.2);
+  background:
+    linear-gradient(90deg, rgba(255, 233, 196, 0.055) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(255, 233, 196, 0.04) 1px, transparent 1px),
+    radial-gradient(circle at 50% 52%, rgba(255, 233, 196, 0.1), transparent 34%);
+  background-size: 42px 42px, 42px 42px, auto;
+}
+
+.aurelle-inspection__copy {
+  position: relative;
+  z-index: 34;
+}
+
+.loupe-ring {
+  position: absolute;
+  left: 16%;
+  top: 18%;
+  width: min(28vw, 18rem);
+  aspect-ratio: 1;
+  border: 1px solid rgba(235, 197, 127, 0.58);
+  border-radius: 999px;
+  box-shadow: 0 0 0 10px rgba(235, 197, 127, 0.035);
+}
+
+.measure-line {
+  position: absolute;
+  height: 1px;
+  background: rgba(235, 197, 127, 0.42);
+}
+
+.measure-line--a {
+  left: 42%;
+  right: 15%;
+  top: 34%;
+}
+
+.measure-line--b {
+  left: 20%;
+  right: 34%;
+  top: 58%;
+}
+
+.measure-line--c {
+  left: 48%;
+  right: 8%;
+  top: 72%;
+}
+
+.inspection-row {
+  display: grid;
+  grid-template-columns: 2.8rem minmax(7rem, 0.45fr) 1fr;
+  gap: 1rem;
+  align-items: baseline;
+  border-top: 1px solid rgba(228, 187, 118, 0.2);
+  padding: 0.9rem 0;
+}
+
+.inspection-row span {
+  color: rgba(231, 199, 145, 0.74);
+  font-size: 0.72rem;
+}
+
+.inspection-row b {
+  font-size: 0.9rem;
+  font-weight: 650;
+}
+
+.inspection-row em {
+  color: var(--color-bench-muted);
+  font-size: 0.88rem;
+  font-style: normal;
+}
+
+@media (max-width: 1023px) {
+  .aurelle-hero {
+    padding-top: 5.75rem;
+  }
+
+  .aurelle-hero__orbit {
+    left: 50%;
+    right: auto;
+    top: 30%;
+    width: min(88vw, 30rem);
+    transform: translate(-50%, -50%);
+  }
+
+  .aurelle-hero__stage-note,
+  .aurelle-ring-frame__caption {
+    display: none;
+  }
+
+  .aurelle-config {
+    margin-top: 44svh;
+    max-width: none;
+    padding: 1rem;
+  }
+
+  .aurelle-config__price {
+    grid-template-columns: 1fr;
+  }
+
+  .aurelle-metal-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .aurelle-stone-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .aurelle-ring-frame {
+    display: none;
+  }
+
+  .aurelle-inspection__plate {
+    min-height: 42svh;
+  }
+
+  .inspection-row {
+    grid-template-columns: 2.2rem 1fr;
+  }
+
+  .inspection-row em {
+    grid-column: 2;
+  }
+}
+
+.photo-chapter {
+  background:
+    radial-gradient(40% 52% at 18% 44%, rgba(255, 231, 196, 0.09), transparent 70%),
+    linear-gradient(180deg, #090705 0%, #0f0a06 100%);
+}
+
+.photo-chapter__hero {
+  position: relative;
+  min-height: min(76svh, 50rem);
+  overflow: hidden;
+  border: 1px solid rgba(228, 187, 118, 0.2);
+  background: #050403;
+}
+
+.photo-chapter__hero img {
+  height: 100%;
+  min-height: inherit;
+  width: 100%;
+  object-fit: cover;
+}
+
+.photo-chapter__shade {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(5, 4, 3, 0.74), transparent 48%),
+    linear-gradient(180deg, transparent 58%, rgba(5, 4, 3, 0.34));
+  pointer-events: none;
+}
+
+.photo-chapter__caption {
+  position: absolute;
+  left: 1rem;
+  bottom: 1rem;
+  display: grid;
+  gap: 0.28rem;
+}
+
+.photo-chapter__caption span,
+.photo-proof span {
+  color: rgba(231, 199, 145, 0.78);
+  font-size: 0.62rem;
+  text-transform: uppercase;
+}
+
+.photo-chapter__caption b {
+  max-width: 16rem;
+  color: var(--color-bench-ink);
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.photo-chapter__copy {
+  position: relative;
+  z-index: 12;
+}
+
+.photo-proof {
+  display: grid;
+  gap: 0.55rem;
+  border: 1px solid rgba(228, 187, 118, 0.18);
+  background: rgba(255, 241, 220, 0.035);
+  padding: 0.55rem;
+}
+
+.photo-proof img {
+  aspect-ratio: 1;
+  width: 100%;
+  object-fit: cover;
+  background: #0a0807;
+}
+
+@media (max-width: 1023px) {
+  .photo-chapter__hero {
+    min-height: 48svh;
+  }
+}
+
+.ledger-chapter {
+  background:
+    linear-gradient(90deg, rgba(255, 233, 196, 0.035) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(255, 233, 196, 0.028) 1px, transparent 1px),
+    linear-gradient(180deg, #0f0a06 0%, #080604 100%);
+  background-size: 88px 88px, 88px 88px, auto;
+}
+
+.ledger-summary,
+.ledger-sheet {
+  border: 1px solid rgba(228, 187, 118, 0.2);
+  background:
+    linear-gradient(180deg, rgba(255, 241, 220, 0.04), rgba(0, 0, 0, 0.16)),
+    rgba(12, 8, 5, 0.74);
+}
+
+.ledger-summary {
+  padding: clamp(1rem, 2.5vw, 2rem);
+}
+
+.ledger-sheet {
+  padding: clamp(0.8rem, 2vw, 1.4rem);
+}
+
+.ledger-price {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1rem;
+  border-top: 1px solid rgba(228, 187, 118, 0.2);
+  padding-top: 1rem;
+}
+
+.ledger-price span,
+.ledger-row span {
+  color: rgba(231, 199, 145, 0.72);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+}
+
+.ledger-price b {
+  font-size: clamp(2rem, 4vw, 4rem);
+  line-height: 0.9;
+}
+
+.ledger-selection {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.ledger-selection span {
+  border: 1px solid rgba(228, 187, 118, 0.2);
+  padding: 0.5rem 0.62rem;
+  color: var(--color-bench-muted);
+  font-size: 0.78rem;
+}
+
+.ledger-row {
+  display: grid;
+  grid-template-columns: minmax(7rem, 0.3fr) 1fr;
+  gap: 1rem;
+  align-items: baseline;
+  border-bottom: 1px solid rgba(228, 187, 118, 0.18);
+  padding: 1rem 0;
+}
+
+.ledger-product-image {
+  margin-bottom: 1rem;
+  border: 1px solid rgba(228, 187, 118, 0.16);
+  background: #0a0807;
+  padding: 0.65rem;
+}
+
+.ledger-product-image img {
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  object-fit: contain;
+}
+
+.ledger-row:first-child {
+  padding-top: 0;
+}
+
+.ledger-row b {
+  font-size: clamp(1.35rem, 2.4vw, 2.4rem);
+  font-weight: 500;
+  line-height: 1;
+}
+
+.ledger-note {
+  margin-top: 1rem;
+  max-width: 32rem;
+  color: var(--color-bench-muted);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+@media (max-width: 640px) {
+  .ledger-row {
+    grid-template-columns: 1fr;
+    gap: 0.4rem;
+  }
+}
+
+.finale-chapter {
+  background:
+    radial-gradient(48% 46% at 62% 48%, rgba(255, 231, 196, 0.14), transparent 72%),
+    linear-gradient(180deg, #080604 0%, #050403 100%);
+}
+
+.finale-chapter__mark {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(58vw, 42rem);
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border: 1px solid rgba(228, 187, 118, 0.18);
+  border-radius: 999px;
+  pointer-events: none;
+  mask-image: radial-gradient(circle, black 0 62%, transparent 78%);
+}
+
+.finale-card {
+  border: 1px solid rgba(228, 187, 118, 0.2);
+  background:
+    linear-gradient(180deg, rgba(255, 241, 220, 0.04), rgba(0, 0, 0, 0.18)),
+    rgba(12, 8, 5, 0.78);
+  padding: clamp(1rem, 2.4vw, 2rem);
+}
+
+.finale-promises {
+  align-self: end;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.6rem;
+}
+
+.finale-promises span {
+  border: 1px solid rgba(228, 187, 118, 0.2);
+  background: rgba(255, 241, 220, 0.035);
+  padding: 0.65rem 0.8rem;
+  color: var(--color-bench-muted);
+  font-size: 0.76rem;
+  text-transform: uppercase;
+}
+
+@media (max-width: 1023px) {
+  .finale-chapter__mark {
+    width: min(88vw, 32rem);
+  }
+
+  .finale-promises {
+    justify-content: flex-start;
+  }
+}
+
+/* ============================================================================
+   Configurator console + centred inspection stage (premium rebuild)
+   ========================================================================== */
+.aurelle-hero__atmos {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(40% 52% at 70% 50%, rgba(255, 232, 196, 0.10), transparent 66%),
+    radial-gradient(64% 40% at 72% 98%, rgba(255, 223, 176, 0.06), transparent 60%);
+}
+
+.aurelle-console {
+  position: relative;
+  z-index: 34;
+  display: grid;
+  gap: clamp(0.85rem, 1.7svh, 1.25rem);
+  padding: clamp(1.1rem, 1.7vw, 1.6rem);
+  border: 1px solid rgba(228, 187, 118, 0.22);
+  background:
+    linear-gradient(180deg, rgba(255, 241, 220, 0.055), rgba(0, 0, 0, 0.22)),
+    rgba(10, 7, 4, 0.74);
+  box-shadow:
+    0 40px 120px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 237, 202, 0.06);
+  backdrop-filter: blur(16px) saturate(1.1);
+}
+
+.aurelle-console__price {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: 1rem;
+  border-top: 1px solid rgba(228, 187, 118, 0.2);
+  border-bottom: 1px solid rgba(228, 187, 118, 0.2);
+  padding: 0.72rem 0;
+}
+
+.aurelle-stage-caption {
+  align-self: end;
+  justify-self: end;
+  display: grid;
+  gap: 0.35rem;
+  max-width: 19rem;
+  padding-bottom: 7svh;
+  text-align: right;
+}
+.aurelle-stage-caption span {
+  color: var(--color-bench-gold);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+.aurelle-stage-caption b {
+  color: var(--color-bench-muted);
+  font-size: 0.92rem;
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+/* Liquid-metal sample — gradient billet with a sheen that flows on hover/active */
+.aurelle-metal__swatch {
+  position: relative;
+  height: 1.55rem;
+  overflow: hidden;
+}
+.aurelle-metal__swatch::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-130%);
+  background: linear-gradient(110deg, transparent 32%, rgba(255, 255, 255, 0.72) 50%, transparent 68%);
+}
+.aurelle-metal:hover .aurelle-metal__swatch::after,
+.aurelle-metal[data-selected="true"] .aurelle-metal__swatch::after {
+  animation: metal-sheen 1.5s var(--ease-lux);
+}
+@keyframes metal-sheen {
+  to {
+    transform: translateX(130%);
+  }
+}
+
+.aurelle-stone__gem {
+  display: block;
+  height: 2.05rem;
+  width: 2.05rem;
+  transition: transform 240ms var(--ease-lux);
+}
+.aurelle-stone:hover .aurelle-stone__gem,
+.aurelle-stone[data-selected="true"] .aurelle-stone__gem {
+  transform: translateY(-2px) scale(1.06);
+}
+
+/* Centred configurator stage — the centre column stays clear for the live ring */
+.aurelle-configure {
+  background:
+    radial-gradient(46% 52% at 50% 48%, rgba(255, 232, 196, 0.10), transparent 66%),
+    linear-gradient(180deg, #0c0805 0%, #080604 100%);
+}
+.aurelle-configure__copy {
+  position: relative;
+  z-index: 20;
+  max-width: 34rem;
+}
+.aurelle-configure__chips {
+  position: relative;
+  z-index: 20;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+}
+.aurelle-chip {
+  display: grid;
+  gap: 0.18rem;
+  flex: 1 1 12rem;
+  min-width: 11rem;
+  max-width: 16rem;
+  border: 1px solid rgba(228, 187, 118, 0.2);
+  background: rgba(255, 241, 220, 0.035);
+  padding: 0.72rem 0.85rem;
+  backdrop-filter: blur(8px);
+}
+.aurelle-chip span {
+  color: var(--color-bench-gold);
+  font-size: 0.62rem;
+  letter-spacing: 0.2em;
+}
+.aurelle-chip b {
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+.aurelle-chip em {
+  color: var(--color-bench-muted);
+  font-size: 0.76rem;
+  font-style: normal;
+}
+
+@media (max-width: 1023px) {
+  .aurelle-stage-caption {
+    display: none;
+  }
+  .aurelle-console {
+    margin-top: 40svh;
+  }
+  .aurelle-configure__copy {
+    max-width: none;
+  }
+}
+
+/* Finale reveal — centre stays clear for the configured ring ---------------- */
+.finale-reveal {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: 1.5rem;
+  border: 1px solid rgba(228, 187, 118, 0.22);
+  background:
+    linear-gradient(180deg, rgba(255, 241, 220, 0.05), rgba(0, 0, 0, 0.22)),
+    rgba(10, 7, 4, 0.72);
+  padding: clamp(1rem, 2vw, 1.6rem);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 40px 120px rgba(0, 0, 0, 0.5);
+}
+.finale-reveal__spec span {
+  color: var(--color-bench-gold);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+.finale-reveal__chips {
+  margin-top: 0.6rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.finale-reveal__chips b {
+  border: 1px solid rgba(228, 187, 118, 0.24);
+  background: rgba(255, 241, 220, 0.04);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.86rem;
+  font-weight: 500;
+}
+.finale-reveal__buy {
+  display: grid;
+  justify-items: end;
+  gap: 0.85rem;
+}
+.finale-trust {
+  margin-top: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.55rem;
+}
+.finale-trust span {
+  border: 1px solid rgba(228, 187, 118, 0.18);
+  background: rgba(255, 241, 220, 0.03);
+  padding: 0.5rem 0.75rem;
+  color: var(--color-bench-muted);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+@media (max-width: 640px) {
+  .finale-reveal {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+  .finale-reveal__buy {
+    justify-items: start;
+  }
+  .finale-reveal__buy .w-full {
+    max-width: none;
   }
 }

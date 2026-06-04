@@ -6,7 +6,7 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { AddToCartButton } from "@/components/studio/AddToCartButton";
 import { PriceTag } from "@/components/studio/PriceTag";
-import { StoneThumb } from "@/components/studio/StoneThumb";
+import { StoneGlyph } from "@/components/studio/StoneGlyph";
 import { playPing, playShimmer } from "@/hooks/useSound";
 import { useProduct } from "@/hooks/useProduct";
 import { useVariation } from "@/hooks/useVariation";
@@ -20,7 +20,6 @@ import {
 } from "@/lib/config";
 import {
   nudgeRing,
-  parkRingForConfigurator,
   setActiveChapter,
   setRingMotionMode,
   useConfigurator,
@@ -28,10 +27,10 @@ import {
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
-const PRODUCT_NOTES = [
-  ["01", "split twist shank"],
-  ["02", "pave shoulder"],
-  ["03", "four-prong basket"],
+const DETAIL_POINTS = [
+  ["01", "Split shank", "two strands cross at the shoulder"],
+  ["02", "Pavé shoulder", "small stones trace one upper ribbon"],
+  ["03", "Four-prong basket", "the round brilliant, lifted to the light"],
 ] as const;
 
 export function RingFilm() {
@@ -59,171 +58,177 @@ export function RingFilm() {
       const triggers = gsap.utils.toArray<HTMLElement>("[data-product-chapter]", root).map((section) =>
         ScrollTrigger.create({
           trigger: section,
-          start: "top 58%",
-          end: "bottom 42%",
+          start: "top 55%",
+          end: "bottom 45%",
           invalidateOnRefresh: true,
-          onEnter: () => applyChapterState(section),
-          onEnterBack: () => applyChapterState(section),
+          onEnter: () => applyChapter(section),
+          onEnterBack: () => applyChapter(section),
         }),
       );
 
-      const parkTrigger = ScrollTrigger.create({
-        trigger: root.querySelector("#materials") as HTMLElement,
-        start: "top 65%",
-        once: true,
-        onEnter: () => {
-          parkRingForConfigurator();
-          setRingMotionMode("parked");
-        },
+      const reveal = gsap.from("[data-reveal-line]", {
+        y: 18,
+        opacity: 0,
+        duration: 0.8,
+        ease: "power3.out",
+        stagger: 0.07,
       });
 
       ScrollTrigger.refresh();
       return () => {
+        reveal.kill();
         triggers.forEach((trigger) => trigger.kill());
-        parkTrigger.kill();
       };
     },
     { scope: rootRef },
   );
 
   return (
-    <div ref={rootRef} className="product-run relative">
+    <div ref={rootRef} className="aurelle-product-story relative">
       <section
         id="ring"
-        data-ring="impact"
-        data-product-chapter="impact"
-        className="product-hero relative min-h-[128svh] overflow-clip text-bench-ink"
+        data-ring="hero"
+        data-product-chapter="hero"
+        className="aurelle-hero relative min-h-[100svh] overflow-hidden px-5 pt-24 pb-12 text-bench-ink sm:px-8 lg:px-14 lg:pt-28"
       >
-        <div className="product-hero__sticky">
-          <div className="product-hero__field" aria-hidden />
-          <div className="product-hero__plate" aria-hidden />
+        <div className="aurelle-hero__atmos" aria-hidden />
 
-          <div className="product-hero__copy">
-            <span className="bench-label">The Twist Engagement Ring</span>
-            <h1 className="mt-5 max-w-[9ch] font-display text-[clamp(3.4rem,8vw,8rem)] font-semibold leading-[0.88]">
-              A ring, held still enough to believe.
-            </h1>
-            <p className="mt-6 max-w-md text-[1rem] leading-relaxed text-bench-muted sm:text-[1.05rem]">
-              Split twist shank, pave shoulder, and a four-prong basket. The first screen should sell the object before the interface asks anything from you.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-2">
-              {PRODUCT_NOTES.map(([n, label]) => (
-                <span key={n} className="product-note">
-                  <b>{n}</b>
-                  {label}
+        <div className="relative z-30 grid min-h-[calc(100svh-9rem)] items-center gap-10 lg:grid-cols-[minmax(23rem,30rem)_minmax(0,1fr)]">
+          <div className="aurelle-console" id="materials">
+            <div data-reveal-line>
+              <p className="aurelle-kicker">Made to order · The Twist</p>
+              <h1 className="mt-2 font-display text-[clamp(2.3rem,3.6vw,3.6rem)] font-semibold leading-[0.92]">
+                The Twist
+                <span className="block text-[0.5em] not-italic tracking-[0.02em] text-bench-gold">
+                  Engagement Ring
                 </span>
-              ))}
+              </h1>
+              <p className="mt-3 max-w-sm text-[0.9rem] leading-relaxed text-bench-muted">
+                A split twist setting — one polished strand, one pavé shoulder, a
+                round brilliant held in a four-prong basket. Configured live.
+              </p>
+            </div>
+
+            <div className="aurelle-console__price" data-reveal-line>
+              <div>
+                <p className="aurelle-kicker">Current build</p>
+                <p className="mt-1 text-[0.8rem] text-bench-muted">
+                  {metalLabel} · {stoneLabel} · US {size}
+                </p>
+              </div>
+              <p className="font-sans text-[clamp(1.7rem,2.4vw,2.5rem)] font-semibold leading-none tabular-nums text-bench-ink">
+                <PriceTag value={price} symbol={symbol} />
+              </p>
+            </div>
+
+            <PickerBlock label="Metal" value={metalLabel} reveal>
+              <div className="aurelle-metal-grid">
+                {METALS.map((item) => {
+                  const selected = item.id === metal;
+                  const premium = METAL_PREMIUM[item.id];
+                  return (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => {
+                        setMetal(item.id);
+                        nudgeRing("metal");
+                        playShimmer();
+                      }}
+                      onFocus={() => setPreviewMetal(item.id)}
+                      onBlur={() => setPreviewMetal(null)}
+                      onPointerEnter={() => setPreviewMetal(item.id)}
+                      onPointerLeave={() => setPreviewMetal(null)}
+                      aria-pressed={selected}
+                      aria-label={`${item.label}, ${item.caption}`}
+                      className="aurelle-metal"
+                      data-selected={selected ? "true" : "false"}
+                    >
+                      <span
+                        className="aurelle-metal__swatch"
+                        style={{ background: `linear-gradient(135deg, ${item.swatch[0]} 0%, ${item.swatch[1]} 58%, ${item.swatch[0]} 100%)` }}
+                        aria-hidden
+                      />
+                      <span>
+                        {item.label.replace(" Gold", "")}
+                        <em>{premium === 0 ? "base" : `+$${premium}`}</em>
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </PickerBlock>
+
+            <PickerBlock label="Centre stone" value={`${activeStone.label} · ${activeStone.carat}`} reveal>
+              <div className="aurelle-stone-grid">
+                {STONES.map((item) => {
+                  const selected = item.id === stone;
+                  const premium = STONE_PREMIUM[item.id];
+                  return (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => {
+                        setStone(item.id);
+                        nudgeRing("stone");
+                        playPing();
+                      }}
+                      aria-pressed={selected}
+                      aria-label={`${item.label} centre stone, ${item.carat}, ${item.caption}`}
+                      className="aurelle-stone"
+                      data-selected={selected ? "true" : "false"}
+                    >
+                      <span className="aurelle-stone__gem">
+                        <StoneGlyph stone={item.id} selected={selected} />
+                      </span>
+                      <span>{item.label}</span>
+                      <em>{premium === 0 ? "base" : `+$${premium}`}</em>
+                    </button>
+                  );
+                })}
+              </div>
+            </PickerBlock>
+
+            <div className="aurelle-action-row" data-reveal-line>
+              <AddToCartButton variationId={variation?.id} loading={isLoading} />
+              <a href="#photo-handoff" className="aurelle-text-link">
+                See it worn
+              </a>
             </div>
           </div>
 
-          <a href="#materials" className="product-hero__cta">
-            Configure the ring
-          </a>
+          <div className="aurelle-stage-caption" aria-hidden>
+            <span>Live preview</span>
+            <b>Ten cuts orbit the ring — your choice flies to the centre.</b>
+          </div>
         </div>
       </section>
 
       <section
-        id="materials"
+        id="inspection"
         data-ring="config"
-        data-product-chapter="config"
-        className="configurator-bench relative min-h-[100svh] overflow-hidden px-5 py-20 text-bench-ink sm:px-10 lg:px-16 lg:py-20"
+        data-product-chapter="inspection"
+        className="aurelle-configure relative flex min-h-[100svh] flex-col justify-between overflow-hidden px-5 py-20 text-bench-ink sm:px-8 lg:px-14 lg:py-24"
       >
-        <div className="configurator-bench__field" aria-hidden />
-        <div className="mx-auto grid min-h-[calc(100svh-12rem)] max-w-7xl items-center gap-8 lg:grid-cols-[minmax(0,1.02fr)_minmax(24rem,0.78fr)]">
-          <div className="configurator-stage" aria-hidden>
-            <span className="configurator-stage__label">Live 3D setting</span>
-            <span className="configurator-stage__rule configurator-stage__rule--top" />
-            <span className="configurator-stage__rule configurator-stage__rule--bottom" />
-          </div>
+        <div className="aurelle-configure__copy">
+          <p className="aurelle-kicker">Turn it in the light</p>
+          <h2 className="mt-3 max-w-[12ch] font-display text-[clamp(2rem,3.6vw,3.6rem)] font-semibold leading-[0.95]">
+            Read the ring before you choose it.
+          </h2>
+          <p className="mt-4 max-w-xs text-[0.95rem] leading-relaxed text-bench-muted">
+            The centre stone you picked is set live — turn it, change the metal,
+            and watch the light move across every facet.
+          </p>
+        </div>
 
-          <div className="configurator-panel">
-            <div className="flex flex-wrap items-start justify-between gap-5 border-b border-bench-line/60 pb-5">
-              <div>
-                <span className="bench-label">Configure</span>
-                <h2 className="mt-2 font-display text-[clamp(2rem,3.4vw,3.2rem)] leading-[0.92]">
-                  Build the ring.
-                </h2>
-                <p className="mt-2 text-[0.82rem] leading-relaxed text-bench-muted">
-                  {METAL_BY_ID[metal].label} / {stoneLabel} / US {size}
-                </p>
-              </div>
-              <div className="grid justify-items-end gap-3 text-right">
-                <p className="font-sans text-3xl font-semibold tabular-nums text-bench-ink">
-                  <PriceTag value={price} symbol={symbol} />
-                </p>
-                <AddToCartButton variationId={variation?.id} loading={isLoading} />
-              </div>
+        <div className="aurelle-configure__chips" aria-hidden>
+          {DETAIL_POINTS.map(([num, title, text]) => (
+            <div key={title} className="aurelle-chip">
+              <span>{num}</span>
+              <b>{title}</b>
+              <em>{text}</em>
             </div>
-
-            <div className="mt-5 space-y-5">
-              <PickerBlock label="Metal" value={metalLabel}>
-                <div className="metal-grid">
-                  {METALS.map((item) => {
-                    const selected = item.id === metal;
-                    const premium = METAL_PREMIUM[item.id];
-                    return (
-                      <button
-                        key={item.id}
-                        type="button"
-                        onClick={() => {
-                          setMetal(item.id);
-                          nudgeRing("metal");
-                          playShimmer();
-                        }}
-                        onFocus={() => setPreviewMetal(item.id)}
-                        onBlur={() => setPreviewMetal(null)}
-                        onPointerEnter={() => setPreviewMetal(item.id)}
-                        onPointerLeave={() => setPreviewMetal(null)}
-                        aria-pressed={selected}
-                        aria-label={`${item.label}, ${item.caption}`}
-                        className="metal-choice"
-                        data-selected={selected ? "true" : "false"}
-                      >
-                        <span
-                          className="metal-choice__swatch"
-                          style={{ background: `linear-gradient(135deg, ${item.swatch[0]}, ${item.swatch[1]})` }}
-                          aria-hidden
-                        />
-                        <span className="metal-choice__text">
-                          <span>{item.label.replace(" Gold", "")}</span>
-                          <em>{premium === 0 ? "base" : `+$${premium}`}</em>
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </PickerBlock>
-
-              <PickerBlock label="Stone" value={`${activeStone.label} / ${activeStone.carat}`}>
-                <div className="stone-grid">
-                  {STONES.map((item) => {
-                    const selected = item.id === stone;
-                    const premium = STONE_PREMIUM[item.id];
-                    return (
-                      <button
-                        key={item.id}
-                        type="button"
-                        onClick={() => {
-                          setStone(item.id);
-                          nudgeRing("stone");
-                          playPing();
-                        }}
-                        aria-pressed={selected}
-                        aria-label={`${item.label} center stone, ${item.carat}, ${item.caption}`}
-                        className="stone-choice"
-                        data-selected={selected ? "true" : "false"}
-                      >
-                        <StoneThumb stone={item.id} selected={selected} />
-                        <span>{item.label}</span>
-                        <em>{premium === 0 ? "base" : `+$${premium}`}</em>
-                      </button>
-                    );
-                  })}
-                </div>
-              </PickerBlock>
-            </div>
-
-          </div>
+          ))}
         </div>
       </section>
     </div>
@@ -233,33 +238,31 @@ export function RingFilm() {
 function PickerBlock({
   label,
   value,
+  reveal,
   children,
 }: {
   label: string;
   value: string;
+  reveal?: boolean;
   children: ReactNode;
 }) {
   return (
-    <section className="picker-block" aria-label={`${label} picker`}>
-      <div className="mb-3 flex items-end justify-between gap-4">
-        <div>
-          <span className="bench-label">{label}</span>
-          <p className="mt-1 font-display text-[1.45rem] leading-none text-bench-ink">{value}</p>
-        </div>
+    <section className="aurelle-picker" aria-label={`${label} picker`} data-reveal-line={reveal ? "" : undefined}>
+      <div className="mb-2.5 flex items-end justify-between gap-4">
+        <p className="aurelle-kicker">{label}</p>
+        <p className="text-right text-[0.74rem] text-bench-muted">{value}</p>
       </div>
       {children}
     </section>
   );
 }
 
-function applyChapterState(section: HTMLElement) {
+function applyChapter(section: HTMLElement) {
   const chapter = section.dataset.productChapter;
-  if (chapter === "impact") {
+  if (chapter === "inspection") {
+    setActiveChapter("inspection");
+  } else {
     setActiveChapter("impact");
-    setRingMotionMode("parked");
   }
-  if (chapter === "config") {
-    setActiveChapter("config");
-    setRingMotionMode("parked");
-  }
+  setRingMotionMode("parked");
 }
