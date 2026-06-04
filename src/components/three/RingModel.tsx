@@ -6,7 +6,7 @@ import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { METAL_BY_ID } from "@/lib/config";
 import type { MetalId } from "@/lib/types";
-import { StoneGem } from "./StoneGem";
+import { Gem } from "./Gem";
 
 export const RING_MODEL_URL = "/models/ring.glb";
 const TARGET_SIZE = 2.95;
@@ -200,7 +200,7 @@ export function RingModel({ metalId, mobile = false }: { metalId: MetalId; mobil
       <primitive object={classified.root} />
       <MetalAnimator material={metalMat} metalId={metalId} />
       <group position={classified.gemPos} scale={classified.gemScaleFactor}>
-        <StoneGem mobile={mobile} />
+        <Gem mobile={mobile} />
       </group>
     </group>
   );

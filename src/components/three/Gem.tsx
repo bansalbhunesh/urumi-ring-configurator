@@ -1,78 +1,80 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useFrame, useThree } from "@react-three/fiber";
-import { MeshTransmissionMaterial } from "@react-three/drei";
+import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { gemGeometryFor, STONE_SCALE } from "./gemGeometry";
 import { useConfigurator } from "@/store/configurator";
 import type { StoneId } from "@/lib/types";
 
-function easeOutQuint(x: number) {
-  return 1 - Math.pow(1 - x, 5);
+/* ----------------------------------------------------------------------------
+   The centre diamond.
+
+   A faceted physical material (not MeshRefractionMaterial — that renders black in
+   software WebGL and needs a bright cube to refract). With flatShading the facets
+   each catch the bright studio soft-boxes, a touch of transmission gives glassy
+   depth, iridescence adds fire, and a faint emissive floor means the stone is
+   never a dead black shape — it reads as a bright, sparkling diamond on every GPU.
+   Geometry is the reliable procedural cut; changing the cut pops the new stone in.
+---------------------------------------------------------------------------- */
+
+function easeOutBack(x: number) {
+  const c1 = 1.70158;
+  const c3 = c1 + 1;
+  return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2);
 }
 
 export function Gem({ mobile }: { mobile: boolean }) {
   const targetStone = useConfigurator((s) => s.stone);
   const [displayStone, setDisplayStone] = useState<StoneId>(targetStone);
-  const { scene } = useThree();
-  const envTexture = (scene.environment as THREE.Texture | null) ?? undefined;
-
   const geometry = useMemo(() => gemGeometryFor(displayStone), [displayStone]);
   useEffect(() => () => geometry.dispose(), [geometry]);
 
   const groupRef = useRef<THREE.Group>(null);
   const t = useRef(0);
   const age = useRef(0);
-  const settleRoll = useRef(0);
 
-  useFrame((state, dt) => {
+  useFrame((_, dt) => {
     age.current += dt;
-    const introDelayPassed = age.current > 1.15;
     const swapping = displayStone !== targetStone;
-    const goal = swapping || !introDelayPassed ? 0 : 1;
-    t.current = THREE.MathUtils.damp(t.current, goal, 13, dt);
-
-    if (swapping && t.current < 0.035) {
+    const intro = age.current > 0.5;
+    const goal = swapping || !intro ? 0 : 1;
+    t.current = THREE.MathUtils.damp(t.current, goal, 14, dt);
+    if (swapping && t.current < 0.04) {
       setDisplayStone(targetStone);
       t.current = 0.0001;
-      settleRoll.current = 0.12;
     }
-
-    const group = groupRef.current;
-    if (!group) return;
-
-    const formed = easeOutQuint(THREE.MathUtils.clamp(t.current, 0, 1));
+    const g = groupRef.current;
+    if (!g) return;
     const [sx, sy, sz] = STONE_SCALE[displayStone];
-    group.scale.set(sx * formed, sy * formed, sz * formed);
-
-    settleRoll.current = THREE.MathUtils.damp(settleRoll.current, (1 - t.current) * 0.055, 10, dt);
-    group.rotation.set(settleRoll.current * 0.28, settleRoll.current, -settleRoll.current * 0.2);
-    group.position.y = Math.sin(state.clock.elapsedTime * 0.9) * 0.0018;
+    const k = Math.max(0.0001, easeOutBack(THREE.MathUtils.clamp(t.current, 0, 1)));
+    g.scale.set(sx * k, sy * k, sz * k);
+    g.rotation.y += dt * 0.16;
   });
 
   return (
     <group ref={groupRef}>
-      <mesh geometry={geometry} castShadow receiveShadow>
-        <MeshTransmissionMaterial
-          background={envTexture}
-          backside
-          backsideThickness={0.1}
-          samples={mobile ? 5 : 11}
-          resolution={mobile ? 224 : 448}
-          transmission={1}
-          thickness={0.58}
-          ior={2.42}
-          chromaticAberration={0.018}
-          anisotropicBlur={0.006}
+      <mesh geometry={geometry} castShadow>
+        <meshPhysicalMaterial
+          color="#ffffff"
+          metalness={0}
           roughness={0}
-          distortion={0.006}
-          temporalDistortion={0.0015}
+          transmission={0.6}
+          thickness={0.5}
+          ior={2.4}
+          reflectivity={1}
+          envMapIntensity={mobile ? 3 : 4.5}
           clearcoat={1}
           clearcoatRoughness={0}
-          attenuationDistance={3.4}
-          attenuationColor="#f7fbff"
-          color="#ffffff"
+          iridescence={0.5}
+          iridescenceIOR={1.45}
+          specularIntensity={1.5}
+          specularColor="#ffffff"
+          attenuationColor="#eaf2ff"
+          attenuationDistance={1.6}
+          emissive="#aebfd8"
+          emissiveIntensity={0.08}
+          flatShading
         />
       </mesh>
     </group>

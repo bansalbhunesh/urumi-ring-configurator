@@ -49,15 +49,28 @@ export type ActiveChapter =
   | "ledger"
   | "finale";
 
-/* Orbit halo strength 0→1 — 1 while the configurator stage is in view (the ten
-   stones orbit the ring), 0 elsewhere. Set by the scene director, read by the
-   orbiting-stones halo each frame. Lives outside React to avoid re-renders. */
-let _orbitStrength = 0;
-export function getOrbitStrength() {
-  return _orbitStrength;
+/* Manual ring rotation from cursor / touch drag. The fixed WebGL canvas is
+   pointer-events:none so the page stays scrollable; an HTML drag-pad over the
+   ring writes the yaw/pitch here and the scene director reads it each frame.
+   Lives outside React so dragging never triggers re-renders. */
+let _userYaw = 0;
+let _userPitch = 0;
+let _dragging = false;
+export function getUserYaw() {
+  return _userYaw;
 }
-export function setOrbitStrength(v: number) {
-  _orbitStrength = v;
+export function getUserPitch() {
+  return _userPitch;
+}
+export function isDragging() {
+  return _dragging;
+}
+export function setDragging(v: boolean) {
+  _dragging = v;
+}
+export function addUserDrag(dxYaw: number, dyPitch: number) {
+  _userYaw += dxYaw;
+  _userPitch = Math.max(-0.6, Math.min(0.6, _userPitch + dyPitch));
 }
 
 let _ringMotionMode: RingMotionMode = "physical";
