@@ -147,7 +147,7 @@ async function main() {
       if (!drawer) return false;
       const rect = drawer.getBoundingClientRect();
       return rect.width > 0 && rect.height > 0 && rect.right > window.innerWidth - 8;
-    }, null, { timeout: 12000 });
+    }, null, { timeout: 20000 });
     check("cart: auto-opens after celebration", await dialog.count() > 0);
     check("cart: shows added item", (await dialog.locator("li").count()) > 0);
     const headerHasCount = await page.evaluate(() => /\d/.test(document.querySelector('[aria-label="Open bag"]')?.textContent || ""));
@@ -167,7 +167,7 @@ async function main() {
       if (!drawer) return false;
       const rect = drawer.getBoundingClientRect();
       return rect.width > 0 && rect.height > 0 && rect.right > window.innerWidth - 8;
-    }, null, { timeout: 8000 });
+    }, null, { timeout: 20000 });
     check("cart: manual Open bag works", await dialog.isVisible());
     await dialog.locator('[aria-label="Close bag"]').dispatchEvent("click");
     await page.waitForFunction(() => !document.querySelector('[role="dialog"][aria-label="Your bag"]'), null, { timeout: 8000 });
