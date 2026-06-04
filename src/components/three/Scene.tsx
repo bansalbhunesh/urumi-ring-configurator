@@ -15,9 +15,11 @@ import { HybridRingModel, ModelBoundary } from "./RingModel";
 import {
   getUserPitch,
   getUserYaw,
+  getUserYawVel,
   isDragging,
   setRingPose,
   setRingReveal,
+  setUserYaw,
   useConfigurator,
 } from "@/store/configurator";
 
@@ -56,6 +58,8 @@ function RingStageDirector({
   const pos = useRef(new THREE.Vector3(isDesktop ? 1.1 : 0, 0, 0));
   const scale = useRef(0.0001);
   const intro = useRef(0);
+  const yaw = useRef(0);
+  const vel = useRef(0);
 
   useFrame((state, dt) => {
     const step = Math.min(dt, 1 / 30);
@@ -87,10 +91,23 @@ function RingStageDirector({
     ring.scale.setScalar(Math.max(0.0001, scale.current));
     ring.visible = scale.current > 0.01;
 
-    // Cursor/touch drag drives yaw + pitch; a slow idle turn when untouched.
-    const dragging = isDragging();
-    const idle = reduceMotion || dragging ? 0 : state.clock.elapsedTime * 0.16;
-    ring.rotation.y = getUserYaw() + idle;
+    // Cursor/touch drag drives yaw with inertia — a flick keeps spinning and
+    // eases to a slow idle turn (Oryzo "weight"). Reduced-motion holds still.
+    if (isDragging()) {
+      yaw.current = getUserYaw();
+      vel.current = getUserYawVel();
+    } else if (reduceMotion) {
+      yaw.current = getUserYaw();
+    } else {
+      vel.current *= 0.94;
+      if (Math.abs(vel.current) > 0.0003) {
+        yaw.current += vel.current;
+      } else {
+        yaw.current += 0.0016; // gentle idle turntable
+      }
+      setUserYaw(yaw.current);
+    }
+    ring.rotation.y = yaw.current;
     ring.rotation.x = THREE.MathUtils.damp(ring.rotation.x, 0.08 + getUserPitch(), 8, step);
   });
 

@@ -7,40 +7,44 @@
    ========================================================================== */
 
 @theme {
-  /* Surfaces — warm espresso atelier, never flat black */
-  --color-ivory: #14110c;
-  --color-ivory-deep: #0e0b08;
-  --color-porcelain: #1c1812;
-  --color-champagne: #221b12;
-  --color-paper: #14110c;
-  --color-paper-ink: #f2e9da;
+  /* Oryzo-grade palette: near-black warm canvas, one warm cream for all text +
+     borders, one buried burnt-orange accent used only as a hairline flourish.
+     No decorative gradients, no drop shadows — atmosphere comes from grain +
+     a single light leak, and from the lit ring itself. */
+  --color-ivory: #100904;
+  --color-ivory-deep: #0a0502;
+  --color-porcelain: #150d06;
+  --color-champagne: #1a1009;
+  --color-paper: #100904;
+  --color-paper-ink: #ffedd7;
 
-  /* Ink — warm off-white */
-  --color-ink: #f3ebdd;
-  --color-ink-soft: #c4b7a3;
-  --color-muted: #8f8270;
-  --color-line: #34291d;
+  /* Cream — every label, heading, body, hairline */
+  --color-ink: #ffedd7;
+  --color-ink-soft: #cdb59b;
+  --color-muted: #8c7b63;
+  --color-line: rgba(255, 237, 215, 0.14);
 
-  /* Accent — champagne gold */
-  --color-gold: #cda76a;
-  --color-gold-bright: #e9cd97;
-  --color-gold-warm: #b08a52;
+  /* Buried burnt-orange accent — hairlines + the rare flourish only */
+  --color-gold: #dc5000;
+  --color-gold-bright: #ff6a24;
+  --color-gold-warm: #b8825a;
 
-  /* shadcn-compat + legacy "bench" names mapped onto the dark palette */
-  --color-border: #34291d;
-  --color-card: #1c1812;
-  --color-card-foreground: #f3ebdd;
-  --color-muted-foreground: #8f8270;
-  --color-bench: #1c1812;
-  --color-bench-deep: #0e0b08;
-  --color-bench-panel: #1c1812;
-  --color-bench-ink: #f3ebdd;
-  --color-bench-muted: #b7a98f;
-  --color-bench-line: #3a2e20;
-  --color-bench-gold: #cda76a;
+  /* legacy/shadcn names mapped onto the same palette */
+  --color-border: rgba(255, 237, 215, 0.14);
+  --color-card: #150d06;
+  --color-card-foreground: #ffedd7;
+  --color-muted-foreground: #8c7b63;
+  --color-bench: #150d06;
+  --color-bench-deep: #0a0502;
+  --color-bench-panel: #150d06;
+  --color-bench-ink: #ffedd7;
+  --color-bench-muted: #cdbc9f;
+  --color-bench-line: rgba(255, 237, 215, 0.14);
+  --color-bench-gold: #dc5000;
 
-  --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.4), 0 18px 48px -22px rgba(0, 0, 0, 0.7);
-  --shadow-lift: 0 2px 8px rgba(0, 0, 0, 0.5), 0 36px 80px -34px rgba(0, 0, 0, 0.85);
+  /* Oryzo uses no drop shadows — keep these as near-noop hairlines */
+  --shadow-soft: 0 0 0 1px rgba(255, 237, 215, 0.06);
+  --shadow-lift: 0 0 0 1px rgba(255, 237, 215, 0.08);
 
   --ease-lux: cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -57,12 +61,11 @@ html {
 }
 
 body {
-  background-color: #0c0a07;
-  /* warm champagne pool high-centre, deepening into espresso — atmosphere, not a flat void */
+  background-color: #100904;
+  /* Oryzo: a flat warm-black canvas + ONE faint light leak (no decorative gradients) */
   background-image:
-    radial-gradient(58% 44% at 76% 6%, rgba(205, 167, 106, 0.14), transparent 58%),
-    radial-gradient(46% 40% at 14% 88%, rgba(120, 92, 56, 0.08), transparent 70%),
-    linear-gradient(180deg, #14110c 0%, #0d0b07 52%, #090703 100%);
+    linear-gradient(118deg, transparent 0%, rgba(220, 80, 0, 0.05) 36%, transparent 52%),
+    radial-gradient(70% 40% at 80% -6%, rgba(255, 237, 215, 0.06), transparent 60%);
   color: var(--color-ink);
   font-family: var(--font-sans);
   font-feature-settings: "ss01";
@@ -123,10 +126,20 @@ body::after {
 .kicker {
   font-family: var(--font-sans);
   text-transform: uppercase;
-  letter-spacing: 0.22em;
-  font-size: 0.7rem;
+  letter-spacing: 0.28em;
+  font-size: 0.68rem;
   font-weight: 600;
-  color: var(--color-gold);
+  color: var(--color-ink-soft);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+/* the one buried accent — a burnt-orange hairline before each label */
+.kicker::before {
+  content: "";
+  width: 1.6rem;
+  height: 1px;
+  background: var(--color-gold);
 }
 .rule-soft {
   height: 1px;
@@ -324,9 +337,9 @@ body::after {
   border-color: var(--color-ink-soft);
 }
 .pp-size[data-selected="true"] {
-  border-color: var(--color-gold);
-  background: var(--color-gold);
-  color: #1a140c;
+  border-color: var(--color-ink);
+  background: var(--color-ink);
+  color: #150d06;
   font-weight: 600;
 }
 
@@ -420,6 +433,7 @@ body::after {
 /* ====================  EDITORIAL SECTIONS  ==================== */
 .pp-section {
   padding: clamp(4rem, 9vh, 7rem) clamp(1.25rem, 5vw, 5rem);
+  border-top: 1px dashed rgba(255, 237, 215, 0.14);
 }
 .pp-wrap {
   margin: 0 auto;

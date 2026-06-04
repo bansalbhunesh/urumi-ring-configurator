@@ -55,9 +55,16 @@ export type ActiveChapter =
    Lives outside React so dragging never triggers re-renders. */
 let _userYaw = 0;
 let _userPitch = 0;
+let _userYawVel = 0;
 let _dragging = false;
 export function getUserYaw() {
   return _userYaw;
+}
+export function setUserYaw(v: number) {
+  _userYaw = v;
+}
+export function getUserYawVel() {
+  return _userYawVel;
 }
 export function getUserPitch() {
   return _userPitch;
@@ -71,6 +78,7 @@ export function setDragging(v: boolean) {
 export function addUserDrag(dxYaw: number, dyPitch: number) {
   _userYaw += dxYaw;
   _userPitch = Math.max(-0.6, Math.min(0.6, _userPitch + dyPitch));
+  _userYawVel = dxYaw; // latest delta → flick momentum on release
 }
 
 let _ringMotionMode: RingMotionMode = "physical";
