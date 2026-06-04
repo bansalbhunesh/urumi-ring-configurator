@@ -78,7 +78,7 @@ export function Closing() {
           transition={{ duration: 1, ease: CI, delay: 0.3 }}
         >
           <MagneticButton
-            href="#ring"
+            href="#materials"
             className="inline-flex h-14 items-center rounded-full bg-gold/10 border border-gold/60 px-12 text-[0.82rem] uppercase tracking-[0.22em] text-gold outline-none transition-[background-color,border-color,color] hover:bg-gold hover:text-black focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-porcelain"
             strength={0.28}
           >

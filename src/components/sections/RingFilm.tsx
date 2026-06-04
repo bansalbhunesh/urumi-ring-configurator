@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, type ReactNode } from "react";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -28,10 +28,10 @@ import {
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
-const INSPECTION_LABELS = [
-  { n: "01", label: "split twist shank", className: "left-[10%] top-[62%]" },
-  { n: "02", label: "pave shoulder", className: "right-[11%] top-[33%]" },
-  { n: "03", label: "four-prong basket", className: "left-[25%] top-[29%]" },
+const PRODUCT_NOTES = [
+  ["01", "split twist shank"],
+  ["02", "pave shoulder"],
+  ["03", "four-prong basket"],
 ] as const;
 
 export function RingFilm() {
@@ -49,237 +49,180 @@ export function RingFilm() {
   const shownMetal = previewMetal ?? metal;
   const metalLabel = METAL_BY_ID[shownMetal].label;
   const stoneLabel = STONE_BY_ID[stone].label;
-  const activeStone = STONES.find((item) => item.id === stone) ?? STONES[0];
+  const activeStone = STONE_BY_ID[stone];
 
   useGSAP(
     () => {
       const root = rootRef.current;
       if (!root) return undefined;
 
-      const mm = gsap.matchMedia();
-      mm.add("(min-width: 768px)", () => {
-        const chapters = gsap.utils.toArray<HTMLElement>(".cinematic-chapter", root);
-        const triggers = chapters.map((chapter) =>
-          ScrollTrigger.create({
-            trigger: chapter,
-            start: "top top",
-            end: "bottom bottom",
-            scrub: 0.65,
-            invalidateOnRefresh: true,
-            onEnter: () => setChapterState(chapter),
-            onEnterBack: () => setChapterState(chapter),
-            onUpdate: (self) => {
-              chapter.style.setProperty("--chapter-progress", self.progress.toFixed(4));
-            },
-          }),
-        );
+      const triggers = gsap.utils.toArray<HTMLElement>("[data-product-chapter]", root).map((section) =>
+        ScrollTrigger.create({
+          trigger: section,
+          start: "top 58%",
+          end: "bottom 42%",
+          invalidateOnRefresh: true,
+          onEnter: () => applyChapterState(section),
+          onEnterBack: () => applyChapterState(section),
+        }),
+      );
 
-        const parkTrigger = ScrollTrigger.create({
-          trigger: root.querySelector("#materials") as HTMLElement,
-          start: "top 62%",
-          once: true,
-          onEnter: () => {
-            parkRingForConfigurator();
-            setRingMotionMode("parked");
-          },
-        });
-
-        ScrollTrigger.refresh();
-        return () => {
-          triggers.forEach((trigger) => trigger.kill());
-          parkTrigger.kill();
-        };
+      const parkTrigger = ScrollTrigger.create({
+        trigger: root.querySelector("#materials") as HTMLElement,
+        start: "top 65%",
+        once: true,
+        onEnter: () => {
+          parkRingForConfigurator();
+          setRingMotionMode("parked");
+        },
       });
 
-      mm.add("(max-width: 767px)", () => {
-        const chapters = gsap.utils.toArray<HTMLElement>(".cinematic-chapter", root);
-        const triggers = chapters.map((chapter) =>
-          ScrollTrigger.create({
-            trigger: chapter,
-            start: "top 60%",
-            end: "bottom 40%",
-            onEnter: () => setChapterState(chapter),
-            onEnterBack: () => setChapterState(chapter),
-          }),
-        );
-        return () => triggers.forEach((trigger) => trigger.kill());
-      });
-
-      return () => mm.revert();
+      ScrollTrigger.refresh();
+      return () => {
+        triggers.forEach((trigger) => trigger.kill());
+        parkTrigger.kill();
+      };
     },
     { scope: rootRef },
   );
 
   return (
-    <div ref={rootRef} className="cinematic-run relative">
+    <div ref={rootRef} className="product-run relative">
       <section
         id="ring"
         data-ring="impact"
-        data-chapter="impact"
-        className="cinematic-chapter chapter-impact relative min-h-[260svh] overflow-clip text-bench-ink"
+        data-product-chapter="impact"
+        className="product-hero relative min-h-[128svh] overflow-clip text-bench-ink"
       >
-        <div className="chapter-sticky">
-          <ChapterField />
-          <div className="impact-meter" aria-hidden>
-            <span />
-            <span />
-            <span />
-          </div>
-          <div className="chapter-copy chapter-copy--impact">
-            <span className="bench-label">Chapter 01 / Impact</span>
-            <h1 className="mt-5 font-display text-[clamp(3.4rem,9vw,9rem)] font-semibold leading-[0.86]">
-              The Twist
-            </h1>
-            <p className="mt-4 font-display text-[clamp(1.45rem,3vw,2.8rem)] italic leading-none text-bench-gold">
-              Engagement Ring
-            </p>
-          </div>
-          <div className="impact-notes" aria-hidden>
-            <span>mass 4.8g</span>
-            <span>off-axis impact</span>
-            <span>polished gold / diamond</span>
-          </div>
-        </div>
-      </section>
+        <div className="product-hero__sticky">
+          <div className="product-hero__field" aria-hidden />
+          <div className="product-hero__plate" aria-hidden />
 
-      <section
-        id="atelier"
-        data-ring="inspection"
-        data-chapter="inspection"
-        className="cinematic-chapter chapter-inspection relative min-h-[215svh] overflow-clip text-bench-ink"
-      >
-        <div className="chapter-sticky">
-          <ChapterField dense />
-          <div className="inspection-loupe" aria-hidden />
-          <div className="chapter-copy chapter-copy--inspection">
-            <span className="bench-label">Chapter 02 / Inspection</span>
-            <h2 className="mt-4 max-w-[9ch] font-display text-[clamp(2.9rem,7vw,7.2rem)] font-semibold leading-[0.9]">
-              Settled by contact.
-            </h2>
-            <p className="mt-5 max-w-sm text-[0.94rem] leading-relaxed text-bench-muted">
-              The side appears because the ring moved through a real event:
-              impact, friction, wobble, rest.
+          <div className="product-hero__copy">
+            <span className="bench-label">The Twist Engagement Ring</span>
+            <h1 className="mt-5 max-w-[9ch] font-display text-[clamp(3.4rem,8vw,8rem)] font-semibold leading-[0.88]">
+              A ring, held still enough to believe.
+            </h1>
+            <p className="mt-6 max-w-md text-[1rem] leading-relaxed text-bench-muted sm:text-[1.05rem]">
+              Split twist shank, pave shoulder, and a four-prong basket. The first screen should sell the object before the interface asks anything from you.
             </p>
+            <div className="mt-8 flex flex-wrap gap-2">
+              {PRODUCT_NOTES.map(([n, label]) => (
+                <span key={n} className="product-note">
+                  <b>{n}</b>
+                  {label}
+                </span>
+              ))}
+            </div>
           </div>
-          <div className="inspection-tags pointer-events-none hidden sm:block">
-            {INSPECTION_LABELS.map((item) => (
-              <div key={item.n} className={`film-tag absolute ${item.className}`}>
-                <span>{item.n}</span>
-                {item.label}
-              </div>
-            ))}
-          </div>
+
+          <a href="#materials" className="product-hero__cta">
+            Configure the ring
+          </a>
         </div>
       </section>
 
       <section
         id="materials"
         data-ring="config"
-        data-chapter="config"
-        className="cinematic-chapter chapter-config relative min-h-[250svh] overflow-clip text-bench-ink"
+        data-product-chapter="config"
+        className="configurator-bench relative min-h-[100svh] overflow-hidden px-5 py-20 text-bench-ink sm:px-10 lg:px-16 lg:py-20"
       >
-        <div className="chapter-sticky">
-          <ChapterField dense />
-          <div className="config-stage-keepout" aria-hidden />
-
-          <div className="config-copy">
-            <span className="bench-label">Chapter 03 / Configuration bench</span>
-            <h2 className="mt-3 font-display text-[clamp(2.4rem,4.5vw,4.8rem)] leading-[0.92]">
-              Choose without breaking the film.
-            </h2>
+        <div className="configurator-bench__field" aria-hidden />
+        <div className="mx-auto grid min-h-[calc(100svh-12rem)] max-w-7xl items-center gap-8 lg:grid-cols-[minmax(0,1.02fr)_minmax(24rem,0.78fr)]">
+          <div className="configurator-stage" aria-hidden>
+            <span className="configurator-stage__label">Live 3D setting</span>
+            <span className="configurator-stage__rule configurator-stage__rule--top" />
+            <span className="configurator-stage__rule configurator-stage__rule--bottom" />
           </div>
 
-          <div className="config-metal-panel bench-panel">
-            <div className="flex items-end justify-between gap-4 border-b border-bench-line/55 pb-4">
+          <div className="configurator-panel">
+            <div className="flex flex-wrap items-start justify-between gap-5 border-b border-bench-line/60 pb-5">
               <div>
-                <span className="bench-label">Metal</span>
-                <p className="mt-2 font-display text-3xl leading-none text-bench-ink sm:text-4xl">
-                  {metalLabel}
+                <span className="bench-label">Configure</span>
+                <h2 className="mt-2 font-display text-[clamp(2rem,3.4vw,3.2rem)] leading-[0.92]">
+                  Build the ring.
+                </h2>
+                <p className="mt-2 text-[0.82rem] leading-relaxed text-bench-muted">
+                  {METAL_BY_ID[metal].label} / {stoneLabel} / US {size}
                 </p>
               </div>
-              <p className="max-w-[9rem] text-right text-[0.68rem] uppercase tracking-[0.16em] text-bench-muted">
-                Live material response
-              </p>
-            </div>
-
-            <div className="mt-5 grid grid-cols-2 gap-3 lg:grid-cols-4">
-              {METALS.map((item) => {
-                const selected = item.id === metal;
-                const premium = METAL_PREMIUM[item.id];
-                return (
-                  <button
-                    key={item.id}
-                    type="button"
-                    onClick={() => {
-                      setMetal(item.id);
-                      nudgeRing("metal");
-                      playShimmer();
-                    }}
-                    onFocus={() => setPreviewMetal(item.id)}
-                    onBlur={() => setPreviewMetal(null)}
-                    onPointerEnter={() => setPreviewMetal(item.id)}
-                    onPointerLeave={() => setPreviewMetal(null)}
-                    aria-pressed={selected}
-                    aria-label={`${item.label}, ${item.caption}`}
-                    className="material-swatch min-h-20 p-2 text-left outline-none focus-visible:ring-2 focus-visible:ring-bench-gold sm:min-h-24 sm:p-3"
-                    data-selected={selected ? "true" : "false"}
-                  >
-                    <span
-                      className="block h-8 w-full sm:h-10"
-                      style={{ background: `linear-gradient(135deg, ${item.swatch[0]}, ${item.swatch[1]})` }}
-                      aria-hidden
-                    />
-                    <span className="mt-3 block text-[0.72rem] font-semibold text-bench-ink sm:text-[0.78rem]">
-                      {item.label}
-                    </span>
-                    <span className="mt-1 block text-[0.56rem] uppercase tracking-[0.14em] text-bench-muted">
-                      {premium === 0 ? "base" : `+$${premium}`}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          <div className="config-stone-panel bench-panel">
-            <div className="flex items-end justify-between gap-4 border-b border-bench-line/55 pb-4">
-              <div>
-                <span className="bench-label">Center stone</span>
-                <p className="mt-2 font-display text-3xl leading-none text-bench-ink">
-                  {activeStone.label}
+              <div className="grid justify-items-end gap-3 text-right">
+                <p className="font-sans text-3xl font-semibold tabular-nums text-bench-ink">
+                  <PriceTag value={price} symbol={symbol} />
                 </p>
-              </div>
-              <p className="text-right text-[0.68rem] uppercase tracking-[0.16em] text-bench-muted">
-                {activeStone.carat}
-                <br />
-                {activeStone.caption}
-              </p>
-            </div>
-            <div className="mt-5 grid grid-cols-3 gap-3 lg:grid-cols-5">
-              {STONES.map((item) => renderStoneButton(item, stone, setStone))}
-            </div>
-          </div>
-
-          <div className="config-summary bench-panel">
-            <div>
-              <span className="bench-label">Locked variation</span>
-              <p className="mt-2 text-[0.82rem] leading-relaxed text-bench-muted">
-                {metalLabel} / {stoneLabel} / US {size}
-              </p>
-              {variation?.sku && (
-                <p className="mt-2 text-[0.58rem] uppercase tracking-[0.16em] text-bench-muted">
-                  SKU {variation.sku}
-                </p>
-              )}
-            </div>
-            <div className="text-right">
-              <p className="font-sans text-2xl font-semibold tabular-nums text-bench-ink">
-                <PriceTag value={price} symbol={symbol} />
-              </p>
-              <div className="mt-3">
                 <AddToCartButton variationId={variation?.id} loading={isLoading} />
               </div>
             </div>
+
+            <div className="mt-5 space-y-5">
+              <PickerBlock label="Metal" value={metalLabel}>
+                <div className="metal-grid">
+                  {METALS.map((item) => {
+                    const selected = item.id === metal;
+                    const premium = METAL_PREMIUM[item.id];
+                    return (
+                      <button
+                        key={item.id}
+                        type="button"
+                        onClick={() => {
+                          setMetal(item.id);
+                          nudgeRing("metal");
+                          playShimmer();
+                        }}
+                        onFocus={() => setPreviewMetal(item.id)}
+                        onBlur={() => setPreviewMetal(null)}
+                        onPointerEnter={() => setPreviewMetal(item.id)}
+                        onPointerLeave={() => setPreviewMetal(null)}
+                        aria-pressed={selected}
+                        aria-label={`${item.label}, ${item.caption}`}
+                        className="metal-choice"
+                        data-selected={selected ? "true" : "false"}
+                      >
+                        <span
+                          className="metal-choice__swatch"
+                          style={{ background: `linear-gradient(135deg, ${item.swatch[0]}, ${item.swatch[1]})` }}
+                          aria-hidden
+                        />
+                        <span className="metal-choice__text">
+                          <span>{item.label.replace(" Gold", "")}</span>
+                          <em>{premium === 0 ? "base" : `+$${premium}`}</em>
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </PickerBlock>
+
+              <PickerBlock label="Stone" value={`${activeStone.label} / ${activeStone.carat}`}>
+                <div className="stone-grid">
+                  {STONES.map((item) => {
+                    const selected = item.id === stone;
+                    const premium = STONE_PREMIUM[item.id];
+                    return (
+                      <button
+                        key={item.id}
+                        type="button"
+                        onClick={() => {
+                          setStone(item.id);
+                          nudgeRing("stone");
+                          playPing();
+                        }}
+                        aria-pressed={selected}
+                        aria-label={`${item.label} center stone, ${item.carat}, ${item.caption}`}
+                        className="stone-choice"
+                        data-selected={selected ? "true" : "false"}
+                      >
+                        <StoneThumb stone={item.id} selected={selected} />
+                        <span>{item.label}</span>
+                        <em>{premium === 0 ? "base" : `+$${premium}`}</em>
+                      </button>
+                    );
+                  })}
+                </div>
+              </PickerBlock>
+            </div>
+
           </div>
         </div>
       </section>
@@ -287,64 +230,36 @@ export function RingFilm() {
   );
 }
 
-function setChapterState(chapter: HTMLElement) {
-  const chapterName = chapter.dataset.chapter;
-  if (chapterName === "impact") {
+function PickerBlock({
+  label,
+  value,
+  children,
+}: {
+  label: string;
+  value: string;
+  children: ReactNode;
+}) {
+  return (
+    <section className="picker-block" aria-label={`${label} picker`}>
+      <div className="mb-3 flex items-end justify-between gap-4">
+        <div>
+          <span className="bench-label">{label}</span>
+          <p className="mt-1 font-display text-[1.45rem] leading-none text-bench-ink">{value}</p>
+        </div>
+      </div>
+      {children}
+    </section>
+  );
+}
+
+function applyChapterState(section: HTMLElement) {
+  const chapter = section.dataset.productChapter;
+  if (chapter === "impact") {
     setActiveChapter("impact");
-    setRingMotionMode("physical");
+    setRingMotionMode("parked");
   }
-  if (chapterName === "inspection") {
-    setActiveChapter("inspection");
-    setRingMotionMode("physical");
-  }
-  if (chapterName === "config") {
+  if (chapter === "config") {
     setActiveChapter("config");
     setRingMotionMode("parked");
   }
-}
-
-function ChapterField({ dense = false }: { dense?: boolean }) {
-  return (
-    <>
-      <div className={`chapter-field ${dense ? "chapter-field--dense" : ""}`} aria-hidden />
-      <div className="chapter-reticle" aria-hidden>
-        {Array.from({ length: 28 }).map((_, index) => (
-          <span key={index} style={{ transform: `rotate(${index * 12.857}deg)` }} />
-        ))}
-      </div>
-      <div className="chapter-surface" aria-hidden />
-    </>
-  );
-}
-
-function renderStoneButton(
-  item: (typeof STONES)[number],
-  current: string,
-  setStone: ReturnType<typeof useConfigurator.getState>["setStone"],
-) {
-  const selected = item.id === current;
-  const premium = STONE_PREMIUM[item.id];
-  return (
-    <button
-      key={item.id}
-      type="button"
-      onClick={() => {
-        setStone(item.id);
-        nudgeRing("stone");
-        playPing();
-      }}
-      aria-pressed={selected}
-      aria-label={`${item.label} center stone, ${item.carat}, ${item.caption}`}
-      className="stone-vial grid min-h-24 place-items-center gap-2 p-2 text-center outline-none focus-visible:ring-2 focus-visible:ring-bench-gold sm:min-h-28 sm:gap-2"
-      data-selected={selected ? "true" : "false"}
-    >
-      <StoneThumb stone={item.id} selected={selected} />
-      <span>
-        <span className="block text-[0.68rem] text-bench-ink sm:text-[0.78rem]">{item.label}</span>
-        <span className="mt-1 block text-[0.58rem] uppercase tracking-[0.14em] text-bench-muted">
-          {premium === 0 ? "base" : `+$${premium}`}
-        </span>
-      </span>
-    </button>
-  );
 }

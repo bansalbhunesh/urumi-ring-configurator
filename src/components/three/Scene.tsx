@@ -37,8 +37,6 @@ type Stage = {
 
 const damp = THREE.MathUtils.damp;
 const clamp = THREE.MathUtils.clamp;
-const FILM_MAX_LINEAR_SPEED = 2.8;
-const FILM_MAX_ANGULAR_SPEED = 5.5;
 const COLLIDER_SCALE = 1.55;
 const RING_BAND_COLLIDERS = Array.from({ length: 18 }, (_, index) => {
   const angle = (index / 18) * Math.PI * 2;
@@ -123,66 +121,44 @@ function ProductRing({
     pitch: 0.16,
     roll: 0.08,
   });
+  const settledPose = useRef({
+    yaw: mobile ? -0.34 : -0.62,
+    pitch: mobile ? 0.98 : 0.76,
+    roll: mobile ? 0.18 : 0.28,
+  });
 
   const resetCinematicBody = (ringRigid: RapierRigidBody) => {
-    rotationEuler.set(mobile ? 1.1 : 0.85, mobile ? -0.4 : -0.95, mobile ? 0.55 : 0.75, "XYZ");
+    rotationEuler.set(mobile ? 0.98 : 0.76, mobile ? -0.34 : -0.62, mobile ? 0.18 : 0.28, "XYZ");
     rotationQuat.setFromEuler(rotationEuler);
     ringRigid.setTranslation(
       {
-        x: mobile ? 0.06 : 0.42,
-        y: mobile ? 2.4 : 3.2,
-        z: mobile ? -0.08 : -0.22,
+        x: mobile ? 0 : 0.02,
+        y: mobile ? 0.98 : 1.02,
+        z: mobile ? 0.02 : 0.04,
       },
       true,
     );
     ringRigid.setRotation(rotationQuat, true);
-    ringRigid.setLinearDamping(mobile ? 0.85 : 0.62);
-    ringRigid.setAngularDamping(mobile ? 1.15 : 0.86);
-    ringRigid.setLinvel(
-      {
-        x: mobile ? -0.04 : -0.18,
-        y: mobile ? -0.8 : -1.2,
-        z: mobile ? 0.03 : 0.08,
-      },
-      true,
-    );
-    ringRigid.setAngvel(
-      {
-        x: mobile ? 0.95 : 1.85,
-        y: mobile ? -0.52 : -1.05,
-        z: mobile ? 0.8 : 1.48,
-      },
-      true,
-    );
-    ringRigid.applyImpulseAtPoint(
-      {
-        x: mobile ? -0.02 : -0.06,
-        y: -0.035,
-        z: mobile ? 0.015 : 0.04,
-      },
-      {
-        x: mobile ? 0.08 : 0.2,
-        y: 0.3,
-        z: -0.12,
-      },
-      true,
-    );
+    ringRigid.setLinearDamping(8);
+    ringRigid.setAngularDamping(9);
+    ringRigid.setLinvel({ x: 0, y: 0, z: 0 }, true);
+    ringRigid.setAngvel({ x: 0, y: 0, z: 0 }, true);
   };
 
   const parkCinematicBody = (ringRigid: RapierRigidBody) => {
-    rotationEuler.set(mobile ? 1.0 : 0.78, mobile ? -0.32 : -0.62, mobile ? 0.2 : 0.34, "XYZ");
+    rotationEuler.set(mobile ? 0.98 : 0.74, mobile ? -0.38 : -0.7, mobile ? 0.16 : 0.22, "XYZ");
     rotationQuat.setFromEuler(rotationEuler);
     ringRigid.setTranslation(
       {
-        x: mobile ? 0 : 0.12,
-        y: mobile ? 1.02 : 1.03,
+        x: mobile ? 0 : 0,
+        y: mobile ? 0.98 : 1.02,
         z: mobile ? 0.02 : 0.08,
       },
       true,
     );
     ringRigid.setRotation(rotationQuat, true);
-    ringRigid.setLinearDamping(4.2);
-    ringRigid.setAngularDamping(5.4);
+    ringRigid.setLinearDamping(8);
+    ringRigid.setAngularDamping(9);
     ringRigid.setLinvel({ x: 0, y: 0, z: 0 }, true);
     ringRigid.setAngvel({ x: 0, y: 0, z: 0 }, true);
   };
@@ -237,7 +213,7 @@ function ProductRing({
     const step = Math.min(dt, 1 / 30);
     const scrollVel = clamp(getScrollVel(), -4.5, 4.5);
     const ringRigid = rigidRef.current;
-    const { zone, progress } = readRingZone();
+    const { zone } = readRingZone();
   const cinematicZone =
     zone === "impact" ||
     zone === "inspection" ||
@@ -274,53 +250,10 @@ function ProductRing({
       if (!cinematicStarted.current) {
         cinematicStarted.current = true;
         eventStage.current = 0;
-        if (zone === "impact" || zone === "film") {
-          resetCinematicBody(ringRigid);
-        } else {
+        if (zone === "config" || zone === "photo") {
           parkCinematicBody(ringRigid);
-        }
-      }
-
-      const nextStage =
-        zone === "inspection"
-          ? 3
-          : zone === "config" || zone === "photo"
-            ? 4
-            : progress < 0.18
-              ? 0
-              : progress < 0.38
-                ? 1
-                : progress < 0.6
-                  ? 2
-                  : progress < 0.82
-                    ? 3
-                    : 4;
-      if (nextStage !== eventStage.current) {
-        eventStage.current = nextStage;
-        if (nextStage === 1) {
-          ringRigid.applyImpulseAtPoint(
-            { x: mobile ? 0.032 : 0.085, y: 0.012, z: mobile ? -0.024 : -0.065 },
-            { x: -0.22, y: -0.18, z: 0.14 },
-            true,
-          );
-          ringRigid.applyTorqueImpulse({ x: -0.06, y: 0.045, z: -0.08 }, true);
-        }
-        if (nextStage === 2) {
-          ringRigid.setLinearDamping(mobile ? 1.15 : 0.9);
-          ringRigid.setAngularDamping(mobile ? 1.65 : 1.25);
-          ringRigid.applyImpulseAtPoint(
-            { x: mobile ? -0.022 : -0.065, y: 0.02, z: mobile ? 0.025 : 0.06 },
-            { x: 0.18, y: 0.05, z: -0.12 },
-            true,
-          );
-        }
-        if (nextStage === 3) {
-          ringRigid.setLinearDamping(mobile ? 2.1 : 1.7);
-          ringRigid.setAngularDamping(mobile ? 3.0 : 2.35);
-        }
-        if (nextStage === 4) {
-          ringRigid.setLinearDamping(3.8);
-          ringRigid.setAngularDamping(5.0);
+        } else {
+          resetCinematicBody(ringRigid);
         }
       }
 
@@ -329,102 +262,42 @@ function ProductRing({
         lastMotionSeq.current = motionSeq;
         const reason = getRingMotionReason();
         const dir = reason === "stone" ? -1 : 1;
-        const strength = reason === "pointer" ? 0.55 : reason === "park" ? 0.35 : 1;
-        ringRigid.applyImpulseAtPoint(
-          { x: 0.018 * dir * strength, y: 0.018 * strength, z: -0.012 * dir * strength },
-          { x: 0.2 * dir, y: 0.16, z: -0.12 },
-          true,
-        );
-        ringRigid.applyTorqueImpulse(
-          { x: 0.025 * strength, y: -0.04 * dir * strength, z: 0.032 * strength },
-          true,
-        );
+        settledPose.current.roll += 0.05 * dir;
+        settledPose.current.yaw += reason === "pointer" ? 0.1 * dir : 0.035 * dir;
       }
 
       if (Math.abs(drag.current.torque) > 0.0001) {
-        const torque = drag.current.torque;
-        ringRigid.applyTorqueImpulse({ x: torque * 0.35, y: torque, z: -torque * 0.45 }, true);
-        drag.current.torque *= 0.62;
+        settledPose.current.yaw += drag.current.torque * 1.8;
+        settledPose.current.roll -= drag.current.torque * 0.65;
+        drag.current.torque *= 0.58;
       }
 
-      const translation = ringRigid.translation();
-      const linvel = ringRigid.linvel();
-      const target = {
-        x: mobile ? 0 : zone === "config" ? 0.18 : zone === "inspection" ? 0.03 : progress > 0.62 ? -0.04 : 0.06,
-        y: mobile ? 1.0 : 1.04,
-        z: zone === "config" ? 0.08 : progress > 0.55 ? 0.02 : -0.02,
-      };
-      /* Centering pull — just a gentle nudge, gravity + floor do the real work.
-         Only the x/z axes pull toward centre; y is left to gravity entirely
-         so the ring falls and bounces naturally. */
-      const pull =
-        zone === "config" || zone === "photo"
-          ? 0.02
-          : zone === "inspection"
-            ? 0.012
-            : progress > 0.6
-              ? 0.01
-              : 0.0045;
-      ringRigid.applyImpulse(
+      const base =
+        zone === "config"
+          ? { yaw: mobile ? -0.42 : -0.76, pitch: mobile ? 0.98 : 0.74, roll: mobile ? 0.16 : 0.22 }
+          : zone === "photo"
+            ? { yaw: mobile ? -0.32 : -0.54, pitch: mobile ? 0.94 : 0.72, roll: mobile ? 0.12 : 0.18 }
+            : { yaw: mobile ? -0.34 : -0.62, pitch: mobile ? 0.98 : 0.76, roll: mobile ? 0.18 : 0.28 };
+
+      settledPose.current.yaw = damp(settledPose.current.yaw, base.yaw, 3.8, step);
+      settledPose.current.pitch = damp(settledPose.current.pitch, base.pitch, 5.2, step);
+      settledPose.current.roll = damp(settledPose.current.roll, base.roll, 4.8, step);
+      rotationEuler.set(settledPose.current.pitch, settledPose.current.yaw, settledPose.current.roll, "XYZ");
+      rotationQuat.setFromEuler(rotationEuler);
+
+      ringRigid.setTranslation(
         {
-          x: (target.x - translation.x) * pull - linvel.x * 0.004,
-          y: 0, // no artificial lift — let gravity and floor handle y
-          z: (target.z - translation.z) * pull - linvel.z * 0.004,
+          x: mobile ? 0 : zone === "config" ? 0 : 0.02,
+          y: mobile ? 0.98 : 1.02,
+          z: zone === "config" ? 0.08 : 0.04,
         },
         true,
       );
-
-      /* Scroll → torque: scrolling faster kicks the ring harder,
-         like flicking a real object with your finger. */
-      const scrollTorque = clamp(scrollVel * 0.003, -0.024, 0.024);
-      if (Math.abs(scrollTorque) > 0.001 && progress > 0.25) {
-        ringRigid.applyTorqueImpulse({ x: scrollTorque * 0.6, y: scrollTorque, z: -scrollTorque * 0.5 }, true);
-        /* Scroll also gives a small upward kick — the ring lifts off
-           the floor briefly like a coin being flicked on a table. */
-        if (Math.abs(scrollVel) > 1.2) {
-          ringRigid.applyImpulse(
-            { x: 0, y: clamp(Math.abs(scrollVel) * 0.004, 0, 0.02), z: 0 },
-            true,
-          );
-        }
-      }
-
-      const cappedLinvel = ringRigid.linvel();
-      const linearSpeed = Math.hypot(cappedLinvel.x, cappedLinvel.y, cappedLinvel.z);
-      if (linearSpeed > FILM_MAX_LINEAR_SPEED) {
-        const ratio = FILM_MAX_LINEAR_SPEED / linearSpeed;
-        ringRigid.setLinvel(
-          {
-            x: cappedLinvel.x * ratio,
-            y: cappedLinvel.y * ratio,
-            z: cappedLinvel.z * ratio,
-          },
-          true,
-        );
-      }
-
-      const cappedAngvel = ringRigid.angvel();
-      const angularSpeed = Math.hypot(cappedAngvel.x, cappedAngvel.y, cappedAngvel.z);
-      if (angularSpeed > FILM_MAX_ANGULAR_SPEED) {
-        const ratio = FILM_MAX_ANGULAR_SPEED / angularSpeed;
-        ringRigid.setAngvel(
-          {
-            x: cappedAngvel.x * ratio,
-            y: cappedAngvel.y * ratio,
-            z: cappedAngvel.z * ratio,
-          },
-          true,
-        );
-      }
-
-      if (
-        translation.y < -0.85 ||
-        Math.abs(translation.x) > 1.9 ||
-        Math.abs(translation.z) > 1.7
-      ) {
-        resetCinematicBody(ringRigid);
-      }
+      ringRigid.setRotation(rotationQuat, true);
+      ringRigid.setLinvel({ x: 0, y: 0, z: 0 }, true);
+      ringRigid.setAngvel({ x: 0, y: 0, z: 0 }, true);
       return;
+
     }
 
     const yawTarget = getRingYawTarget();
@@ -581,8 +454,8 @@ function StageDirector({
           opacity: 1,
         };
     const hero: Stage = isDesktop
-      ? { pos: new THREE.Vector3(1.3, 0.02, 0), scale: 0.84, camZ: 8.0, lookY: 0.5, opacity: 1 }
-      : { pos: new THREE.Vector3(0, 1.95, 0), scale: 0.38, camZ: 8.7, lookY: 0.84, opacity: 1 };
+      ? { pos: new THREE.Vector3(0.9, -0.34, 0), scale: 0.62, camZ: 7.7, lookY: 0.42, opacity: 1 }
+      : { pos: new THREE.Vector3(0, 1.08, 0), scale: 0.36, camZ: 8.55, lookY: 0.66, opacity: 1 };
     const filmBeat =
       zoneProgress < 0.2 ? 0 : zoneProgress < 0.48 ? 1 : zoneProgress < 0.66 ? 2 : 3;
     const filmEase = THREE.MathUtils.smoothstep(zoneProgress, 0.02, 0.92);
@@ -670,13 +543,13 @@ function StageDirector({
     const materials: Stage = isDesktop
       ? {
           pos: new THREE.Vector3(
-            THREE.MathUtils.lerp(0.24, 0.1, materialsEase),
-            THREE.MathUtils.lerp(-0.28, -0.34, materialsEase),
+            THREE.MathUtils.lerp(0.58, 0.76, materialsEase),
+            THREE.MathUtils.lerp(-0.24, -0.26, materialsEase),
             0,
           ),
-          scale: THREE.MathUtils.lerp(0.34, 0.4, materialsEase),
-          camZ: THREE.MathUtils.lerp(7.9, 7.65, materialsEase),
-          lookY: THREE.MathUtils.lerp(0.5, 0.48, materialsEase),
+          scale: THREE.MathUtils.lerp(0.28, 0.31, materialsEase),
+          camZ: THREE.MathUtils.lerp(8.05, 7.92, materialsEase),
+          lookY: THREE.MathUtils.lerp(0.48, 0.46, materialsEase),
           opacity: 1,
         }
       : {
@@ -699,8 +572,10 @@ function StageDirector({
     const hidden: Stage = { pos: new THREE.Vector3(0, 0.2, 0), scale: 0.0001, camZ: 8.6, lookY: 0.55, opacity: 0 };
 
     const target =
-      zone === "impact" || zone === "film"
-        ? film
+      zone === "impact"
+        ? hero
+        : zone === "film"
+          ? film
         : zone === "inspection"
           ? anatomy
           : zone === "config"
@@ -723,11 +598,11 @@ function StageDirector({
 
     if (zone !== previousZone.current) {
       previousZone.current = zone;
-      groupVel.current.x += zone === "impact" || zone === "film" ? -0.04 : 0.04;
+      groupVel.current.x += zone === "film" ? -0.04 : 0.04;
       groupVel.current.y += 0.03;
       camZVel.current += zone === "hidden" ? 0.22 : -0.06;
     }
-    if ((zone === "impact" || zone === "film") && filmBeat !== previousFilmBeat.current) {
+    if (zone === "film" && filmBeat !== previousFilmBeat.current) {
       const direction = previousFilmBeat.current < filmBeat ? 1 : -1;
       previousFilmBeat.current = filmBeat;
       groupVel.current.x += direction * (filmBeat === 3 ? -0.12 : -0.07);
@@ -838,8 +713,9 @@ function StageDirector({
     if (group) {
       group.position.copy(groupPos.current);
       const photoHandedOff = zone === "photo" && zoneProgress > 0.16;
-      group.scale.setScalar(photoHandedOff ? 0.0001 : Math.max(scale.current, 0.0001));
-      group.visible = reveal.current > 0.02 && !photoHandedOff;
+      const hiddenNow = zone === "hidden";
+      group.scale.setScalar(photoHandedOff || hiddenNow ? 0.0001 : Math.max(scale.current, 0.0001));
+      group.visible = reveal.current > 0.02 && !photoHandedOff && !hiddenNow;
     }
     state.camera.position.set(camX.current, 0.52, camZ.current);
     state.camera.lookAt(lookX.current, lookY.current, 0);
@@ -980,7 +856,7 @@ export default function Scene() {
           gl.toneMappingExposure = 1.12;
           gl.outputColorSpace = THREE.SRGBColorSpace;
         }}
-        style={{ pointerEvents: "auto" }}
+        style={{ pointerEvents: "none" }}
       >
         <PerspectiveCamera makeDefault position={[0, 0.52, 7.2]} fov={31} />
         <StudioLights />

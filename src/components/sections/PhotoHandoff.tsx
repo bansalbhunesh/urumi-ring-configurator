@@ -1,128 +1,84 @@
 "use client";
 
-import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
-import { useRef } from "react";
+import { motion } from "framer-motion";
 
-const PHOTO_FRAMES = [
+const FRAMES = [
   {
-    id: "worn-01",
-    eyebrow: "Worn",
-    title: "Scale on the hand",
+    id: "hand",
+    label: "On hand",
+    title: "Scale, skin, daylight.",
     src: "/img/doamore/twist-lifestyle.jpg",
     alt: "The Twist engagement ring worn on a hand",
+    className: "lg:col-span-7",
   },
   {
-    id: "studio-01",
-    eyebrow: "Studio",
-    title: "The exact setting",
+    id: "angle",
+    label: "Studio angle",
+    title: "The twist reads from the side.",
     src: "/img/doamore/twist-round-white-gold-angle.jpg",
-    alt: "The Twist engagement ring studio product angle",
+    alt: "The Twist engagement ring three-quarter studio angle",
+    className: "lg:col-span-5",
   },
   {
-    id: "worn-02",
-    eyebrow: "Second angle",
-    title: "Light across the stone",
-    src: "/img/doamore/twist-lifestyle-angle.jpg",
-    alt: "The Twist engagement ring on a hand from another angle",
+    id: "front",
+    label: "Product plate",
+    title: "Round brilliant, four prongs.",
+    src: "/img/doamore/twist-round-white-gold.jpg",
+    alt: "The Twist engagement ring front studio view",
+    className: "lg:col-span-5",
   },
 ] as const;
 
 export function PhotoHandoff() {
-  const ref = useRef<HTMLElement>(null);
-  const reduceMotion = useReducedMotion() ?? false;
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start start", "end end"],
-  });
-
-  const captureOpacity = useTransform(scrollYProgress, [0, 0.18, 0.32], [0, 1, 0]);
-  const captureScale = useTransform(scrollYProgress, [0, 0.32], reduceMotion ? [1, 1] : [0.92, 1.03]);
-  const titleOpacity = useTransform(scrollYProgress, [0.02, 0.28, 0.78], [1, 1, 0.22]);
-  const titleY = useTransform(scrollYProgress, [0, 0.7], reduceMotion ? [0, 0] : [0, -38]);
-  const gridOpacity = useTransform(scrollYProgress, [0.18, 0.34], [0, 1]);
-  const gridY = useTransform(scrollYProgress, [0.22, 0.72], reduceMotion ? ["0vh", "0vh"] : ["8vh", "-5vh"]);
-  const leadScale = useTransform(scrollYProgress, [0.22, 0.72], reduceMotion ? [1, 1] : [0.96, 1.04]);
-
   return (
     <section
-      ref={ref}
       id="photo-handoff"
-      data-ring="photo"
-      data-chapter="photo"
-      className="photo-handoff relative min-h-[220svh] overflow-clip bg-bench-deep text-bench-ink"
+      data-ring="hidden"
+      className="proof-gallery relative overflow-hidden bg-paper px-5 py-24 text-paper-ink sm:px-10 lg:px-16 lg:py-32"
     >
-      <div className="sticky top-0 h-[100svh] overflow-hidden">
-        <div className="absolute inset-0 photo-handoff__field" aria-hidden />
-        <div className="pointer-events-none absolute inset-0 photo-handoff__aperture" aria-hidden />
-
-        <motion.div
-          className="pointer-events-none absolute left-6 top-24 z-30 max-w-[34rem] sm:left-10 lg:left-16 lg:top-28"
-          style={{ opacity: titleOpacity, y: titleY }}
-        >
-          <span className="bench-label">Chapter 04 / Object to hand</span>
-          <h2 className="mt-5 max-w-[8ch] font-display text-[clamp(3.1rem,7.4vw,7rem)] font-semibold leading-[0.88]">
-            From object to proof.
-          </h2>
-          <p className="mt-5 max-w-sm text-[0.95rem] leading-relaxed text-bench-muted">
-            The render is only useful if it survives contact with skin, scale,
-            and daylight.
+      <div className="mx-auto max-w-7xl">
+        <div className="grid gap-8 lg:grid-cols-12 lg:items-end">
+          <div className="lg:col-span-5">
+            <span className="eyebrow">Proof</span>
+            <h2 className="mt-5 max-w-[9ch] font-display text-[clamp(3rem,6vw,6.2rem)] font-semibold leading-[0.9]">
+              From render to real life.
+            </h2>
+          </div>
+          <p className="max-w-xl text-[1.02rem] leading-relaxed text-paper-ink/68 lg:col-span-5 lg:col-start-8">
+            The 3D view earns trust only when it agrees with product photography. The hand shots make scale, profile, and light legible without another forced animation.
           </p>
-        </motion.div>
+        </div>
 
-        <motion.div
-          className="photo-handoff__capture pointer-events-none absolute left-1/2 top-1/2 z-20 aspect-[4/5] w-[min(52vw,31rem)] -translate-x-1/2 -translate-y-1/2 overflow-hidden"
-          style={{ opacity: captureOpacity, scale: captureScale }}
-          aria-hidden
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/img/doamore/twist-round-white-gold-angle.jpg"
-            alt=""
-            className="h-full w-full object-contain"
-          />
-          <span className="photo-handoff__scan" />
-          <span className="absolute bottom-4 left-4 font-mono text-[0.58rem] uppercase tracking-[0.22em] text-bench-muted">
-            Render capture / matched plate
-          </span>
-        </motion.div>
-
-        <motion.div
-          className="photo-proof-grid absolute inset-x-6 top-[18svh] z-40 grid grid-cols-12 gap-5 sm:inset-x-10 lg:inset-x-16"
-          style={{ opacity: gridOpacity, y: gridY }}
-        >
-          {PHOTO_FRAMES.map((frame, index) => (
+        <div className="mt-12 grid gap-5 lg:grid-cols-12">
+          {FRAMES.map((frame, index) => (
             <motion.article
               key={frame.id}
-              className={`photo-proof-card ${
-                index === 0
-                  ? "col-span-7 col-start-5 row-start-1 max-lg:col-span-8 max-lg:col-start-4"
-                  : index === 1
-                    ? "col-span-4 col-start-2 row-start-1 mt-[34svh] max-lg:col-span-5 max-lg:col-start-1"
-                    : "col-span-4 col-start-9 row-start-1 mt-[42svh] max-lg:col-span-5 max-lg:col-start-8"
-              } max-sm:col-span-12 max-sm:col-start-1 max-sm:mt-0`}
-              style={index === 0 ? { scale: leadScale } : undefined}
+              className={`proof-card ${frame.className}`}
+              initial={{ opacity: 0, y: 28 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1], delay: index * 0.08 }}
             >
-              <div className="relative overflow-hidden">
+              <div className="proof-card__image">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={frame.src}
                   alt={frame.alt}
-                  className={`h-[min(58svh,38rem)] w-full max-sm:h-[46svh] ${
-                    frame.id.startsWith("studio") ? "object-contain" : "object-cover"
-                  }`}
+                  className={frame.id === "hand" ? "object-cover" : "object-contain"}
                   loading={index === 0 ? "eager" : "lazy"}
                 />
-                <div className="pointer-events-none absolute inset-0 photo-handoff__frame-vignette" />
               </div>
-              <div className="mt-4 flex items-baseline justify-between gap-5 border-t border-bench-line/45 pt-3">
-                <span className="font-mono text-[0.62rem] uppercase tracking-[0.2em] text-bench-gold">
-                  {frame.eyebrow}
+              <div className="mt-4 flex items-baseline justify-between gap-5 border-t border-paper-ink/15 pt-3">
+                <span className="font-mono text-[0.62rem] uppercase tracking-[0.18em] text-gold-warm">
+                  {frame.label}
                 </span>
-                <h3 className="text-right font-display text-2xl leading-none">{frame.title}</h3>
+                <h3 className="max-w-[14rem] text-right font-display text-[1.7rem] leading-[0.95]">
+                  {frame.title}
+                </h3>
               </div>
             </motion.article>
           ))}
-        </motion.div>
+        </div>
       </div>
     </section>
   );

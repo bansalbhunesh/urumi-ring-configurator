@@ -125,13 +125,13 @@ async function main() {
     check("studio: stone switch updates selection", nowPressed, target.label);
   } catch (e) { fail("studio: stone switch", String(e)); }
 
-  // configuration summary remains visible after picker changes
+  // configuration panel remains visible after picker changes
   try {
     const summary = await page.evaluate(() =>
-      (document.querySelector("#materials")?.textContent || "").includes("Locked variation"),
+      (document.querySelector("#materials")?.textContent || "").includes("Build the ring"),
     );
-    check("studio: configuration summary present", summary);
-  } catch (e) { fail("studio: configuration summary", String(e)); }
+    check("studio: configuration panel present", summary);
+  } catch (e) { fail("studio: configuration panel", String(e)); }
 
   // add to bag -> Celebration (~1.5s) -> cart auto-opens (real UX flow)
   const dialog = page.locator('[role="dialog"][aria-label="Your bag"]');
@@ -175,22 +175,20 @@ async function main() {
 
   // all sections present (current narrative arc)
   for (const [id, label] of [
-    ["ring", "#ring (impact)"], ["atelier", "#atelier (inspection)"],
-    ["materials", "#materials"], ["provenance", "#provenance"],
-    ["commitment", "#commitment"], ["pairing", "#pairing"],
-    ["mission", "#mission"], ["reviews", "#reviews"], ["worn", "#worn"],
+    ["ring", "#ring"],
+    ["materials", "#materials"],
+    ["photo-handoff", "#photo-handoff"],
+    ["provenance", "#provenance"],
     ["finale", "#finale"],
   ]) {
     check(`section: ${label} exists`, await page.locator(`#${id}`).count() > 0);
   }
   const dataRings = await page.evaluate(() => ({
     provenance: document.querySelector("#provenance")?.getAttribute("data-ring"),
-    commitment: document.querySelector("#commitment")?.getAttribute("data-ring"),
-    mission: document.querySelector("#mission")?.getAttribute("data-ring"),
+    proof: document.querySelector("#photo-handoff")?.getAttribute("data-ring"),
   }));
   check("section: #provenance data-ring=hidden", dataRings.provenance === "hidden");
-  check("section: #commitment data-ring=hidden", dataRings.commitment === "hidden");
-  check("section: #mission data-ring=hidden", dataRings.mission === "hidden");
+  check("section: #photo-handoff data-ring=hidden", dataRings.proof === "hidden");
 
   // provenance product imagery loads
   try {
@@ -207,15 +205,15 @@ async function main() {
     check("provenance: image decodes", imgStats.total > 0 && imgStats.loaded === imgStats.total, `${imgStats.loaded}/${imgStats.total}`);
   } catch (e) { fail("provenance: images", String(e)); }
 
-  // mission impact counters render
+  // finale renders
   try {
-    await page.locator("#mission").scrollIntoViewIfNeeded();
+    await page.locator("#finale").scrollIntoViewIfNeeded();
     await page.waitForTimeout(1200);
-    const missionOk = await page.evaluate(() =>
-      (document.querySelector("#mission")?.textContent || "").includes("wells built"),
+    const finaleOk = await page.evaluate(() =>
+      (document.querySelector("#finale")?.textContent || "").includes("Some choices"),
     );
-    check("mission: impact counters present", missionOk);
-  } catch (e) { fail("mission: counters", String(e)); }
+    check("finale: purchase close present", finaleOk);
+  } catch (e) { fail("finale: purchase close", String(e)); }
 
   check("runtime: no uncaught page errors", pageErrors.length === 0, pageErrors.slice(0, 3).join(" | "));
   if (consoleErrors.length) results.push({ name: "runtime: console.error count (warn)", ok: true, info: `${consoleErrors.length}: ${consoleErrors.slice(0, 4).join(" | ").slice(0, 300)}` });
@@ -227,15 +225,15 @@ async function main() {
     const rmCtx = await browser.newContext({ viewport: { width: 1280, height: 900 }, reducedMotion: "reduce" });
     const rm = await rmCtx.newPage();
     await rm.goto(BASE, { waitUntil: "load", timeout: 120000 });
-    await rm.locator("#mission").scrollIntoViewIfNeeded();
+    await rm.locator("#finale").scrollIntoViewIfNeeded();
     await rm.waitForTimeout(1200);
     const g = await rm.evaluate(() => {
-      const el = document.querySelector("#mission");
-      return { visible: !!el && el.getBoundingClientRect().height > 0, hasCopy: (el?.textContent || "").includes("well") };
+      const el = document.querySelector("#finale");
+      return { visible: !!el && el.getBoundingClientRect().height > 0, hasCopy: (el?.textContent || "").includes("Configure yours") };
     });
-    check("reduced-motion: mission renders", g.visible && g.hasCopy);
+    check("reduced-motion: finale renders", g.visible && g.hasCopy);
     await rmCtx.close();
-  } catch (e) { fail("reduced-motion: mission", String(e)); }
+  } catch (e) { fail("reduced-motion: finale", String(e)); }
 
   // ---- Mobile: no horizontal overflow -----------------------------------
   try {
@@ -244,10 +242,10 @@ async function main() {
     await mp.goto(BASE, { waitUntil: "load", timeout: 120000 });
     const overflowTop = await mp.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
     check("mobile: no horizontal overflow (top)", overflowTop <= 2, `overflow ${overflowTop}px`);
-    await mp.locator("#mission").scrollIntoViewIfNeeded().catch(() => {});
+    await mp.locator("#finale").scrollIntoViewIfNeeded().catch(() => {});
     await mp.waitForTimeout(800);
-    const overflowMission = await mp.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
-    check("mobile: no horizontal overflow (mission)", overflowMission <= 2, `overflow ${overflowMission}px`);
+    const overflowFinale = await mp.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+    check("mobile: no horizontal overflow (finale)", overflowFinale <= 2, `overflow ${overflowFinale}px`);
     check("mobile: #ring present", await mp.locator("#ring").count() > 0);
     await mCtx.close();
   } catch (e) { fail("mobile: overflow", String(e)); }
