@@ -93,6 +93,22 @@ body::after {
   outline-offset: 3px;
 }
 
+/* Tailwind v4's Preflight leaves <button> at the browser default (cursor: default),
+   so swatches, size chips, the stone picker and Add to Bag showed an arrow, not a
+   hand. Restore the expected pointer on interactive controls. */
+button:not(:disabled),
+[role="button"]:not([aria-disabled="true"]),
+a[href],
+label[for],
+select,
+summary {
+  cursor: pointer;
+}
+button:disabled,
+[aria-disabled="true"] {
+  cursor: not-allowed;
+}
+
 .font-display {
   font-family: var(--font-display);
   font-weight: 400;
