@@ -25,17 +25,25 @@ import type {
    caller falls back to the seeded mock, which mirrors this exact shape.
 ---------------------------------------------------------------------------- */
 
-const WOO_URL = (process.env.WOOCOMMERCE_URL ?? "http://localhost:8080").replace(
+// The deployed showcase points at a live headless WooCommerce demo store.
+// Override with WOOCOMMERCE_URL for your own instance (see .env.example).
+const DEFAULT_STORE_URL = "https://dashing-bear-1845f4.instawp.site";
+const WOO_URL = (process.env.WOOCOMMERCE_URL ?? DEFAULT_STORE_URL).replace(
   /\/$/,
   "",
 );
 const STORE_API = `${WOO_URL}/wp-json/wc/store/v1`;
-const TIMEOUT_MS = Number(process.env.WOOCOMMERCE_TIMEOUT_MS ?? 2500);
+const TIMEOUT_MS = Number(process.env.WOOCOMMERCE_TIMEOUT_MS ?? 8000);
 
-// Opt-in flag. Without a running WooCommerce instance (e.g. local `npm run dev`
-// with no Docker, or a Vercel preview), we skip the network entirely and serve
-// the seeded mock instantly rather than eating a timeout on every request.
-const ENABLED = process.env.WOOCOMMERCE_ENABLED === "true";
+// Live mode is on when WOOCOMMERCE_ENABLED is set explicitly, or automatically on
+// Vercel production — so the deployed showcase reads the live store without any
+// manual env wiring. Local `npm run dev` stays on the instant seeded mock (no
+// timeout) unless you opt in with WOOCOMMERCE_ENABLED=true. Every live call is
+// timeout-bounded and falls back to the mock, so a sleeping/expired store degrades
+// gracefully rather than breaking the page.
+const ENABLED = process.env.WOOCOMMERCE_ENABLED
+  ? process.env.WOOCOMMERCE_ENABLED === "true"
+  : process.env.VERCEL_ENV === "production";
 
 export const CART_TOKEN_COOKIE = "urumi_cart_token";
 
