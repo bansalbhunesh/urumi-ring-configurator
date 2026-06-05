@@ -67,8 +67,12 @@ function RingStageDirector({
     const step = Math.min(dt, 1 / 30);
     const zone = currentRingZone();
     if (reduceMotion) intro.current = 1;
-    else intro.current = Math.min(1, intro.current + step / 0.8);
+    else intro.current = Math.min(1, intro.current + step / 1.1);
     const introEase = 1 - Math.pow(1 - intro.current, 3);
+    // Entrance arc — the ring descends from above and unwinds its rotation into
+    // the resting pose as it scales in (reveal-through-motion, Oryzo #5/#13/#14).
+    const introLift = (1 - introEase) * 1.6;
+    const introSpin = (1 - introEase) * -1.5;
 
     const hero: Stage = isDesktop
       ? { x: 1.15, y: 0.05, scale: 1.0 }
@@ -92,6 +96,7 @@ function RingStageDirector({
     const ring = ringGroupRef.current;
     if (!ring) return;
     ring.position.copy(pos.current);
+    ring.position.y += introLift;
     ring.scale.setScalar(Math.max(0.0001, scale.current));
     ring.visible = scale.current > 0.01;
 
@@ -111,7 +116,7 @@ function RingStageDirector({
       }
       setUserYaw(yaw.current);
     }
-    ring.rotation.y = yaw.current;
+    ring.rotation.y = yaw.current + introSpin;
     ring.rotation.x = THREE.MathUtils.damp(ring.rotation.x, 0.08 + getUserPitch(), 8, step);
   });
 
