@@ -164,10 +164,11 @@ function getClassifiedClone(scene: THREE.Object3D): ClassifiedClone {
       // bounds from making elongated replacement stones cartoon-large.
       // A touch smaller than the GLB stone so all four prongs stay visible
       // around it rather than being covered by an oversized crown.
-      gemScaleFactor = THREE.MathUtils.clamp(glbGemRadius / 0.172, 0.68, 2.35) * 0.88;
-      // Seat the procedural gem just below the top of the GLB diamond so the
-      // crown nestles *into* the four-prong basket (not perched on top of it).
-      const TABLE_LOCAL_Y = 0.12;
+      gemScaleFactor = THREE.MathUtils.clamp(glbGemRadius / 0.172, 0.68, 2.35) * 0.96;
+      // Seat the procedural gem so its girdle sits at the prong grip — full
+      // enough to fill the basket, high enough that the prongs hug it (not
+      // splay above an undersized stone).
+      const TABLE_LOCAL_Y = 0.085;
       gemPos = [dCenter.x, dBox.max.y - TABLE_LOCAL_Y * gemScaleFactor, dCenter.z];
       m.visible = false;
     } else if (kind === "metal") {

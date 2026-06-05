@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { SceneReveal } from "@/components/ui/SceneReveal";
 import { useProduct } from "@/hooks/useProduct";
 import { useVariation } from "@/hooks/useVariation";
 import { METAL_BY_ID, STONE_BY_ID } from "@/lib/config";
@@ -35,34 +36,25 @@ export function Provenance() {
   return (
     <section id="provenance" data-ring="hidden" className="pp-section">
       <div className="pp-wrap">
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.8, ease }}
-        >
+        <SceneReveal depth={1.15}>
           <p className="kicker"><span className="kicker__idx">03</span> The details</p>
           <h2 className="pp-h2 mt-3">Considered, to the last facet.</h2>
           <p className="pp-body">
             Every choice you make is written into the order — and priced
             {live ? " live from the store" : " from the same source the store uses"}.
           </p>
-        </motion.div>
+        </SceneReveal>
 
-        <motion.dl
-          className="pp-specs"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-60px" }}
-          transition={{ duration: 0.7, ease, delay: 0.05 }}
-        >
-          {specs.map(([k, v]) => (
-            <div key={k} className="pp-spec">
-              <dt>{k}</dt>
-              <dd>{v}</dd>
-            </div>
-          ))}
-        </motion.dl>
+        <SceneReveal depth={0.5}>
+          <dl className="pp-specs">
+            {specs.map(([k, v]) => (
+              <div key={k} className="pp-spec">
+                <dt>{k}</dt>
+                <dd>{v}</dd>
+              </div>
+            ))}
+          </dl>
+        </SceneReveal>
 
         <div className="pp-gallery">
           {GALLERY.map((g, i) => (

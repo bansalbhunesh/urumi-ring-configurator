@@ -40,9 +40,8 @@ type Ghost = {
 const GHOSTS: Ghost[] = [
   { kind: "ring", radius: 2.7, height: 0.2, speed: 0.075, phase: 0.4, spin: 0.16, scale: 0.6, tilt: 0.6, color: ACCENT_DEEP, baseOpacity: 0.28 },
   { kind: "ring", radius: 3.15, height: -0.4, speed: -0.05, phase: 2.6, spin: -0.1, scale: 0.74, tilt: -0.8, color: ACCENT, baseOpacity: 0.2 },
-  { kind: "diamond", radius: 2.15, height: 1.0, speed: 0.13, phase: 1.2, spin: 0.6, scale: 0.3, tilt: 0.3, color: ACCENT, baseOpacity: 0.66 },
-  { kind: "diamond", radius: 2.7, height: -0.9, speed: -0.1, phase: 4.0, spin: 0.5, scale: 0.24, tilt: 0.9, color: COOL, baseOpacity: 0.54 },
-  { kind: "diamond", radius: 3.1, height: 0.6, speed: 0.07, phase: 5.3, spin: -0.4, scale: 0.2, tilt: -0.4, color: ACCENT_DEEP, baseOpacity: 0.46 },
+  { kind: "diamond", radius: 2.35, height: 1.05, speed: 0.11, phase: 1.2, spin: 0.6, scale: 0.24, tilt: 0.3, color: ACCENT, baseOpacity: 0.32 },
+  { kind: "diamond", radius: 2.9, height: -0.95, speed: -0.09, phase: 4.0, spin: 0.5, scale: 0.2, tilt: 0.9, color: COOL, baseOpacity: 0.26 },
 ];
 
 function GhostNode({ ghost, follow }: { ghost: Ghost; follow: RefObject<THREE.Group | null> }) {
