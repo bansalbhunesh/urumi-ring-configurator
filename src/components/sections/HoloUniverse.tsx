@@ -72,7 +72,9 @@ function HoloSlide({
   n: number;
   progress: MotionValue<number>;
 }) {
-  const f = 0.085;
+  // Narrower crossfade band = each universe holds (fully displayed) far longer
+  // before the next warps in, instead of flipping past mid-transition.
+  const f = 0.05;
   const b0 = i / n;
   const b1 = (i + 1) / n;
   const isFirst = i === 0;
@@ -125,14 +127,15 @@ export function HoloUniverse() {
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end end"] });
   const n = SLIDES.length;
 
-  // Holographic flash peaks at each universe threshold.
-  const f = 0.085;
+  // Holographic flash peaks at each universe threshold — kept gentle so the
+  // transition reads as a soft light bloom, not a harsh white blink.
+  const f = 0.05;
   const inputs: number[] = [0];
   const outputs: number[] = [0];
   for (let kk = 1; kk < n; kk++) {
     const b = kk / n;
     inputs.push(b - f, b, b + f);
-    outputs.push(0, 0.92, 0);
+    outputs.push(0, 0.42, 0);
   }
   inputs.push(1);
   outputs.push(0);
@@ -140,7 +143,7 @@ export function HoloUniverse() {
 
   return (
     <section id="anatomy" data-ring="hidden" className="holo">
-      <div ref={ref} className="holo__track" style={{ height: `${n * 100}vh` }}>
+      <div ref={ref} className="holo__track" style={{ height: `${n * 135}vh` }}>
         <div className="holo__sticky">
           {SLIDES.map((s, i) => (
             <HoloSlide key={i} slide={s} i={i} n={n} progress={scrollYProgress} />

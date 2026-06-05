@@ -22,10 +22,9 @@ import { getGhostFocus } from "@/store/configurator";
 
 const ACCENT = new THREE.Color("#ff7a2a");
 const ACCENT_DEEP = new THREE.Color("#dc5000");
-const COOL = new THREE.Color("#cdb59b");
+const COOL = new THREE.Color("#e7b27a");
 
 type Ghost = {
-  kind: "ring" | "diamond";
   radius: number; // orbit radius around the hero
   height: number; // vertical offset
   speed: number; // orbital angular velocity
@@ -37,26 +36,61 @@ type Ghost = {
   baseOpacity: number;
 };
 
+/* Each ghost is a whole ring — a twisted wireframe band lifting a faceted
+   diamond — so the orbiting "variants" actually read as the product (the Oryzo
+   "choose your own" duplicates), not abstract orange diagrams. */
 const GHOSTS: Ghost[] = [
-  { kind: "ring", radius: 2.7, height: 0.2, speed: 0.075, phase: 0.4, spin: 0.16, scale: 0.6, tilt: 0.6, color: ACCENT_DEEP, baseOpacity: 0.28 },
-  { kind: "ring", radius: 3.15, height: -0.4, speed: -0.05, phase: 2.6, spin: -0.1, scale: 0.74, tilt: -0.8, color: ACCENT, baseOpacity: 0.2 },
-  { kind: "diamond", radius: 2.35, height: 1.05, speed: 0.11, phase: 1.2, spin: 0.6, scale: 0.24, tilt: 0.3, color: ACCENT, baseOpacity: 0.32 },
-  { kind: "diamond", radius: 2.9, height: -0.95, speed: -0.09, phase: 4.0, spin: 0.5, scale: 0.2, tilt: 0.9, color: COOL, baseOpacity: 0.26 },
+  { radius: 2.7, height: 0.25, speed: 0.07, phase: 0.4, spin: 0.18, scale: 0.62, tilt: 0.5, color: ACCENT_DEEP, baseOpacity: 0.3 },
+  { radius: 3.2, height: -0.5, speed: -0.05, phase: 2.6, spin: -0.12, scale: 0.78, tilt: -0.7, color: ACCENT, baseOpacity: 0.22 },
+  { radius: 2.45, height: 1.0, speed: 0.1, phase: 4.2, spin: 0.24, scale: 0.5, tilt: 0.9, color: COOL, baseOpacity: 0.26 },
 ];
+
+/* A wireframe "twist ring" ghost: two interleaved bands (the twin shanks of The
+   Twist) cradling an octahedron diamond. Built once and shared by all ghosts. */
+function buildGhostRing(): THREE.BufferGeometry {
+  const parts: THREE.BufferGeometry[] = [];
+
+  // Two thin tori, tilted opposite ways, evoke the twisted twin strands.
+  for (const sign of [1, -1]) {
+    const band = new THREE.TorusGeometry(0.92, 0.05, 6, 80);
+    band.rotateX(Math.PI / 2);
+    band.rotateZ(sign * 0.17);
+    parts.push(new THREE.WireframeGeometry(band));
+    band.dispose();
+  }
+
+  // Four prongs + the centre stone, lifted to the crown of the band.
+  const stone = new THREE.OctahedronGeometry(0.26, 0);
+  stone.translate(0, 1.04, 0);
+  parts.push(new THREE.WireframeGeometry(stone));
+  stone.dispose();
+
+  // Merge the wireframe line segments into one buffer (position-only).
+  let total = 0;
+  for (const p of parts) total += (p.getAttribute("position") as THREE.BufferAttribute).count;
+  const merged = new Float32Array(total * 3);
+  let o = 0;
+  for (const p of parts) {
+    const pos = p.getAttribute("position") as THREE.BufferAttribute;
+    merged.set(pos.array as Float32Array, o);
+    o += pos.array.length;
+    p.dispose();
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute("position", new THREE.BufferAttribute(merged, 3));
+  return geo;
+}
+
+let _sharedGhostGeo: THREE.BufferGeometry | null = null;
+function ghostGeometry() {
+  if (!_sharedGhostGeo) _sharedGhostGeo = buildGhostRing();
+  return _sharedGhostGeo;
+}
 
 function GhostNode({ ghost, follow }: { ghost: Ghost; follow: RefObject<THREE.Group | null> }) {
   const group = useRef<THREE.Group>(null);
   const matRef = useRef<THREE.LineBasicMaterial>(null);
-
-  const geometry = useMemo(() => {
-    const src =
-      ghost.kind === "ring"
-        ? new THREE.TorusGeometry(1, 0.045, 5, 56)
-        : new THREE.OctahedronGeometry(1, 0);
-    const wire = new THREE.WireframeGeometry(src);
-    src.dispose();
-    return wire;
-  }, [ghost.kind]);
+  const geometry = useMemo(() => ghostGeometry(), []);
 
   const focus = useRef(0);
 
@@ -80,16 +114,16 @@ function GhostNode({ ghost, follow }: { ghost: Ghost; follow: RefObject<THREE.Gr
     g.position.set(
       cx + Math.cos(ang) * ghost.radius,
       cy + ghost.height + Math.sin(t * 0.5 + ghost.phase) * 0.12,
-      Math.sin(ang) * ghost.radius - 1.4, // bias behind the hero
+      Math.sin(ang) * ghost.radius - 1.6, // bias behind the hero
     );
-    g.rotation.x = ghost.tilt + t * ghost.spin * 0.3;
+    g.rotation.x = ghost.tilt + Math.sin(t * 0.2 + ghost.phase) * 0.1;
     g.rotation.y = t * ghost.spin;
     const s = ghost.scale * (0.85 + presence * 0.15);
     g.scale.setScalar(s);
 
     const mat = matRef.current;
     if (mat) {
-      const flicker = 0.82 + Math.sin(t * 1.7 + ghost.phase * 3) * 0.18;
+      const flicker = 0.86 + Math.sin(t * 1.7 + ghost.phase * 3) * 0.14;
       // Fade as a ghost swings toward the front so it never slashes across the
       // hero ring — they read as duplicates receding into the dark behind it.
       const depthFade = THREE.MathUtils.clamp(-g.position.z / 1.3, 0.1, 1);
