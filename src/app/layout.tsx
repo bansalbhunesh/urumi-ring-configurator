@@ -33,6 +33,7 @@ export const metadata: Metadata = {
 
 import { SmoothScroll } from "@/components/ui/SmoothScroll";
 import { Grain } from "@/components/ui/Grain";
+import { Loader } from "@/components/ui/Loader";
 
 export default function RootLayout({
   children,
@@ -42,6 +43,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${display.variable} ${sans.variable}`}>
       <body className="antialiased">
+        <Loader />
         <Grain />
         <SmoothScroll>
           <Providers>{children}</Providers>

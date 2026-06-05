@@ -1,66 +1,90 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, animate, motion, useMotionValue, useTransform } from "framer-motion";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
+/* The atelier intro — a branded loading curtain (Oryzo-style). A counter-rotating
+   ring mark counts the atelier up to 100, then the dark panel lifts to reveal the
+   hero. Honours reduced-motion by skipping straight through. framer-motion only. */
 export function Loader() {
-  const [count, setCount] = useState(0);
   const [done, setDone] = useState(false);
+  const [n, setN] = useState(0);
+  const count = useMotionValue(0);
+  const width = useTransform(count, (v) => `${v}%`);
 
   useEffect(() => {
-    let raf: number;
-    const start = performance.now();
-    const duration = 1100;
-
-    const tick = (now: number) => {
-      const t = Math.min((now - start) / duration, 1);
-      const eased = 1 - Math.pow(1 - t, 3);
-      setCount(Math.round(eased * 100));
-      if (t < 1) {
-        raf = requestAnimationFrame(tick);
-      } else {
-        setTimeout(() => setDone(true), 200);
-      }
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, []);
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setDone(true);
+      return;
+    }
+    const controls = animate(count, 100, {
+      duration: 1.7,
+      ease: EASE,
+      onUpdate: (v) => setN(Math.round(v)),
+      onComplete: () => setTimeout(() => setDone(true), 280),
+    });
+    return () => controls.stop();
+  }, [count]);
 
   return (
     <AnimatePresence>
       {!done && (
         <motion.div
-          key="loader"
-          initial={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.65, ease: EASE }}
-          className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-ivory"
+          key="intro"
+          className="intro"
           aria-hidden="true"
+          initial={{ y: 0 }}
+          exit={{ y: "-101%" }}
+          transition={{ duration: 0.92, ease: EASE }}
         >
+          <div className="intro__glow" />
+          <span className="intro__corner intro__corner--tl">Aurelle · Atelier</span>
+          <span className="intro__corner intro__corner--tr">Made to order</span>
+          <span className="intro__corner intro__corner--bl">Est. — light, considered</span>
+          <span className="intro__corner intro__corner--br">Loading the stage</span>
+
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
+            className="intro__core"
+            initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, ease: EASE }}
-            className="flex flex-col items-center gap-6"
+            exit={{ opacity: 0, scale: 1.06 }}
+            transition={{ duration: 0.6, ease: EASE }}
           >
-            <div className="flex items-center gap-2">
-              <span className="text-gold text-sm">◆</span>
-              <span className="text-[0.72rem] uppercase tracking-[0.5em] text-muted">
-                Aurelle
-              </span>
+            <p className="kicker" style={{ justifyContent: "center" }}>The Atelier</p>
+
+            <div className="intro__ring">
+              <svg viewBox="0 0 100 100">
+                <circle className="intro__track" cx="50" cy="50" r="46" />
+                <circle className="intro__track" cx="50" cy="50" r="35" />
+                <motion.circle
+                  className="intro__arc"
+                  cx="50"
+                  cy="50"
+                  r="46"
+                  style={{ transformBox: "fill-box", transformOrigin: "center" }}
+                  animate={{ rotate: 360 }}
+                  transition={{ repeat: Infinity, duration: 2.2, ease: "linear" }}
+                />
+                <motion.circle
+                  className="intro__arc2"
+                  cx="50"
+                  cy="50"
+                  r="35"
+                  style={{ transformBox: "fill-box", transformOrigin: "center" }}
+                  animate={{ rotate: -360 }}
+                  transition={{ repeat: Infinity, duration: 3.6, ease: "linear" }}
+                />
+                <circle className="intro__dot" cx="50" cy="50" r="1.6" />
+              </svg>
+              <span className="intro__count">{String(n).padStart(3, "0")}</span>
             </div>
 
-            <div className="font-display text-[5rem] leading-none tabular-nums text-line">
-              {String(count).padStart(2, "0")}
-            </div>
+            <h1 className="intro__word">AURELLE</h1>
 
-            <div className="h-px w-20 overflow-hidden bg-line">
-              <motion.div
-                className="h-full bg-gold/60"
-                style={{ width: `${count}%` }}
-              />
+            <div className="intro__bar">
+              <motion.div style={{ width }} />
             </div>
           </motion.div>
         </motion.div>
