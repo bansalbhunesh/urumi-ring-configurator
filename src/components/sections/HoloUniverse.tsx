@@ -75,12 +75,25 @@ function HoloSlide({
   const f = 0.085;
   const b0 = i / n;
   const b1 = (i + 1) / n;
-  // Keep every breakpoint within [0,1] — framer feeds these to the Web Animations
-  // API as keyframe offsets, which must be monotonic and in range.
-  const k = [Math.max(0, b0 - f), b0 + f, b1 - f, Math.min(1, b1 + f)];
+  const isFirst = i === 0;
+  const isLast = i === n - 1;
+  // The first universe holds from the top of the section and the last holds to
+  // the bottom — only the middles cross-fade on both edges. (Without this the
+  // final universe fades to an empty frame at the end of the scroll.) Breakpoints
+  // stay within [0,1] — framer feeds them to the WAAPI as keyframe offsets.
+  const oIn = isFirst
+    ? [0, b1 - f, b1 + f]
+    : isLast
+      ? [b0 - f, b0 + f, 1]
+      : [b0 - f, b0 + f, b1 - f, b1 + f];
+  const oOut = isFirst ? [1, 1, 0] : isLast ? [0, 1, 1] : [0, 1, 1, 0];
+  // Strong depth-warp: a new universe rushes up from far away (0.62 → 1) while
+  // the previous one flies past the camera (1 → 1.5) — crossing a scene, not
+  // sliding a card.
+  const sOut = isFirst ? [1, 1, 1.5] : isLast ? [0.62, 1, 1] : [0.62, 1, 1, 1.5];
 
-  const opacity = useTransform(progress, k, [0, 1, 1, 0]);
-  const scale = useTransform(progress, k, [0.82, 1, 1, 1.16]);
+  const opacity = useTransform(progress, oIn, oOut);
+  const scale = useTransform(progress, oIn, sOut);
   const yMedia = useTransform(progress, [b0, b1], ["6%", "-6%"]);
 
   return (
@@ -119,7 +132,7 @@ export function HoloUniverse() {
   for (let kk = 1; kk < n; kk++) {
     const b = kk / n;
     inputs.push(b - f, b, b + f);
-    outputs.push(0, 0.5, 0);
+    outputs.push(0, 0.92, 0);
   }
   inputs.push(1);
   outputs.push(0);
