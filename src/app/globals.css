@@ -591,9 +591,9 @@ body::after {
 .pp-h2 {
   font-family: var(--font-display);
   font-weight: 600;
-  line-height: 1.02;
-  letter-spacing: -0.02em;
-  font-size: clamp(2rem, 4vw, 3.4rem);
+  line-height: 0.98;
+  letter-spacing: -0.025em;
+  font-size: clamp(2.4rem, 4.8vw, 4rem);
   color: var(--color-ink);
 }
 .pp-body {

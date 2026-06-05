@@ -27,7 +27,7 @@ export function PhotoHandoff() {
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.8, ease, delay: 0.05 }}
         >
-          <p className="kicker">On the hand</p>
+          <p className="kicker"><span className="kicker__idx">02</span> On the hand</p>
           <h2 className="pp-h2 mt-3">Made to be worn,<br />not just admired.</h2>
           <p className="pp-body">
             What you build on screen is what arrives in the box — the same twist of

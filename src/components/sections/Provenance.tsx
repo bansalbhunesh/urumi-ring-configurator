@@ -41,7 +41,7 @@ export function Provenance() {
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.8, ease }}
         >
-          <p className="kicker">The details</p>
+          <p className="kicker"><span className="kicker__idx">03</span> The details</p>
           <h2 className="pp-h2 mt-3">Considered, to the last facet.</h2>
           <p className="pp-body">
             Every choice you make is written into the order — and priced
