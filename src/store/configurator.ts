@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { DEFAULT_METAL, DEFAULT_STONE } from "@/lib/config";
 import type { MetalId, StoneId } from "@/lib/types";
+import type { RingBounds } from "@/components/three/framing";
 
 /* Scroll position + velocity — updated by a passive listener, read by the 3D
    scroll rig. Lives outside React to avoid re-renders on every pixel. */
@@ -79,6 +80,19 @@ export function addUserDrag(dxYaw: number, dyPitch: number) {
   _userYaw += dxYaw;
   _userPitch = Math.max(-0.6, Math.min(0.6, _userPitch + dyPitch));
   _userYawVel = dxYaw; // latest delta → flick momentum on release
+}
+
+/* Rotation-invariant world-local bounds of the live ring (band + prongs +
+   centre stone), republished by RingModel whenever the cut changes. The camera
+   rig reads it each frame to fit the lens to the *current* silhouette so every
+   cut is framed like its own product shot. Lives outside React — bounds change
+   on stone swap, not per frame. */
+let _ringBounds: RingBounds = { radiusXZ: 1.5, minY: -1.2, maxY: 1.45 };
+export function getRingBounds() {
+  return _ringBounds;
+}
+export function setRingBounds(bounds: RingBounds) {
+  _ringBounds = bounds;
 }
 
 /* Ghost-variant focus 0→1 — set by the scene director from the active scroll

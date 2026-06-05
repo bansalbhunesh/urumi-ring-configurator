@@ -7,6 +7,8 @@ import * as THREE from "three";
 import { METAL_BY_ID } from "@/lib/config";
 import type { MetalId } from "@/lib/types";
 import { Gem } from "./Gem";
+import { gemBounds, mergeBounds, planarBounds, type RingBounds } from "./framing";
+import { setRingBounds, useConfigurator } from "@/store/configurator";
 
 export const RING_MODEL_URL = "/models/ring.glb";
 const TARGET_SIZE = 2.95;
@@ -115,6 +117,9 @@ interface ClassifiedClone {
   paveMeshes: THREE.Mesh[];
   gemPos: [number, number, number];
   gemScaleFactor: number;
+  /** Rotation-invariant bounds of the metal band + prongs (no centre stone),
+      measured once in the ring-local frame for the camera fit. */
+  bandBounds: RingBounds;
 }
 
 /* The deep clone + bounding-box maths + geometry/normal work is expensive and
@@ -182,13 +187,26 @@ function getClassifiedClone(scene: THREE.Object3D): ClassifiedClone {
     }
   });
 
-  const entry: ClassifiedClone = { root: clone, metalMeshes, paveMeshes, gemPos, gemScaleFactor };
+  /* The band is the same for every cut, so measure its swept silhouette once.
+     The clone is still detached here, so matrixWorld == the normalize transform
+     — i.e. exactly the ring-local frame the stage group later poses. */
+  const bandBounds = planarBounds(clone);
+
+  const entry: ClassifiedClone = {
+    root: clone,
+    metalMeshes,
+    paveMeshes,
+    gemPos,
+    gemScaleFactor,
+    bandBounds,
+  };
   cloneCache.set(scene, entry);
   return entry;
 }
 
 export function RingModel({ metalId, mobile = false }: { metalId: MetalId; mobile?: boolean }) {
   const { scene } = useGLTF(RING_MODEL_URL);
+  const stone = useConfigurator((s) => s.stone);
 
   const classified = useMemo(() => getClassifiedClone(scene), [scene]);
   const metalRef = useRef<THREE.MeshPhysicalMaterial | null>(null);
@@ -200,6 +218,13 @@ export function RingModel({ metalId, mobile = false }: { metalId: MetalId; mobil
     for (const mesh of classified.metalMeshes) mesh.material = metalMat;
     for (const mesh of classified.paveMeshes) mesh.material = paveMat;
   }, [classified, metalMat, paveMat]);
+
+  /* Republish the full ring silhouette (band + this cut's centre stone) so the
+     camera rig re-frames the shot for the new stone. */
+  useEffect(() => {
+    const stoneBounds = gemBounds(stone, classified.gemPos, classified.gemScaleFactor);
+    setRingBounds(mergeBounds(classified.bandBounds, stoneBounds));
+  }, [classified, stone]);
 
   return (
     <group>

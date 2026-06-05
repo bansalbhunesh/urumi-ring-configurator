@@ -13,7 +13,9 @@ import * as THREE from "three";
 import { TwistRing } from "./TwistRing";
 import { HybridRingModel, ModelBoundary } from "./RingModel";
 import { HoloVariants } from "./HoloVariants";
+import { STONE_FRAMING } from "./framing";
 import {
+  getRingBounds,
   getUserPitch,
   getUserYaw,
   getUserYawVel,
@@ -26,8 +28,38 @@ import {
 } from "@/store/configurator";
 
 const damp = THREE.MathUtils.damp;
+const CAMERA_FOV = 30;
 
-type Stage = { x: number; y: number; scale: number };
+/* A scene "stage" = where the ring lives in world space + where its centre
+   should sit on screen for the chapter that owns it. The camera rig converts
+   screenY into a look-at offset and a fit distance, so a chapter can place the
+   ring high (finale, leaving the lower frame for the CTA) without ever clipping.
+   Both the stage director (which poses the ring) and the camera rig read this,
+   so they can never disagree about the composition. */
+type Stage = { x: number; y: number; scale: number; screenY: number };
+
+function stageFor(zone: string, isDesktop: boolean): Stage {
+  if (zone === "finale") {
+    return {
+      x: 0,
+      y: 0,
+      scale: 1,
+      // sit in the upper-middle so the price + Add to Bag bar owns clear space below
+      screenY: isDesktop ? 0.42 : 0.36,
+    };
+  }
+  if (zone === "hidden") {
+    return { x: 0, y: 0.1, scale: 0.0001, screenY: 0.5 };
+  }
+  // hero / configurator
+  return {
+    x: isDesktop ? 0.95 : 0,
+    y: 0,
+    scale: 1,
+    // desktop: centred in its column; mobile: crowns the top third over the copy
+    screenY: isDesktop ? 0.5 : 0.34,
+  };
+}
 
 /* Which chapter owns the ring = the [data-ring] section covering the most of the
    viewport. Only the hero and finale show the ring; editorial sections hide it. */
@@ -57,7 +89,7 @@ function RingStageDirector({
   reduceMotion: boolean;
   ringGroupRef: RefObject<THREE.Group | null>;
 }) {
-  const pos = useRef(new THREE.Vector3(isDesktop ? 1.1 : 0, 0, 0));
+  const pos = useRef(new THREE.Vector3(isDesktop ? 0.95 : 0, 0, 0));
   const scale = useRef(0.0001);
   const intro = useRef(0);
   const yaw = useRef(0);
@@ -74,14 +106,7 @@ function RingStageDirector({
     const introLift = (1 - introEase) * 1.6;
     const introSpin = (1 - introEase) * -1.5;
 
-    const hero: Stage = isDesktop
-      ? { x: 1.15, y: 0.05, scale: 1.0 }
-      : { x: 0, y: 1.35, scale: 0.58 };
-    const finale: Stage = isDesktop
-      ? { x: 0, y: 0.05, scale: 1.0 }
-      : { x: 0, y: 0.4, scale: 0.74 };
-    const hidden: Stage = { x: 0, y: 0.1, scale: 0.0001 };
-    const target = zone === "finale" ? finale : zone === "hidden" ? hidden : hero;
+    const target = stageFor(zone, isDesktop);
     // Ghost variants belong with the live ring only — on in hero/config + finale.
     setGhostFocus(zone === "hidden" ? 0 : 1);
 
@@ -118,6 +143,84 @@ function RingStageDirector({
     }
     ring.rotation.y = yaw.current + introSpin;
     ring.rotation.x = THREE.MathUtils.damp(ring.rotation.x, 0.08 + getUserPitch(), 8, step);
+  });
+
+  return null;
+}
+
+/* ----------------------------------------------------------------------------
+   The cinematographer.
+
+   Instead of a single hardcoded distance, the camera is dollied each frame to
+   fit the *measured* ring silhouette (band + the live cut's stone) to a per-cut
+   target fill, with safe margins on all sides. Because we fit the rotation-
+   invariant swept cylinder (radiusXZ) rather than the instantaneous outline, the
+   ring can spin a full turn and never clip. The vertical look-at is derived from
+   the chapter's screenY so chapters compose the ring high or centred without the
+   stone ever leaving frame. Perceived size stays consistent across cuts; the
+   per-shape profile then adds the individually-photographed character.
+---------------------------------------------------------------------------- */
+function CameraRig({
+  isDesktop,
+  reduceMotion,
+}: {
+  isDesktop: boolean;
+  reduceMotion: boolean;
+}) {
+  const camPos = useRef(new THREE.Vector3(0, 0.6, 9));
+  const lookAt = useRef(new THREE.Vector3(0, 0, 0));
+  const tmpLook = useRef(new THREE.Vector3());
+
+  useFrame((state, dt) => {
+    const cam = state.camera as THREE.PerspectiveCamera;
+    const step = Math.min(dt, 1 / 30);
+    const zone = currentRingZone();
+    const stage = stageFor(zone, isDesktop);
+    const stone = useConfigurator.getState().stone;
+    const profile = STONE_FRAMING[stone];
+    const b = getRingBounds();
+    const s = stage.scale;
+
+    // World-space extent of the ring at the chapter's scale.
+    const centerYWorld = stage.y + ((b.minY + b.maxY) / 2) * s;
+    const halfH = ((b.maxY - b.minY) / 2) * s;
+    const radius = b.radiusXZ * s;
+
+    // Required half-extents to contain the ring (+ horizontal offset, + any
+    // intentional vertical shift) with breathing room.
+    const halfW = radius * profile.sideRoom + Math.abs(stage.x);
+    const reqH = halfH + Math.abs(profile.yShift * s);
+
+    const vHalf = THREE.MathUtils.degToRad(cam.fov) / 2;
+    const aspect = state.size.width / Math.max(1, state.size.height);
+    const tanV = Math.tan(vHalf);
+
+    // screenY (0 top → 1 bottom) places the ring centre off the optical axis;
+    // the vertical budget is the smaller side, so the fit guarantees the stone
+    // never clips even when composed high.
+    const vBudget = 2 * Math.min(stage.screenY, 1 - stage.screenY);
+    const fill = profile.fill * (isDesktop ? 1 : 0.95);
+
+    const distV = reqH / (tanV * fill * Math.max(0.2, vBudget));
+    const distH = halfW / (tanV * aspect * fill);
+    const dist = THREE.MathUtils.clamp(Math.max(distV, distH), 4.2, 18);
+
+    // Look-at sits above/below centre so the subject lands at screenY; a small
+    // base elevation + the cut's camElev give the downward product-shot angle.
+    const viewHalfH = dist * tanV;
+    const lookY =
+      centerYWorld + (stage.screenY - 0.5) * 2 * viewHalfH + profile.yShift * s;
+    const camY = centerYWorld + (isDesktop ? 0.55 : 0.4) + profile.camElev;
+
+    const k = reduceMotion ? 999 : 3.2;
+    camPos.current.x = damp(camPos.current.x, 0, k, step);
+    camPos.current.y = damp(camPos.current.y, camY, k, step);
+    camPos.current.z = damp(camPos.current.z, dist, k, step);
+    lookAt.current.x = damp(lookAt.current.x, 0, k, step);
+    lookAt.current.y = damp(lookAt.current.y, lookY, k, step);
+
+    cam.position.copy(camPos.current);
+    cam.lookAt(tmpLook.current.copy(lookAt.current));
   });
 
   return null;
@@ -195,7 +298,9 @@ export default function Scene() {
         }}
         style={{ pointerEvents: "none" }}
       >
-        <PerspectiveCamera makeDefault position={[0, 0.4, 7.0]} fov={32} />
+        {/* Initial transform only — CameraRig dollies it to fit each cut. */}
+        <PerspectiveCamera makeDefault position={[0, 0.6, 9]} fov={CAMERA_FOV} />
+        <CameraRig isDesktop={isDesktop} reduceMotion={reduceMotion} />
         <StudioLights />
 
         <group ref={ringGroupRef}>
