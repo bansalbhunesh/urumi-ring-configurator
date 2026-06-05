@@ -1,103 +1,120 @@
 <div align="center">
 
-# AURELLE — The Twist Engagement Ring
+<br>
 
-### A live, 3D, configurable engagement-ring product page
+# ✦ &nbsp; A U R E L L E &nbsp; ✦
 
-`Next.js 16` · `React Three Fiber` · `Framer Motion` · `Headless WooCommerce` · `Tailwind v4`
+### The Twist — a live, 3D, configurable engagement ring
+
+*Turn it in the light. Change the metal, change the cut.*
+*Every choice rendered live, in three dimensions.*
+
+<br>
+
+`Next.js 16` · `React Three Fiber` · `Framer Motion` · `Headless WooCommerce` · `Higgsfield AI`
+
+<br>
+
+**[ ▶ Open the experience ](#-open-the-experience)** · **[ The film, scene by scene ](#-the-film-scene-by-scene)** · **[ The brief, answered ](#-the-brief-answered)** · **[ Where AI did the work ](#-where-ai-did-the-heavy-lifting)**
 
 </div>
 
 ---
 
-## What this is
+> A ring is not a spec sheet. It's a moment.
+> So this isn't a model-viewer bolted to a price — it's a **product page that behaves like a short film**: a single lit ring holds the stage, the configurator lives *in* the scene, and the only UI that survives is the choice itself.
 
-A premium product page for a configurable engagement ring. The shopper rotates the
-ring in 3D, switches the **metal** and **centre stone** and sees the change live,
-picks a **size**, watches the **price update from WooCommerce**, and adds the exact
-configuration to cart.
-
-The feel is calibrated to **Do Amore** (the brief's reference — considered,
-premium, photography-led) with an original, cinematic art direction inspired by
-studios like Oryzo: a warm, atmospheric atelier stage rather than a flat template
-or a clinical model-viewer. The product is the hero; everything else gets out of
-its way.
+The calibration target is **Do Amore** (considered, premium, photography-led) — re-shot in the cinematic language of **[oryzo.ai](https://oryzo.ai)** (Lusion). A warm, dark *atelier in the void* rather than a flat template or a clinical viewer. The ring is the hero. Everything else gets out of its way.
 
 ---
 
-## Run it
+## ▶ &nbsp; Open the experience
 
-**Frontend only (instant):**
+**Instant — frontend only:**
 
 ```bash
 npm install
-npm run dev        # → http://localhost:3000
+npm run dev          # → http://localhost:3000
 ```
 
-`WOOCOMMERCE_ENABLED` defaults to `false`, so every API route returns a seeded
-mock in the **identical shape** as the live Store API — product, all variation
-prices, and full cart CRUD — priced from the same source of truth the store uses.
-Checkout is honestly disabled in demo mode rather than faking an order.
+`WOOCOMMERCE_ENABLED` defaults to `false`, so every API route returns a seeded mock in the **identical shape** as the live Store API — product, every variation price, full cart CRUD — priced from the same source of truth the store uses. Checkout is *honestly disabled* in demo mode rather than faking an order.
 
-**Full stack (live WooCommerce):**
+**Full stack — live WooCommerce in one command:**
 
 ```bash
-docker compose up
+docker compose up    # MariaDB → WordPress + WooCommerce → seeder → Next.js, wired to the Store API
 ```
 
-Boots MariaDB → WordPress + WooCommerce → a seeder that installs the composite
-product (priced from `lib/config.ts`) → the Next.js frontend wired to the
-WooCommerce **Store API**. Copy `.env.example` → `.env.local` and set
-`WOOCOMMERCE_ENABLED=true` to point the dev server at a live store.
+Copy `.env.example` → `.env.local`, set `WOOCOMMERCE_ENABLED=true`, and the same frontend now reads live variations, prices and stock.
 
 ---
 
-## How the brief maps to the build
+## 🎬 &nbsp; The film, scene by scene
 
-| Requirement | Where |
+Scroll *is* the edit. The ring is one persistent object that the scene **directs** — never a carousel of pages.
+
+| # | Scene | What you feel | Under the hood |
+|:--:|---|---|---|
+| 01 | **The hero** | The ring descends out of the dark and unwinds into place; a monumental `FOR / EVER` looms behind it; faint **wireframe variants orbit** in deep space | `Scene.tsx` entrance arc · `HoloVariants.tsx` ghost-rings, zone-gated + depth-faded behind the ring |
+| — | **Configure** | Metals behave like **liquid material samples** (a light sweeps the surface); the **centre stone is a live 3D gem** you can pick from ten cuts; price rolls on every change | `StonePicker3D` (drei `<View>`, one canvas / ten gems) · `RingModel` morphs one PBR material · `PriceTag` odometer |
+| 02 | **On the hand** | A cinematic loop of the ring **worn**, the diamond catching a real star-flare | `ring-hand.mp4` — Higgsfield, framed inset |
+| 03 | **The details** | The spec ledger writes *your* exact configuration, priced live | `Provenance.tsx`, reads the store |
+| ✦ | **A universe in one stone** | Full-bleed: the ring **levitating in a cosmic nebula**, god-rays sweeping, the diamond erupting in fire | `ring-cosmos.mp4` — Higgsfield 1080p, `CinemaInterstitial` |
+| 04 | **Your ring** | It returns to centre; chips, live price, *Add to Bag* | `Closing.tsx`, `data-ring="finale"` |
+
+> The cinematic devices are deliberately kept **behind the ring and out of the shopping flow.** The lesson this build is built on: spectacle that buries the product isn't luxury — it's noise.
+
+---
+
+## ◆ &nbsp; The brief, answered
+
+| Requirement | Where it lives |
 |---|---|
-| Rotate the ring (cursor / touch, smooth) | `three/RingDragPad.tsx` feeds yaw/pitch to the scene director in `three/Scene.tsx`; idle turntable when untouched |
-| Switch metals live | `RingModel.tsx` morphs one shared PBR material's colour + roughness in `useFrame` — never remounts, so it can't blink out |
-| Swap the centre stone | `Gem.tsx` swaps procedural faceted geometry with a pop animation |
-| Live price | `useProduct` → `/api/products` (WooCommerce or mock) → `useVariation` → `PriceTag` odometer |
-| Add to cart | `AddToCartButton` → `/api/cart` → `woo.ts` (live) or `mock.ts` (fallback); `CartDrawer` shows the exact metal + stone |
-| Premium feel | One atmospheric stage, one key-lit hero ring, restrained type/colour, real photography |
+| **Rotate** (cursor / touch, no jank) | `RingDragPad` → scene director in `Scene.tsx`; flick-inertia + idle turntable |
+| **Switch metals live** | `RingModel.tsx` morphs one shared PBR material's colour + roughness in `useFrame` — never remounts, can't blink out |
+| **Swap the centre stone** | `Gem.tsx` swaps faceted geometry with a pop animation; reads the store directly |
+| **Live price from WooCommerce** | `useProduct` → `/api/products` → `useVariation` → odometer; never hardcoded |
+| **Add to cart, exact config** | `AddToCartButton` → `/api/cart` → `woo.ts` (live) / `mock.ts` (fallback); drawer shows the exact metal + cut |
+| **Premium feel** | One lit hero, restrained type & colour, intentional whitespace, real motion |
+| **★ Bonus — 3D picker** | **Done.** `StonePicker3D` renders the ten cuts as live 3D gems, same shaders as the ring |
 
 ---
 
-## Decisions (the intentionally-ambiguous bits)
+## 🤖 &nbsp; Where AI did the heavy lifting
 
-- **3D library — React Three Fiber.** Declarative, ties cleanly to the Zustand
-  store, and `drei` covers the studio environment / shadows out of the box.
-- **The diamond — faceted `MeshPhysicalMaterial`, not `MeshRefractionMaterial`.**
-  Refraction looks best on paper but renders black in software WebGL and needs a
-  bright cube to refract; a flat-shaded physical material with high
-  `envMapIntensity`, a little transmission, iridescence and a faint emissive floor
-  reads as a bright, sparkling diamond on **every** GPU. Reliability over a fragile
-  showpiece.
-- **Metals & stones — 8 metals × 10 cuts.** Quality holds because metals are a real
-  material swap and stones are real (consistent) procedural geometry; the picker
-  stones are crisp faceted SVG glyphs that match the cut on the ring.
-- **One scene, scroll-aware.** A single fixed `<Canvas>` renders the ring; the
-  director shows it in the hero and the finale and steps it off-stage for the
-  editorial sections so it never collides with copy.
-- **Never fake commerce.** Mock mode labels itself ("demo price"); checkout is
-  disabled rather than pretending.
+AI wasn't a garnish here — it was the camera crew.
 
-See `ARCHITECTURE.md` for the data flow (interaction → WooCommerce cart).
+- **Reference, decoded** — fed the oryzo.ai recording through **Higgsfield `video_analysis_create`** for a 27-scene shot-by-shot breakdown (camera, lensing, transitions, pacing), cross-read against 1 fps frames. → [`docs/REFERENCE-ANALYSIS.md`](docs/REFERENCE-ANALYSIS.md)
+- **The cosmic hero** (`ring-cosmos.mp4`) — the *real* product shot was composited into a warm void with `ffmpeg`, then animated by **Higgsfield `seedance_2_0` (1080p)** into a ring levitating through a nebula. It showcases *our* exact ring, not stock.
+- **The lifestyle loop** (`ring-hand.mp4`) — a subtle worn-on-the-hand close-up, framed as an editorial inset.
+- **Thoughtful, not wasteful** — every generation was cost-preflighted; an NSFW false-positive was *not* retried but salvaged locally with `ffmpeg`; extra framing was derived from existing footage rather than re-billed.
 
 ---
 
-## Quality
+## ✶ &nbsp; Decisions that weren't obvious
+
+- **R3F over raw Three / Babylon** — declarative, binds cleanly to the Zustand store, `drei` gives the studio environment, shadows and `<View>` multi-scene picker for free.
+- **The diamond is a faceted `MeshPhysicalMaterial`, not `MeshRefractionMaterial`** — refraction looks best on paper but renders *black* in software WebGL and needs a bright cube to refract. Flat-shaded physical + high `envMapIntensity` + a little transmission + iridescence + an emissive floor reads as a bright diamond on **every** GPU. Reliability over a fragile showpiece.
+- **One scene, scroll-directed** — a single fixed `<Canvas>` owns the ring; the director parks it for the hero & finale and steps it off-stage for editorial sections, so it never collides with copy.
+- **8 metals × 10 cuts** — quality holds because metals are a real material swap and the cuts share geometry + shaders with the live stone.
+- **Never fake commerce** — mock mode labels itself; checkout is disabled, not faked.
+
+---
+
+## ✓ &nbsp; Craft & quality
 
 - `tsc --noEmit` and `next build` clean.
-- Honours `prefers-reduced-motion` (no idle spin, no bloom, instant transitions).
+- Honours `prefers-reduced-motion` — no idle spin, no bloom, no 3D picker, instant transitions.
 - The canvas pauses (`frameloop="never"`) when the cart is open or the tab is hidden.
-- Headless screenshots use software WebGL (SwiftShader), which under-represents
-  metal gleam and diamond fire — the real browser GPU is the ground truth.
+- Mobile: the ring crowns the hero with a legibility scrim; the picker falls back to crisp glyphs.
+- **One honest caveat:** headless screenshots use software WebGL (SwiftShader), which under-represents metal gleam and diamond fire. The real browser GPU is the ground truth — and it's where this is meant to be seen.
+
+<br>
 
 <div align="center">
 
-*Some choices last forever.*
+──────────────  ✦  ──────────────
+
+### *Some choices last forever.*
 
 </div>

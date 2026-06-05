@@ -1,82 +1,111 @@
-# Aurelle Configurator — Architecture & Data Flow
+<div align="center">
 
-How the experience hangs together: the 3D scene, the 2D interface, shared state,
-and the WooCommerce-or-mock backend behind a single set of route handlers.
+# AURELLE — Architecture & Data Flow
 
-## Three synced layers
+*One page. Interaction → pixels → WooCommerce cart.*
 
-1. **The 3D scene** — `@react-three/fiber` + `drei` + `@react-three/postprocessing`.
-   One fixed, full-page `<Canvas>` (`three/Scene.tsx`) renders the ring for the
-   whole site. Loaded via `next/dynamic({ ssr:false })` so WebGL only ever spins
-   up on the client (no SSR hydration crash).
-2. **The 2D interface** — Next.js App Router + Tailwind + Framer Motion + Lenis.
-3. **Shared state** — a single Zustand store (`store/configurator.ts`).
+</div>
 
-The 3D scene and the DOM never talk directly; they both read the store.
+---
 
-## Data flow: interaction → cart
+## The shape of it
+
+Three layers that **never talk directly** — they meet at a single store. The 3D scene
+reads it in `useFrame`; the DOM reads it in React. No prop-drilling between worlds.
+
+```
+                          ┌──────────────────────────────────────┐
+            click / drag   │            ZUSTAND STORE             │   read in render
+        ┌──────────────────▶   store/configurator.ts             ◀──────────────────┐
+        │                  │   metal · stone · size · scroll      │                  │
+        │                  └───────┬──────────────────┬───────────┘                  │
+        │                          │ read in useFrame  │ useVariation                 │
+   ┌────┴─────────┐        ┌────────▼─────────┐  ┌──────▼───────┐          ┌──────────┴────────┐
+   │  2D INTERFACE │        │   3D SCENE        │  │  LIVE PRICE  │          │   CART DRAWER     │
+   │  App Router   │        │  one fixed Canvas │  │  odometer    │          │  exact config     │
+   │  Framer/Lenis │        │  ring · gems ·    │  └──────────────┘          └──────────┬────────┘
+   └───────────────┘        │  HoloVariants     │                                       │
+                            └───────────────────┘                                       │
+                                                                                        │ Add to Bag
+        ┌───────────────────────────────────────────────────────────────────────────────┘
+        ▼
+   ┌─────────────────────┐   Store API (enabled & reachable)   ┌────────────────────────┐
+   │  /api/* route        │ ──────────────────────────────────▶ │  HEADLESS WOOCOMMERCE  │
+   │  handlers (server)   │                                     │  wc/store/v1 · cart    │
+   │                      │ ◀────────────── cart JSON ───────── │  token (httpOnly)      │
+   │                      │                                     └────────────────────────┘
+   │                      │   otherwise (preview / no backend)  ┌────────────────────────┐
+   │                      │ ──────────────────────────────────▶ │  SEEDED MOCK (mock.ts) │
+   └─────────────────────┘   identical response shape           │  same source of truth  │
+                                                                └────────────────────────┘
+```
+
+<details><summary>Same flow as Mermaid</summary>
 
 ```mermaid
 graph TD
-    UI[Metal / Stone selectors] -->|setMetal / setStone| Store[Zustand store]
-    Store -->|read in useFrame| R3F[TwistRing / Gem materials]
+    UI[Metal / Stone / Size] -->|set*| Store[Zustand store]
+    Store -->|useFrame| R3F[Ring · Gem · HoloVariants]
     Store -->|useVariation| Price[Live price odometer]
-    Add[Add to Bag] -->|variationId| API[Next route handlers /api/*]
+    Add[Add to Bag] -->|variationId| API[/api/* route handlers]
     API -->|Store API, when enabled & reachable| Woo[Headless WooCommerce]
-    API -->|seeded fallback otherwise| Mock[mock.ts]
-    Woo -->|cart JSON| API
-    Mock -->|same response shape| API
-    API -->|React Query cache| Cart[Cart drawer]
+    API -->|seeded fallback| Mock[mock.ts · same shape]
+    Woo --> API
+    Mock --> API
+    API -->|React Query| Cart[Cart drawer · exact config]
 ```
+</details>
 
-### 1. Live 3D updates
-A click calls `setMetal(id)` / `setStone(id)`. `TwistRing` and `Gem` read the
-store and **interpolate** material colour/roughness and stone geometry inside
-`useFrame` — the core geometry is never remounted, so changes are smooth and the
-ring can never blink out. (A duplicate-`varying` shader bug that previously made
-the band render with a failed material — i.e. invisible — was fixed here.)
+---
 
-### 2. The scroll "stage" director
-`Scene.tsx` keeps the camera calm. Rather than flying it through the page, the
-ring group is placed in a deterministic on-screen **stage** chosen by scroll
-zone, measured from real section anchors (`#ring`, `#finale`):
+## 1 · Live 3D updates
+A click calls `setMetal(id)` / `setStone(id)`. The ring reads the store inside `useFrame` and
+**interpolates** — `RingModel` morphs one shared PBR material's colour/roughness; `Gem` swaps
+faceted geometry with a pop. Core geometry is **never remounted**, so a change can't blink the
+ring out. The `StonePicker3D` thumbnails render the same geometry + shaders, so the choice
+always matches the ring.
 
-- **Hero** — right column on desktop, top on mobile.
-- **Atelier / Materials** — right-side stage on wide screens (copy held to a left
-  column); the ring steps aside (fades) on narrow/mobile so it never overlaps text.
-- **Finale** — centred, sized to leave clear bands above/below for the copy.
+## 2 · The scene director (no flying cameras)
+`Scene.tsx` keeps the camera calm and moves the **ring** instead. By scroll zone (measured from
+real anchors `#ring` / `#finale`) it places the ring in a deterministic stage:
 
-This is what guarantees the ring and the typography never collide, and it honours
-`prefers-reduced-motion` (instant transitions, no bloom, no idle spin).
+- **Hero** — right column (desktop) / crowning the top (mobile); enters on an arc.
+- **Editorial** (`data-ring="hidden"`) — the ring scales away so it never overlaps copy or the
+  full-bleed video beats; `HoloVariants` and the ghosts fade with it.
+- **Finale** — centred, leaving clear bands for the copy and the *Add to Bag* bar.
 
-### 3. WooCommerce integration — the Store API (no keys)
-`lib/woo.ts` is a **server-only** client for the WooCommerce **Store API**
-(`wc/store/v1`), chosen over the legacy REST v3 deliberately: it is the
-purpose-built headless surface for products, prices and cart, using cookie/cart
-tokens instead of an OAuth 1.0a consumer key/secret — so there is no secret to
-leak to the browser. Every call is server-side and bounded by a short timeout.
+Everything honours `prefers-reduced-motion` (instant transitions, no bloom, no idle spin).
 
-- `/api/products` fetches the variable ("composite") product and hydrates each
-  metal × stone variation's price.
-- `/api/cart` (POST) adds the matched `variationId`; the cart token is stored in
-  an httpOnly cookie.
+## 3 · WooCommerce — the Store API, no keys
+`lib/woo.ts` is a **server-only** client for the WooCommerce **Store API** (`wc/store/v1`),
+chosen over legacy REST v3 on purpose: it's the headless surface for products, prices and cart,
+using cart **tokens** (httpOnly cookie) instead of an OAuth 1.0a consumer secret — so there's no
+secret to leak to the browser. Every call is server-side and timeout-bounded.
 
-### 4. Seeded fallback
-When `WOOCOMMERCE_ENABLED` is not `true` or the store is unreachable (e.g. a
-Vercel preview with no backend), the route handlers return data from
-`lib/mock.ts` in the **same response shape**, priced from the same source of
-truth (`lib/config.ts`) the Docker seeder uses. The UI labels this honestly
-("Seeded demo") and disables checkout rather than faking an order.
+- `/api/products` — fetches the variable/composite product, hydrates each metal × stone price.
+- `/api/cart` (POST) — adds the matched `variationId`; cart token kept in an httpOnly cookie.
+
+## 4 · Seeded fallback (honest)
+When `WOOCOMMERCE_ENABLED !== true` or the store is unreachable (e.g. a Vercel preview with no
+backend), the handlers return `lib/mock.ts` in the **same response shape**, priced from the same
+source of truth. The UI says so ("demo price") and disables checkout rather than faking an order.
 
 ## Source of truth
-`lib/config.ts` defines metals, stones, base price and premiums. The mock, the UI
-and the WooCommerce seeder (`docker/seed.php`) all derive from it, so the live
-store and the demo agree to the dollar.
+`lib/config.ts` defines metals, stones, base price and premiums. The mock, the UI **and** the
+WooCommerce seeder (`docker/`) all derive from it — so the live store and the demo agree to the
+dollar.
 
-## Motion layer
-- **Lenis** — eased desktop scroll (off for touch and reduced-motion).
-- **Magnetic** — interactive elements lean toward the cursor.
-- **SplitText / Reveal** — mask-based editorial type reveals.
-- **PriceTag** — a digit-odometer that rolls on configuration change.
-- **Bloom + Vignette** — a restrained post pass (desktop) so the diamond sparkles
-  and the frame settles into the dark; disabled under reduced-motion.
+---
+
+## The cinematic layer
+| Piece | Role |
+|---|---|
+| `HoloVariants.tsx` | Wireframe ghost-rings + floating diamonds orbiting the hero (zone-gated, depth-faded) |
+| `CinemaInterstitial.tsx` | Full-bleed Higgsfield `ring-cosmos.mp4` in a `data-ring="hidden"` beat |
+| `PhotoHandoff.tsx` | Framed `ring-hand.mp4` lifestyle loop |
+| `PriceTag` | Digit-odometer that rolls on configuration change |
+| Bloom + Vignette | Restrained desktop post pass; off under reduced-motion |
+| Lenis · Magnetic · Reveal | Eased scroll, cursor-lean, mask-based editorial reveals |
+
+> Headless captures run on software WebGL (SwiftShader) and under-represent the metal and the
+> diamond — the browser GPU is the ground truth.
