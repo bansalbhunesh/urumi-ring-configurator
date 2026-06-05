@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { AddToCartButton } from "@/components/studio/AddToCartButton";
 import { PriceTag } from "@/components/studio/PriceTag";
-import { StoneGlyph } from "@/components/studio/StoneGlyph";
+import { StonePicker3D } from "@/components/studio/StonePicker3D";
 import { RingDragPad } from "@/components/three/RingDragPad";
 import { playPing, playShimmer } from "@/hooks/useSound";
 import { useProduct } from "@/hooks/useProduct";
@@ -13,8 +13,6 @@ import {
   METAL_PREMIUM,
   METALS,
   STONE_BY_ID,
-  STONE_PREMIUM,
-  STONES,
 } from "@/lib/config";
 import { useConfigurator } from "@/store/configurator";
 
@@ -124,30 +122,13 @@ export function RingFilm() {
               <span className="pp-field__label">Centre stone</span>
               <span className="pp-field__value">{activeStone.label} · {activeStone.carat}</span>
             </div>
-            <div className="pp-stones">
-              {STONES.map((item) => {
-                const selected = item.id === stone;
-                return (
-                  <button
-                    key={item.id}
-                    type="button"
-                    className="pp-stone"
-                    data-selected={selected ? "true" : "false"}
-                    aria-pressed={selected}
-                    aria-label={`${item.label} cut${STONE_PREMIUM[item.id] ? `, +$${STONE_PREMIUM[item.id]}` : ""}`}
-                    onClick={() => {
-                      setStone(item.id);
-                      playPing();
-                    }}
-                  >
-                    <span className="pp-stone__gem">
-                      <StoneGlyph stone={item.id} selected={selected} />
-                    </span>
-                    <span className="pp-stone__name">{item.label}</span>
-                  </button>
-                );
-              })}
-            </div>
+            <StonePicker3D
+              stone={stone}
+              onSelect={(s) => {
+                setStone(s);
+                playPing();
+              }}
+            />
           </motion.div>
 
           {/* Size */}
