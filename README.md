@@ -45,7 +45,9 @@ npm run dev          # → http://localhost:3000
 docker compose up    # MariaDB → WordPress + WooCommerce → seeder → Next.js, wired to the Store API
 ```
 
-Copy `.env.example` → `.env.local`, set `WOOCOMMERCE_ENABLED=true`, and the same frontend now reads live variations, prices and stock.
+Copy `.env.example` → `.env.local`, set `WOOCOMMERCE_ENABLED=true`, and the same frontend now reads live variations, prices and stock. `docker compose up` then serves the store on `:8080` (`/wp-admin`, admin/admin) and the wired frontend on `:3000`.
+
+> **The frontend is not the store.** The Vercel URL runs the Next.js app — it is *not* a WordPress site, so WooCommerce.com / "Connect your store" can't point at it. To go live: host WordPress + WooCommerce somewhere public (any managed host, or deploy the `docker/` stack to Railway/Render/Fly), run the seeder once, then set `WOOCOMMERCE_ENABLED=true` and `WOOCOMMERCE_URL=https://your-store` in the Vercel project env and redeploy. The frontend talks to the store **server-side** over the Store API — no keys in the browser. Until then it runs the seeded mock, labelled honestly.
 
 ---
 
