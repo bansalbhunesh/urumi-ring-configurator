@@ -631,6 +631,25 @@ body::after {
   object-fit: cover;
   aspect-ratio: 4 / 5;
 }
+/* Cinematic video inset (Higgsfield-rendered loop) */
+.pp-figure--video {
+  aspect-ratio: 16 / 10;
+  position: relative;
+}
+.pp-figure--video video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+/* a faint warm vignette so the loop sits in the dark stage, not as a flat card */
+.pp-figure--video::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(120% 100% at 50% 50%, transparent 55%, rgba(7, 3, 1, 0.5) 100%);
+}
 
 /* Spec ledger */
 .pp-specs {
@@ -676,6 +695,48 @@ body::after {
   border-radius: 0.75rem;
   background: var(--color-ivory-deep);
   box-shadow: var(--shadow-soft);
+}
+
+/* ====================  CINEMATIC INTERSTITIAL  ==================== */
+.pp-cinema {
+  position: relative;
+  min-height: 86svh;
+  display: grid;
+  place-items: center;
+  overflow: clip;
+  text-align: center;
+}
+.pp-cinema__video {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.pp-cinema__scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, var(--color-paper) 0%, transparent 24%, transparent 74%, var(--color-paper) 100%),
+    radial-gradient(120% 90% at 50% 50%, transparent 28%, rgba(7, 3, 1, 0.72) 100%);
+}
+.pp-cinema__copy {
+  position: relative;
+  z-index: 2;
+  padding: 2rem;
+}
+.pp-cinema__title {
+  margin-top: 0.85rem;
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: 0.94;
+  letter-spacing: -0.03em;
+  font-size: clamp(2.6rem, 7vw, 6rem);
+  color: var(--color-ink);
+  text-shadow: 0 4px 34px rgba(7, 3, 1, 0.6);
 }
 
 /* ====================  FINALE / CHECKOUT  ==================== */

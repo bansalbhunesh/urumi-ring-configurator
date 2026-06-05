@@ -10,14 +10,22 @@ export function PhotoHandoff() {
       <div className="pp-wrap pp-split pp-split--reverse">
         <div className="pp-split__media">
           <motion.figure
-            className="pp-figure"
+            className="pp-figure pp-figure--video"
             initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.8, ease }}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/img/doamore/twist-lifestyle.jpg" alt="The Twist engagement ring worn on a hand" loading="lazy" />
+            <video
+              src="/video/ring-hand.mp4"
+              poster="/img/generated/ring-hand-editorial.png"
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="metadata"
+              aria-label="The Twist engagement ring worn on a hand, cinematic loop"
+            />
           </motion.figure>
         </div>
 

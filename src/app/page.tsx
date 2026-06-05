@@ -2,6 +2,7 @@ import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { RingFilm } from "@/components/sections/RingFilm";
 import { PhotoHandoff } from "@/components/sections/PhotoHandoff";
+import { CinemaInterstitial } from "@/components/sections/CinemaInterstitial";
 import { Provenance } from "@/components/sections/Provenance";
 import { Closing } from "@/components/sections/Closing";
 import { CartDrawer } from "@/components/cart/CartDrawer";
@@ -22,6 +23,7 @@ export default function Home() {
         <RingFilm />
         <PhotoHandoff />
         <Provenance />
+        <CinemaInterstitial />
         <Closing />
       </main>
       <Footer />
