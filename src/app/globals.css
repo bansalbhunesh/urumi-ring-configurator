@@ -20,8 +20,9 @@
 
   /* Cream — every label, heading, body, hairline */
   --color-ink: #ffedd7;
-  --color-ink-soft: #cdb59b;
-  --color-muted: #8c7b63;
+  /* body/lede tone — lifted a touch for comfortable reading on the dark canvas */
+  --color-ink-soft: #dcc6ab;
+  --color-muted: #978469;
   --color-line: rgba(255, 237, 215, 0.14);
 
   /* Buried burnt-orange accent — hairlines + the rare flourish only */
@@ -192,7 +193,7 @@ body::after {
   opacity: 0.04;
 }
 .pp-hero__wordmark span {
-  font-size: clamp(4rem, 17vw, 15rem);
+  font-size: clamp(3.5rem, 14vw, 12rem);
 }
 @media (min-width: 1024px) {
   .pp-hero__wordmark {
@@ -234,9 +235,9 @@ body::after {
 .pp-title {
   font-family: var(--font-display);
   font-weight: 600;
-  line-height: 0.96;
-  letter-spacing: -0.025em;
-  font-size: clamp(2.9rem, 5.4vw, 4.6rem);
+  line-height: 1.0;
+  letter-spacing: -0.022em;
+  font-size: clamp(2.4rem, 4.4vw, 3.7rem);
   color: var(--color-ink);
 }
 .pp-title em {
@@ -249,10 +250,10 @@ body::after {
   margin-top: 0.45rem;
 }
 .pp-lede {
-  margin-top: 1rem;
-  max-width: 30rem;
-  font-size: 0.98rem;
-  line-height: 1.65;
+  margin-top: 1.1rem;
+  max-width: 32rem;
+  font-size: 1rem;
+  line-height: 1.72;
   color: var(--color-ink-soft);
 }
 .pp-price-row {
@@ -599,8 +600,9 @@ body::after {
 
 /* ====================  EDITORIAL SECTIONS  ==================== */
 .pp-section {
-  padding: clamp(4rem, 9vh, 7rem) clamp(1.25rem, 5vw, 5rem);
-  border-top: 1px dashed rgba(255, 237, 215, 0.14);
+  padding: clamp(4.5rem, 11vh, 8rem) clamp(1.25rem, 5vw, 5rem);
+  /* a quiet hairline between scenes reads more refined than a dashed rule */
+  border-top: 1px solid var(--color-line);
 }
 .pp-wrap {
   margin: 0 auto;
@@ -609,16 +611,16 @@ body::after {
 .pp-h2 {
   font-family: var(--font-display);
   font-weight: 600;
-  line-height: 1.0;
-  letter-spacing: -0.022em;
-  font-size: clamp(1.95rem, 3.6vw, 3.1rem);
+  line-height: 1.08;
+  letter-spacing: -0.018em;
+  font-size: clamp(1.7rem, 3vw, 2.5rem);
   color: var(--color-ink);
 }
 .pp-body {
-  margin-top: 1.1rem;
-  max-width: 34rem;
-  font-size: 1rem;
-  line-height: 1.7;
+  margin-top: 1.15rem;
+  max-width: 36rem;
+  font-size: 1.02rem;
+  line-height: 1.75;
   color: var(--color-ink-soft);
 }
 
@@ -877,7 +879,9 @@ body::after {
 /* ====================  THE ANATOMY — HOLO UNIVERSE  ==================== */
 .holo {
   position: relative;
-  background: #050204;
+  /* same warm near-black as the product chapters, so the anatomy beat belongs to
+     the same universe rather than reading as a separate cool holographic app */
+  background: var(--color-ivory-deep);
 }
 .holo__track {
   position: relative;
@@ -910,6 +914,9 @@ body::after {
      section reads as immersive depth, not a slideshow */
   animation: holoDrift 18s ease-in-out infinite alternate;
   will-change: transform;
+  /* Colour-grade the cool holographic source renders into the warm amber
+     universe — one tone across every scene, the way a film is graded. */
+  filter: sepia(0.62) saturate(1.3) hue-rotate(-12deg) brightness(0.92) contrast(1.05);
 }
 @keyframes holoDrift {
   from { transform: scale(1.04) translate3d(-1%, 1.5%, 0); }
@@ -920,8 +927,8 @@ body::after {
   inset: 0;
   pointer-events: none;
   background:
-    radial-gradient(120% 92% at 50% 50%, transparent 38%, rgba(5, 2, 4, 0.62) 100%),
-    linear-gradient(180deg, rgba(5, 2, 4, 0.72) 0%, transparent 26%, transparent 70%, rgba(5, 2, 4, 0.9) 100%);
+    radial-gradient(120% 92% at 50% 50%, transparent 38%, rgba(10, 5, 2, 0.62) 100%),
+    linear-gradient(180deg, rgba(10, 5, 2, 0.72) 0%, transparent 26%, transparent 70%, rgba(10, 5, 2, 0.92) 100%);
 }
 .holo__copy {
   position: relative;
@@ -933,9 +940,9 @@ body::after {
   margin-top: 0.85rem;
   font-family: var(--font-display);
   font-weight: 600;
-  line-height: 0.96;
-  letter-spacing: -0.025em;
-  font-size: clamp(1.8rem, 4.2vw, 3.3rem);
+  line-height: 1.04;
+  letter-spacing: -0.02em;
+  font-size: clamp(1.6rem, 3.4vw, 2.7rem);
   color: var(--color-ink);
   text-shadow: 0 4px 44px rgba(0, 0, 0, 0.78);
 }
@@ -952,7 +959,8 @@ body::after {
   z-index: 3;
   pointer-events: none;
   mix-blend-mode: screen;
-  background: radial-gradient(circle at 50% 50%, rgba(220, 236, 255, 0.92), rgba(170, 120, 255, 0.42) 34%, transparent 76%);
+  /* warm threshold flash — cream core into burnt-orange, matching the accent */
+  background: radial-gradient(circle at 50% 50%, rgba(255, 240, 222, 0.9), rgba(220, 110, 40, 0.42) 34%, transparent 76%);
 }
 .holo__rail {
   position: absolute;
@@ -966,7 +974,7 @@ body::after {
 .holo__rail-fill {
   height: 100%;
   transform-origin: left;
-  background: linear-gradient(90deg, #6cf, #c6f);
+  background: linear-gradient(90deg, var(--color-gold), var(--color-gold-bright));
 }
 @media (prefers-reduced-motion: reduce) {
   .holo__track { height: auto !important; }
@@ -991,6 +999,8 @@ body::after {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  /* graded to the warm universe so the cosmic loop reads as the same film */
+  filter: sepia(0.4) saturate(1.18) hue-rotate(-10deg) brightness(0.95) contrast(1.03);
 }
 .pp-cinema__scrim {
   position: absolute;
@@ -1010,9 +1020,9 @@ body::after {
   margin-top: 0.85rem;
   font-family: var(--font-display);
   font-weight: 600;
-  line-height: 0.98;
-  letter-spacing: -0.025em;
-  font-size: clamp(2.1rem, 4.6vw, 4rem);
+  line-height: 1.04;
+  letter-spacing: -0.02em;
+  font-size: clamp(1.8rem, 3.6vw, 3rem);
   color: var(--color-ink);
   text-shadow: 0 4px 34px rgba(7, 3, 1, 0.6);
 }
