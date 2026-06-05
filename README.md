@@ -37,7 +37,7 @@ npm install
 npm run dev          # → http://localhost:3000
 ```
 
-`WOOCOMMERCE_ENABLED` defaults to `false`, so every API route returns a seeded mock in the **identical shape** as the live Store API — product, every variation price, full cart CRUD — priced from the same source of truth the store uses. Checkout is *honestly disabled* in demo mode rather than faking an order.
+`WOOCOMMERCE_ENABLED` defaults to `false`, so every API route returns a seeded mock in the **identical shape** as the live Store API — product, every variation price, full cart CRUD — priced from the same source of truth the store uses. **Add to Bag works for all 8 × 10 configurations** whether or not the live store has that exact variation seeded; locally, checkout is *honestly disabled* (no faked orders) while the deployed showcase hands off to the live store checkout.
 
 **Full stack — live WooCommerce in one command:**
 
@@ -57,14 +57,14 @@ Scroll *is* the edit. The ring is one persistent object that the scene **directs
 
 | # | Scene | What you feel | Under the hood |
 |:--:|---|---|---|
-| 01 | **The hero** | The ring descends out of the dark and unwinds into place; a monumental `FOR / EVER` looms behind it; faint **wireframe variants orbit** in deep space | `Scene.tsx` entrance arc · `HoloVariants.tsx` ghost-rings, zone-gated + depth-faded behind the ring |
-| — | **Configure** | Metals behave like **liquid material samples** (a light sweeps the surface); the **centre stone is a live 3D gem** you can pick from ten cuts; price rolls on every change | `StonePicker3D` (drei `<View>`, one canvas / ten gems) · `RingModel` morphs one PBR material · `PriceTag` odometer |
+| 01 | **The hero** | The ring descends out of the dark and unwinds into place; a monumental `FOR / EVER` looms behind it; faint **twist-ring variants orbit** in deep space | `Scene.tsx` entrance arc · `HoloVariants.tsx` wireframe twin-band + diamond ghosts, zone-gated + depth-faded behind the ring |
+| — | **Configure** | Metals behave like **liquid material samples** (a light sweeps the surface); the **centre stone is a live 3D gem** you can pick from ten cuts; the **camera re-frames itself for each cut**; price rolls on every change | `StonePicker3D` (drei `<View>`, one canvas / ten gems) · `RingModel` morphs one PBR material · `CameraRig` per-shape fit · `PriceTag` odometer |
 | 02 | **On the hand** | A cinematic loop of the ring **worn**, the diamond catching a real star-flare | `ring-hand.mp4` — Higgsfield, framed inset |
-| 03 | **The details** | The spec ledger writes *your* exact configuration, priced live | `Provenance.tsx`, reads the store |
+| 03 | **The details** | An editorial order card writes *your* exact configuration, priced live | `Provenance.tsx`, reads the store |
 | ✦ | **A universe in one stone** | Full-bleed: the ring **levitating in a cosmic nebula**, god-rays sweeping, the diamond erupting in fire | `ring-cosmos.mp4` — Higgsfield 1080p, `CinemaInterstitial` |
 | 04 | **Your ring** | It returns to centre; chips, live price, *Add to Bag* | `Closing.tsx`, `data-ring="finale"` |
 
-> The cinematic devices are deliberately kept **behind the ring and out of the shopping flow.** The lesson this build is built on: spectacle that buries the product isn't luxury — it's noise.
+> Every scene is graded to one warm, dark universe — the holographic anatomy and the cosmic loop share the product's palette, so they read as the same film rather than separate apps. And the cinematic devices stay **behind the ring and out of the shopping flow.** The lesson this build is built on: spectacle that buries the product isn't luxury — it's noise.
 
 ---
 
@@ -98,8 +98,9 @@ AI wasn't a garnish here — it was the camera crew.
 - **R3F over raw Three / Babylon** — declarative, binds cleanly to the Zustand store, `drei` gives the studio environment, shadows and `<View>` multi-scene picker for free.
 - **The diamond is a faceted `MeshPhysicalMaterial`, not `MeshRefractionMaterial`** — refraction looks best on paper but renders *black* in software WebGL and needs a bright cube to refract. Flat-shaded physical + high `envMapIntensity` + a little transmission + iridescence + an emissive floor reads as a bright diamond on **every** GPU. Reliability over a fragile showpiece.
 - **One scene, scroll-directed** — a single fixed `<Canvas>` owns the ring; the director parks it for the hero & finale and steps it off-stage for editorial sections, so it never collides with copy.
-- **8 metals × 10 cuts** — quality holds because metals are a real material swap and the cuts share geometry + shaders with the live stone.
-- **Never fake commerce** — mock mode labels itself; checkout is disabled, not faked.
+- **Per-shape cinematic framing** — the camera isn't a fixed distance. It measures each cut's *rotation-invariant* silhouette (band + stone) and dollies to a per-cut target fill with safe margins, so every silhouette — round, marquise, pear, heart — is composed like its own product shot, stays the same perceived size, and never clips through a full turn. (`framing.ts` + `CameraRig` in `Scene.tsx`.)
+- **8 metals × 10 cuts, always addable** — metals are a real material swap and the cuts share geometry + shaders with the live stone; when the live store lacks a specific variation, a deterministic fallback id keeps every combination buyable.
+- **Honest commerce** — the mock mirrors the live shape to the dollar; locally checkout is disabled rather than faked, and in production it hands off to the real store checkout.
 
 ---
 
