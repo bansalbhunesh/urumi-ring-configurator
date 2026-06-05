@@ -33,7 +33,7 @@ export function RingFilm() {
   const setSize = useConfigurator((s) => s.setSize);
   const setPreviewMetal = useConfigurator((s) => s.setPreviewMetal);
 
-  const { data: product, isLoading } = useProduct();
+  const { data: product } = useProduct();
   const { variation, price, live } = useVariation(product, metal, stone);
   const symbol = product?.currencySymbol ?? "$";
 
@@ -160,7 +160,7 @@ export function RingFilm() {
           </motion.ul>
 
           <motion.div variants={fade} transition={{ duration: 0.6 }} className="pp-actions">
-            <AddToCartButton variationId={variation?.id} loading={isLoading} />
+            <AddToCartButton variationId={variation?.id} />
             <div className="pp-trust">
               <span>Free insured shipping</span>
               <span>Lifetime warranty</span>

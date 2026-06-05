@@ -4,6 +4,7 @@ import {
   CURRENCY_SYMBOL,
   METALS,
   METAL_TERMS,
+  MOCK_VARIATION_BASE,
   PRODUCT_NAME,
   PRODUCT_SLUG,
   STONES,
@@ -23,7 +24,6 @@ import type { CartState, ProductData, Variation } from "./types";
 ---------------------------------------------------------------------------- */
 
 const MOCK_PRODUCT_ID = 1001;
-const MOCK_VARIATION_BASE = 9000;
 
 const MOCK_VARIATIONS: Variation[] = METALS.flatMap((metal, mi) =>
   STONES.map((stone, si) => ({

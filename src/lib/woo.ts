@@ -45,6 +45,16 @@ const ENABLED = process.env.WOOCOMMERCE_ENABLED
   ? process.env.WOOCOMMERCE_ENABLED === "true"
   : process.env.VERCEL_ENV === "production";
 
+/* Shared with the checkout route so "is the store live?" and "where do we send
+   the buyer?" can never drift from the product/cart logic above (the bug that
+   left checkout stuck in demo mode while products/cart were live). */
+export const STORE_ENABLED = ENABLED;
+export function storeCheckoutUrl(): string {
+  const explicit = (process.env.WOOCOMMERCE_CHECKOUT_URL ?? "").trim();
+  if (/^https?:\/\//.test(explicit)) return explicit;
+  return `${WOO_URL}/checkout`;
+}
+
 export const CART_TOKEN_COOKIE = "urumi_cart_token";
 
 const METAL_IDS = new Set<MetalId>(METALS.map((metal) => metal.id));

@@ -176,6 +176,18 @@ export function priceFor(metal: MetalId, stone: StoneId): number {
   return BASE_PRICE + METAL_PREMIUM[metal] + STONE_PREMIUM[stone];
 }
 
+/* Deterministic id for a metal+stone combo, matching the mock seeder's scheme
+   (MOCK_VARIATION_BASE + metalIndex * stoneCount + stoneIndex). The live demo
+   store is only partly seeded (white-gold only), so when a live variation is
+   missing the UI uses this id — the cart route resolves it back to the same
+   combo via the mock, so every configuration is always addable. */
+export const MOCK_VARIATION_BASE = 9000;
+export function fallbackVariationId(metal: MetalId, stone: StoneId): number {
+  const mi = METALS.findIndex((m) => m.id === metal);
+  const si = STONES.findIndex((s) => s.id === stone);
+  return MOCK_VARIATION_BASE + mi * STONES.length + si;
+}
+
 export function skuFor(metal: MetalId, stone: StoneId): string {
   return `TWIST-${metal.toUpperCase().replace("-", "")}-${stone.toUpperCase()}`;
 }

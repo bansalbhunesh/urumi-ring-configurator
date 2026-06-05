@@ -15,7 +15,7 @@ export function Closing() {
   const metal = useConfigurator((s) => s.metal);
   const stone = useConfigurator((s) => s.stone);
   const size = useConfigurator((s) => s.size);
-  const { data: product, isLoading } = useProduct();
+  const { data: product } = useProduct();
   const { variation, price } = useVariation(product, metal, stone);
   const symbol = product?.currencySymbol ?? "$";
   const activeStone = STONE_BY_ID[stone];
@@ -45,7 +45,7 @@ export function Closing() {
           <PriceTag value={price} symbol={symbol} />
         </p>
         <div style={{ width: "100%", maxWidth: "22rem" }}>
-          <AddToCartButton variationId={variation?.id} loading={isLoading} />
+          <AddToCartButton variationId={variation?.id} />
         </div>
         <div className="pp-trust" style={{ justifyContent: "center" }}>
           <span>Free insured shipping</span>

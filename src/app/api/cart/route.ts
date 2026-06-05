@@ -34,7 +34,10 @@ export async function GET() {
 
   if (liveToken) {
     const result = await getCart(liveToken);
-    if (result) {
+    // Only prefer the live cart when it actually holds items — otherwise an empty
+    // live session would mask items added via the mock fallback (the store is
+    // only partly seeded), leaving the bag looking empty.
+    if (result && result.cart.itemCount > 0) {
       const res = NextResponse.json(result.cart);
       if (result.cartToken)
         res.cookies.set(CART_TOKEN_COOKIE, result.cartToken, COOKIE_OPTS);

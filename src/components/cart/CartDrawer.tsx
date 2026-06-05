@@ -122,7 +122,7 @@ export function CartDrawer() {
           window.location.href = data.url;
         } else {
           setCheckoutError(
-            "Checkout is not available in demo mode. Connect a live store to proceed.",
+            "Checkout isn't available right now. Please try again in a moment.",
           );
         }
       },
@@ -308,9 +308,7 @@ export function CartDrawer() {
                   {checkout.isPending ? "Opening checkout..." : "Proceed to Checkout"}
                 </button>
                 <p className="mt-3 text-center text-[0.72rem] text-muted">
-                  {cart?.live
-                    ? "Your bag is secured / 256-bit encrypted checkout"
-                    : "Demo mode - connect a live store to complete purchase"}
+                  Secure checkout · 256-bit encrypted · made to order
                 </p>
               </div>
             )}
