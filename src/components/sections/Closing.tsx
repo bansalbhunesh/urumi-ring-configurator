@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { SceneReveal } from "@/components/ui/SceneReveal";
 import { AddToCartButton } from "@/components/studio/AddToCartButton";
 import { PriceTag } from "@/components/studio/PriceTag";
 import { useProduct } from "@/hooks/useProduct";
@@ -21,18 +22,12 @@ export function Closing() {
 
   return (
     <section id="finale" data-ring="finale" className="pp-finale">
-      <motion.div
-        className="pp-wrap"
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.8, ease }}
-      >
+      <SceneReveal className="pp-wrap" depth={1.3}>
         <p className="kicker" style={{ textAlign: "center" }}><span className="kicker__idx">04</span> Your ring</p>
         <h2 className="pp-h2 mt-3" style={{ margin: "0.75rem auto 0", maxWidth: "18ch" }}>
           Some choices last forever.
         </h2>
-      </motion.div>
+      </SceneReveal>
 
       <motion.div
         className="pp-finale__bar"
