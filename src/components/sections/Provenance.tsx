@@ -23,13 +23,18 @@ export function Provenance() {
   const { live } = useVariation(product, metal, stone);
   const activeStone = STONE_BY_ID[stone];
 
-  const specs: [string, string][] = [
+  // The reader's own choices — set apart and given weight, the way an order card
+  // would read, not a row in a database.
+  const choices: [string, string][] = [
+    ["Metal", METAL_BY_ID[metal].label],
+    ["Centre stone", `${activeStone.label} · ${activeStone.carat}`],
+    ["Size", `US ${size}`],
+  ];
+  // How the ring is made — quiet, editorial supporting detail.
+  const make: [string, string][] = [
     ["Setting", "Split-twist solitaire"],
-    ["Shoulder", "One polished strand · one pavé strand"],
-    ["Basket", "Four-prong, lifts the centre stone to the light"],
-    ["Your metal", METAL_BY_ID[metal].label],
-    ["Your stone", `${activeStone.label} · ${activeStone.carat}`],
-    ["Your size", `US ${size}`],
+    ["Shoulder", "One polished strand, one pavé strand"],
+    ["Basket", "Four-prong, lifting the centre stone to the light"],
     ["Service", "Insured shipping · lifetime warranty · 60-day returns"],
   ];
 
@@ -45,10 +50,21 @@ export function Provenance() {
           </p>
         </SceneReveal>
 
-        <SceneReveal depth={0.5}>
-          <dl className="pp-specs">
-            {specs.map(([k, v]) => (
-              <div key={k} className="pp-spec">
+        <SceneReveal depth={0.6}>
+          <div className="pp-choices">
+            {choices.map(([k, v]) => (
+              <div key={k} className="pp-choice">
+                <span className="pp-choice__k">{k}</span>
+                <span className="pp-choice__v">{v}</span>
+              </div>
+            ))}
+          </div>
+        </SceneReveal>
+
+        <SceneReveal depth={0.4}>
+          <dl className="pp-make">
+            {make.map(([k, v]) => (
+              <div key={k} className="pp-make__row">
                 <dt>{k}</dt>
                 <dd>{v}</dd>
               </div>

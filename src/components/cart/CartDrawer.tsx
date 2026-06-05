@@ -66,7 +66,7 @@ function RemoveButton({ itemKey }: { itemKey: string }) {
       onClick={() => remove.mutate({ key: itemKey })}
       disabled={remove.isPending}
       aria-label="Remove item"
-      className="grid h-7 w-7 shrink-0 place-items-center rounded-full text-muted transition-colors hover:bg-rose-50 hover:text-rose-500 disabled:opacity-40 outline-none focus-visible:ring-1 focus-visible:ring-rose-400"
+      className="grid h-7 w-7 shrink-0 place-items-center rounded-full text-muted transition-colors hover:text-gold disabled:opacity-40 outline-none focus-visible:ring-1 focus-visible:ring-gold"
     >
       <CloseIcon className="h-3.5 w-3.5" />
     </button>
@@ -156,15 +156,20 @@ export function CartDrawer() {
             aria-label="Your bag"
           >
             {/* Header */}
-            <div className="flex items-center justify-between border-b border-line px-6 py-5">
-              <span className="eyebrow">
-                Your Bag
-                {items.length > 0 && (
-                  <span className="ml-2 inline-flex h-5 w-5 items-center justify-center rounded-full bg-gold text-[0.6rem] font-semibold text-black">
-                    {cart?.itemCount}
-                  </span>
-                )}
-              </span>
+            <div className="flex items-start justify-between border-b border-line px-6 py-5">
+              <div className="flex flex-col gap-1">
+                <span className="inline-flex items-center text-[0.7rem] font-semibold uppercase tracking-[0.28em] text-ink">
+                  Your Bag
+                  {items.length > 0 && (
+                    <span className="ml-2 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-gold px-1 text-[0.6rem] font-semibold text-black">
+                      {cart?.itemCount}
+                    </span>
+                  )}
+                </span>
+                <span className="text-[0.72rem] text-muted">
+                  Each ring is made to order
+                </span>
+              </div>
               <button
                 ref={closeRef}
                 type="button"
@@ -267,7 +272,7 @@ export function CartDrawer() {
             {items.length > 0 && (
               <div className="border-t border-line px-6 py-6">
                 {/* Subtotal */}
-                <div className="flex items-center justify-between">
+                <div className="flex items-baseline justify-between">
                   <span className="text-sm uppercase tracking-[0.16em] text-ink-soft">
                     Subtotal
                   </span>
@@ -275,6 +280,9 @@ export function CartDrawer() {
                     {formatPrice(cart?.total ?? 0, symbol)}
                   </span>
                 </div>
+                <p className="mt-1.5 text-[0.72rem] text-muted">
+                  Insured shipping &amp; any duties calculated at checkout
+                </p>
 
                 {/* Checkout error */}
                 <AnimatePresence>
@@ -283,7 +291,7 @@ export function CartDrawer() {
                       initial={{ opacity: 0, y: -6 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0 }}
-                      className="mt-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-[0.78rem] text-amber-800"
+                      className="mt-3 rounded-lg border border-line bg-champagne px-4 py-3 text-[0.78rem] text-ink-soft"
                     >
                       {checkoutError}
                     </motion.p>
