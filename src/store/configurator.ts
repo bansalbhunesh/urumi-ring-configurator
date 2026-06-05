@@ -81,6 +81,18 @@ export function addUserDrag(dxYaw: number, dyPitch: number) {
   _userYawVel = dxYaw; // latest delta → flick momentum on release
 }
 
+/* Ghost-variant focus 0→1 — set by the scene director from the active scroll
+   zone (1 while the ring holds the stage: hero/config + finale; 0 in editorial
+   sections). Read by HoloVariants so the orbiting wireframe variants only exist
+   alongside the live ring and never clutter a lifestyle section. */
+let _ghostFocus = 0;
+export function getGhostFocus() {
+  return _ghostFocus;
+}
+export function setGhostFocus(v: number) {
+  _ghostFocus = v;
+}
+
 let _ringMotionMode: RingMotionMode = "physical";
 let _activeChapter: ActiveChapter = "impact";
 export function getRingMotionMode() {

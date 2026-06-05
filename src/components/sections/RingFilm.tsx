@@ -45,6 +45,12 @@ export function RingFilm() {
 
   return (
     <section id="ring" data-ring="hero" className="pp-hero">
+      {/* Monumental backdrop wordmark — the Oryzo editorial-type signature */}
+      <div className="pp-hero__wordmark" aria-hidden="true">
+        <span>FOR</span>
+        <span>EVER</span>
+      </div>
+
       <div className="pp-hero__grid">
         {/* Configurator */}
         <motion.div
@@ -54,16 +60,16 @@ export function RingFilm() {
           transition={{ staggerChildren: 0.06, delayChildren: 0.1 }}
         >
           <motion.p variants={fade} transition={{ duration: 0.6 }} className="kicker">
-            Made to order · 18k recycled gold
+            <span className="kicker__idx">01</span> Configure yours · made to order
           </motion.p>
           <motion.h1 variants={fade} transition={{ duration: 0.6 }} className="pp-title mt-3">
             The Twist
             <em>Engagement Ring</em>
           </motion.h1>
           <motion.p variants={fade} transition={{ duration: 0.6 }} className="pp-lede">
-            A split-twist solitaire — one polished strand, one pavé shoulder, a
-            brilliant centre stone held in a four-prong basket. Configure it, turn
-            it in the light, make it yours.
+            One polished strand, one pavé shoulder, a brilliant centre stone held
+            in a four-prong basket. Turn it in the light, change the metal and the
+            cut — every choice rendered live, in three dimensions.
           </motion.p>
 
           <motion.div variants={fade} transition={{ duration: 0.6 }} className="pp-price-row">
@@ -166,6 +172,12 @@ export function RingFilm() {
             </div>
           </motion.div>
 
+          <motion.ul variants={fade} transition={{ duration: 0.6 }} className="pp-features">
+            <li>Conflict-free natural diamond, GIA-graded</li>
+            <li>Hand-set four-prong basket, comfort-fit band</li>
+            <li>Recycled 18k gold &amp; platinum, made to order</li>
+          </motion.ul>
+
           <motion.div variants={fade} transition={{ duration: 0.6 }} className="pp-actions">
             <AddToCartButton variationId={variation?.id} loading={isLoading} />
             <div className="pp-trust">
@@ -181,6 +193,11 @@ export function RingFilm() {
           <RingDragPad className="pp-stage__pad" />
           <div className="pp-stage__hint">Drag to rotate · live preview</div>
         </div>
+      </div>
+
+      <div className="pp-scrollcue" aria-hidden="true">
+        <span>Scroll</span>
+        <i />
       </div>
     </section>
   );

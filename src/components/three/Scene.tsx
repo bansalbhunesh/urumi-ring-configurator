@@ -12,11 +12,13 @@ import { Bloom, EffectComposer } from "@react-three/postprocessing";
 import * as THREE from "three";
 import { TwistRing } from "./TwistRing";
 import { HybridRingModel, ModelBoundary } from "./RingModel";
+import { HoloVariants } from "./HoloVariants";
 import {
   getUserPitch,
   getUserYaw,
   getUserYawVel,
   isDragging,
+  setGhostFocus,
   setRingPose,
   setRingReveal,
   setUserYaw,
@@ -70,12 +72,14 @@ function RingStageDirector({
 
     const hero: Stage = isDesktop
       ? { x: 1.15, y: 0.05, scale: 1.0 }
-      : { x: 0, y: 0.9, scale: 0.72 };
+      : { x: 0, y: 1.35, scale: 0.58 };
     const finale: Stage = isDesktop
       ? { x: 0, y: 0.05, scale: 1.0 }
       : { x: 0, y: 0.4, scale: 0.74 };
     const hidden: Stage = { x: 0, y: 0.1, scale: 0.0001 };
     const target = zone === "finale" ? finale : zone === "hidden" ? hidden : hero;
+    // Ghost variants belong with the live ring only — on in hero/config + finale.
+    setGhostFocus(zone === "hidden" ? 0 : 1);
 
     const k = reduceMotion ? 999 : 5;
     pos.current.x = damp(pos.current.x, target.x, k, step);
@@ -196,6 +200,9 @@ export default function Scene() {
             </ModelBoundary>
           </Suspense>
         </group>
+
+        {/* Oryzo "choose your own" ghosts — wireframe variants orbiting the hero */}
+        {isDesktop && !reduceMotion && <HoloVariants follow={ringGroupRef} />}
 
         <ContactShadows position={[0, -1.5, 0]} opacity={0.32} scale={9} blur={2.6} far={5} color="#3a342c" />
 
