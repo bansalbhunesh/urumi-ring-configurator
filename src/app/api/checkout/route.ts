@@ -11,16 +11,16 @@ export const dynamic = "force-dynamic";
 --------------------------------------------------------------------------- */
 export async function POST() {
   const enabled = process.env.WOOCOMMERCE_ENABLED === "true";
-  if (!enabled) {
-    return NextResponse.json(
-      { url: null, reason: "demo" },
-      { status: 200 },
-    );
-  }
-
   const wooUrl = (process.env.WOOCOMMERCE_URL ?? "").replace(/\/$/, "");
   const checkoutBase =
-    process.env.WOOCOMMERCE_CHECKOUT_URL ?? `${wooUrl}/checkout`;
+    process.env.WOOCOMMERCE_CHECKOUT_URL ?? (wooUrl ? `${wooUrl}/checkout` : "");
+
+  // Demo unless we have a real, absolute store checkout URL. Guarding on
+  // checkoutBase prevents ever navigating to a relative "/checkout" (which 404s
+  // on the frontend) when the store env is missing or misconfigured.
+  if (!enabled || !/^https?:\/\//.test(checkoutBase)) {
+    return NextResponse.json({ url: null, reason: "demo" }, { status: 200 });
+  }
 
   const jar = await cookies();
   const cartToken = jar.get(CART_TOKEN_COOKIE)?.value;
