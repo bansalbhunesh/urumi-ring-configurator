@@ -189,10 +189,10 @@ body::after {
   letter-spacing: -0.04em;
   text-transform: uppercase;
   color: var(--color-ink);
-  opacity: 0.055;
+  opacity: 0.04;
 }
 .pp-hero__wordmark span {
-  font-size: clamp(5rem, 21vw, 19rem);
+  font-size: clamp(4rem, 17vw, 15rem);
 }
 @media (min-width: 1024px) {
   .pp-hero__wordmark {
@@ -600,9 +600,9 @@ body::after {
 .pp-h2 {
   font-family: var(--font-display);
   font-weight: 600;
-  line-height: 0.98;
-  letter-spacing: -0.025em;
-  font-size: clamp(2.4rem, 4.8vw, 4rem);
+  line-height: 1.0;
+  letter-spacing: -0.022em;
+  font-size: clamp(1.95rem, 3.6vw, 3.1rem);
   color: var(--color-ink);
 }
 .pp-body {
@@ -840,6 +840,14 @@ body::after {
   height: 100%;
   object-fit: contain;
   display: block;
+  /* never let a static universe sit still — a slow drift keeps it alive so the
+     section reads as immersive depth, not a slideshow */
+  animation: holoDrift 18s ease-in-out infinite alternate;
+  will-change: transform;
+}
+@keyframes holoDrift {
+  from { transform: scale(1.04) translate3d(-1%, 1.5%, 0); }
+  to { transform: scale(1.12) translate3d(1.5%, -2%, 0); }
 }
 .holo__scrim {
   position: absolute;
@@ -859,11 +867,11 @@ body::after {
   margin-top: 0.85rem;
   font-family: var(--font-display);
   font-weight: 600;
-  line-height: 0.92;
-  letter-spacing: -0.03em;
-  font-size: clamp(2.4rem, 6.6vw, 5.6rem);
+  line-height: 0.96;
+  letter-spacing: -0.025em;
+  font-size: clamp(1.8rem, 4.2vw, 3.3rem);
   color: var(--color-ink);
-  text-shadow: 0 4px 44px rgba(0, 0, 0, 0.75);
+  text-shadow: 0 4px 44px rgba(0, 0, 0, 0.78);
 }
 .holo__note {
   margin-top: 1.1rem;
@@ -936,9 +944,9 @@ body::after {
   margin-top: 0.85rem;
   font-family: var(--font-display);
   font-weight: 600;
-  line-height: 0.94;
-  letter-spacing: -0.03em;
-  font-size: clamp(2.6rem, 7vw, 6rem);
+  line-height: 0.98;
+  letter-spacing: -0.025em;
+  font-size: clamp(2.1rem, 4.6vw, 4rem);
   color: var(--color-ink);
   text-shadow: 0 4px 34px rgba(7, 3, 1, 0.6);
 }

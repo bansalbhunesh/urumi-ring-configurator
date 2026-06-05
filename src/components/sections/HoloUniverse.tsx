@@ -72,7 +72,7 @@ function HoloSlide({
   n: number;
   progress: MotionValue<number>;
 }) {
-  const f = 0.05;
+  const f = 0.085;
   const b0 = i / n;
   const b1 = (i + 1) / n;
   // Keep every breakpoint within [0,1] — framer feeds these to the Web Animations
@@ -113,7 +113,7 @@ export function HoloUniverse() {
   const n = SLIDES.length;
 
   // Holographic flash peaks at each universe threshold.
-  const f = 0.05;
+  const f = 0.085;
   const inputs: number[] = [0];
   const outputs: number[] = [0];
   for (let kk = 1; kk < n; kk++) {

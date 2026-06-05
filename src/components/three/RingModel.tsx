@@ -162,12 +162,12 @@ function getClassifiedClone(scene: THREE.Object3D): ClassifiedClone {
       const glbGemRadius = Math.max(dSize.x, dSize.z) / 2;
       // 0.172 is the round procedural girdle radius. Clamp keeps AI GLB
       // bounds from making elongated replacement stones cartoon-large.
-      gemScaleFactor = THREE.MathUtils.clamp(glbGemRadius / 0.172, 0.68, 2.35);
-      // Seat the procedural gem so its TABLE aligns with the top of the GLB
-      // diamond, lifting the crown up into the prongs. (Aligning to the GLB
-      // diamond's bbox-centre sat the stone too low — the basket looked empty
-      // with the diamond floating below it.) 0.066 = procedural crown top (local).
-      const TABLE_LOCAL_Y = 0.066;
+      // A touch smaller than the GLB stone so all four prongs stay visible
+      // around it rather than being covered by an oversized crown.
+      gemScaleFactor = THREE.MathUtils.clamp(glbGemRadius / 0.172, 0.68, 2.35) * 0.88;
+      // Seat the procedural gem just below the top of the GLB diamond so the
+      // crown nestles *into* the four-prong basket (not perched on top of it).
+      const TABLE_LOCAL_Y = 0.12;
       gemPos = [dCenter.x, dBox.max.y - TABLE_LOCAL_Y * gemScaleFactor, dCenter.z];
       m.visible = false;
     } else if (kind === "metal") {
