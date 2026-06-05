@@ -2,6 +2,7 @@ import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { RingFilm } from "@/components/sections/RingFilm";
 import { PhotoHandoff } from "@/components/sections/PhotoHandoff";
+import { HoloUniverse } from "@/components/sections/HoloUniverse";
 import { CinemaInterstitial } from "@/components/sections/CinemaInterstitial";
 import { Provenance } from "@/components/sections/Provenance";
 import { Closing } from "@/components/sections/Closing";
@@ -22,6 +23,7 @@ export default function Home() {
       <main className="bg-transparent">
         <RingFilm />
         <PhotoHandoff />
+        <HoloUniverse />
         <Provenance />
         <CinemaInterstitial />
         <Closing />

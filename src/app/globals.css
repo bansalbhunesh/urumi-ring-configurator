@@ -706,6 +706,99 @@ body::after {
   box-shadow: var(--shadow-soft);
 }
 
+/* ====================  THE ANATOMY — HOLO UNIVERSE  ==================== */
+.holo {
+  position: relative;
+  background: #050204;
+}
+.holo__track {
+  position: relative;
+}
+.holo__sticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+}
+.holo__slide {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  will-change: transform, opacity, filter;
+}
+.holo__media {
+  position: absolute;
+  inset: -4%;
+}
+.holo__media img,
+.holo__media video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+.holo__scrim {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(120% 92% at 50% 50%, transparent 38%, rgba(5, 2, 4, 0.62) 100%),
+    linear-gradient(180deg, rgba(5, 2, 4, 0.72) 0%, transparent 26%, transparent 70%, rgba(5, 2, 4, 0.9) 100%);
+}
+.holo__copy {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: 2rem;
+}
+.holo__title {
+  margin-top: 0.85rem;
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: 0.92;
+  letter-spacing: -0.03em;
+  font-size: clamp(2.4rem, 6.6vw, 5.6rem);
+  color: var(--color-ink);
+  text-shadow: 0 4px 44px rgba(0, 0, 0, 0.75);
+}
+.holo__note {
+  margin-top: 1.1rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-ink-soft);
+}
+.holo__flash {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  background: radial-gradient(circle at 50% 50%, rgba(120, 180, 255, 0.55), rgba(180, 120, 255, 0.22) 42%, transparent 70%);
+}
+.holo__rail {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  z-index: 4;
+  background: rgba(255, 237, 215, 0.08);
+}
+.holo__rail-fill {
+  height: 100%;
+  transform-origin: left;
+  background: linear-gradient(90deg, #6cf, #c6f);
+}
+@media (prefers-reduced-motion: reduce) {
+  .holo__track { height: auto !important; }
+  .holo__sticky { position: static; height: auto; }
+  .holo__slide { position: relative; opacity: 1 !important; transform: none !important; filter: none !important; min-height: 80svh; }
+  .holo__flash { display: none; }
+}
+
 /* ====================  CINEMATIC INTERSTITIAL  ==================== */
 .pp-cinema {
   position: relative;
