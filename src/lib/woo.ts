@@ -5,6 +5,8 @@ import {
   PRODUCT_SLUG,
   STONES,
   STONE_FROM_TERM,
+  priceFor,
+  skuFor,
 } from "./config";
 import type {
   CartState,
@@ -108,10 +110,6 @@ async function storeFetch(
   }
 }
 
-function toMajor(prices: StorePrices, raw: string): number {
-  return Number(raw) / 10 ** prices.currency_minor_unit;
-}
-
 function resolveAttributes(
   attrs: StoreAttribute[],
 ): { metal?: MetalId; stone?: StoneId } {
@@ -140,27 +138,26 @@ export async function getProduct(): Promise<ProductData | null> {
     const product = list?.[0];
     if (!product?.variations?.length) return null;
 
-    // Store API only returns variation ids + attributes on the parent, so we
-    // hydrate each variation's price in parallel (cached upstream by no-store +
-    // our own route-level revalidate). 9 small calls, once.
-    const variations: Variation[] = (
-      await Promise.all(
-        product.variations.map(async (ref) => {
-          const { metal, stone } = resolveAttributes(ref.attributes);
-          if (!metal || !stone) return null;
-          const vRes = await storeFetch(`/products/${ref.id}`);
-          if (!vRes.ok) return null;
-          const v = (await vRes.json()) as StoreProduct;
-          return {
-            id: ref.id,
-            metal,
-            stone,
-            price: toMajor(v.prices, v.prices.price),
-            sku: v.sku,
-          } satisfies Variation;
-        }),
-      )
-    ).filter((v): v is Variation => v !== null);
+    // The parent already carries each variation's id + attributes. We deliberately
+    // do NOT fetch each variation's price separately: that's one HTTP call per
+    // variation (80 against a slow store → timeouts → silent mock fallback). The
+    // store was seeded from the same source of truth (config.ts priceFor/skuFor),
+    // so we derive price/sku from it instead. The ids are the *real* live
+    // variation ids, so Add to Bag still hits the live store and the cart returns
+    // the real line totals — genuinely live, in a single request.
+    const variations: Variation[] = product.variations
+      .map((ref) => {
+        const { metal, stone } = resolveAttributes(ref.attributes);
+        if (!metal || !stone) return null;
+        return {
+          id: ref.id,
+          metal,
+          stone,
+          price: priceFor(metal, stone),
+          sku: skuFor(metal, stone),
+        } satisfies Variation;
+      })
+      .filter((v): v is Variation => v !== null);
 
     if (!variations.length) return null;
 
